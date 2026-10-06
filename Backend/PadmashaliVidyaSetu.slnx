@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../Tests/Backend/PadmashaliVidyaSetu.Api.Tests/PadmashaliVidyaSetu.Api.Tests.csproj" />
+  <Project Path="PadmashaliVidyaSetu.Api/PadmashaliVidyaSetu.Api.csproj" />
+</Solution>
