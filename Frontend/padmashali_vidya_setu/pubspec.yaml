@@ -1,0 +1,34 @@
+name: padmashali_vidya_setu
+description: "Padmashali Vidya Setu - community education, skills and career platform"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  # Riverpod 3 / go_router 18 require a newer Dart SDK than the one installed; stay on these until upgraded.
+  flutter_riverpod: ^2.6.1
+  go_router: ^17.5.0
+  dio: ^5.11.1
+  flutter_secure_storage: ^11.2.0
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  # Generates AppLocalizations from lib/l10n/*.arb (see l10n.yaml).
+  generate: true
