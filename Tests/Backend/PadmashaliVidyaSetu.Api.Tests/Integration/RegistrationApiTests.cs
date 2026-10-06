@@ -18,7 +18,7 @@ public sealed class RegistrationApiTests(PvsApiFactory factory)
 
         var lists = await client.GetFromJsonAsync<Envelope<Dictionary<string, List<MasterDataItemDto>>>>(
             "/api/v1/master-data?types=temples,genders,member-statuses,classes,organisations,disability-types");
-        Assert.Equal(16, lists!.Data!["temples"].Count);
+        Assert.Equal(["Barkur", "Mangaluru", "Kallianapura", "Salikeri", "Kinnimulky"], lists!.Data!["temples"].Select(t => t.Name));
         Assert.Contains(lists.Data["member-statuses"], s => s.Code == "STUDENT");
         Assert.Contains(lists.Data["classes"], c => c.Name == "PUC 1");
 
@@ -245,13 +245,13 @@ public sealed class RegistrationApiTests(PvsApiFactory factory)
     {
         var client = await factory.CreateSignedInClientAsync();
 
-        var a = await RegisterAsync(client, Student("Member A", templeId: 7));
-        var b = await RegisterAsync(client, Student("Member B", templeId: 7));
-        var c = await RegisterAsync(client, Student("Member C", templeId: 8));
+        var a = await RegisterAsync(client, Student("Member A", templeId: 3));
+        var b = await RegisterAsync(client, Student("Member B", templeId: 3));
+        var c = await RegisterAsync(client, Student("Member C", templeId: 4));
 
-        Assert.Matches(@"^PVS-07-\d{4}$", a);
+        Assert.Matches(@"^PVS-03-\d{4}$", a);
         Assert.Equal(int.Parse(a[^4..]) + 1, int.Parse(b[^4..]));
-        Assert.StartsWith("PVS-08-", c);
+        Assert.StartsWith("PVS-04-", c);
     }
 
     [Fact]
@@ -259,7 +259,7 @@ public sealed class RegistrationApiTests(PvsApiFactory factory)
     {
         var clients = await Task.WhenAll(Enumerable.Range(0, 8).Select(_ => factory.CreateSignedInClientAsync()));
 
-        var ids = await Task.WhenAll(clients.Select((c, i) => RegisterAsync(c, Student($"Parallel {(char)('A' + i)}", templeId: 9))));
+        var ids = await Task.WhenAll(clients.Select((c, i) => RegisterAsync(c, Student($"Parallel {(char)('A' + i)}", templeId: 5))));
 
         Assert.Equal(ids.Length, ids.Distinct().Count());
     }

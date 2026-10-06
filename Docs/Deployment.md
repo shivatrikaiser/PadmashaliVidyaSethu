@@ -16,7 +16,8 @@ Hosting has not been chosen yet. This is the recommended path on Azure (any SQL 
    | `ConnectionStrings__DefaultConnection` | Prefer Managed Identity (`Authentication=Active Directory Default`) |
    | `Jwt__SigningKey` | ≥ 32 random bytes |
    | `PhoneVerification__CodeHashingKey` | ≥ 32 random bytes, different from the JWT key |
-   | `PhoneVerification__Sender` | Name of the real SMS sender once implemented |
+   | `SMS__APIKey` | SMS Gateway Hub API key (other `SMS` settings are in appsettings.json) |
+   | `PhoneVerification__Sender` | `SmsGatewayHub` (default in appsettings.json) |
    | `Cors__AllowedOrigins__0` | Only if a web client is deployed |
 
 4. HTTPS only; HSTS is enabled automatically outside Development. If behind a proxy/Front Door, configure

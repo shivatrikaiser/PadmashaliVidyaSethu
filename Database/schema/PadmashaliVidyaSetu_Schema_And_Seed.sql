@@ -2317,3 +2317,302 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [TempleRegistrationSequences]
+    WHERE [TempleId] = 6;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [TempleRegistrationSequences]
+    WHERE [TempleId] = 7;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [TempleRegistrationSequences]
+    WHERE [TempleId] = 8;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [TempleRegistrationSequences]
+    WHERE [TempleId] = 9;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [TempleRegistrationSequences]
+    WHERE [TempleId] = 10;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [TempleRegistrationSequences]
+    WHERE [TempleId] = 11;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [TempleRegistrationSequences]
+    WHERE [TempleId] = 12;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [TempleRegistrationSequences]
+    WHERE [TempleId] = 13;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [TempleRegistrationSequences]
+    WHERE [TempleId] = 14;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [TempleRegistrationSequences]
+    WHERE [TempleId] = 15;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [TempleRegistrationSequences]
+    WHERE [TempleId] = 16;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [Temples]
+    WHERE [TempleId] = 6;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [Temples]
+    WHERE [TempleId] = 7;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [Temples]
+    WHERE [TempleId] = 8;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [Temples]
+    WHERE [TempleId] = 9;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [Temples]
+    WHERE [TempleId] = 10;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [Temples]
+    WHERE [TempleId] = 11;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [Temples]
+    WHERE [TempleId] = 12;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [Temples]
+    WHERE [TempleId] = 13;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [Temples]
+    WHERE [TempleId] = 14;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [Temples]
+    WHERE [TempleId] = 15;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'DELETE FROM [Temples]
+    WHERE [TempleId] = 16;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    DROP INDEX [IX_Temples_TempleName] ON [Temples];
+    DECLARE @var nvarchar(max);
+    SELECT @var = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Temples]') AND [c].[name] = N'TempleName');
+    IF @var IS NOT NULL EXEC(N'ALTER TABLE [Temples] DROP CONSTRAINT ' + @var + ';');
+    ALTER TABLE [Temples] ALTER COLUMN [TempleName] nvarchar(200) NOT NULL;
+    CREATE UNIQUE INDEX [IX_Temples_TempleName] ON [Temples] ([TempleName]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'UPDATE [Temples] SET [TempleName] = N''Barkur''
+    WHERE [TempleId] = 1;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'UPDATE [Temples] SET [TempleName] = N''Mangaluru''
+    WHERE [TempleId] = 2;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'UPDATE [Temples] SET [TempleName] = N''Kallianapura''
+    WHERE [TempleId] = 3;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'UPDATE [Temples] SET [TempleName] = N''Salikeri''
+    WHERE [TempleId] = 4;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    EXEC(N'UPDATE [Temples] SET [TempleName] = N''Kinnimulky''
+    WHERE [TempleId] = 5;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261006114313_TemplesAndSmsVerification'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261006114313_TemplesAndSmsVerification', N'10.0.12');
+END;
+
+COMMIT;
+GO
+

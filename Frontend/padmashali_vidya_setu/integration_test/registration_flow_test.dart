@@ -94,7 +94,7 @@ void main() {
 
     // ---------------------------------------------------------------- Step 3: Temple & Organisation
     await t.waitFor(find.byKey(const Key('templeField')));
-    await t.selectFromDropdown(const Key('templeField'), 'Temple 01 (Placeholder - update name)');
+    await t.selectFromDropdown(const Key('templeField'), 'Barkur');
     await t.selectFromDropdown(const Key('organisationField'), 'DK District');
     await shot(t, '07-temple-organisation');
     await t.next();

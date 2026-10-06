@@ -12,14 +12,14 @@ Codes the application logic relies on — do not change:
 | `DisabilityTypes` | `OTHER` | "Please specify" |
 | `Organisations` | `NONE` | "Not Linked to Any Organisation" |
 | `Countries` | `IN` | Address country (V1 India only) |
-| `Temples` | `01`…`16` | Embedded in Registration IDs — never change once members exist |
+| `Temples` | `01`…`05` (more later) | Embedded in Registration IDs — never change once members exist |
 | `Roles` | `MEMBER`, `ADMIN`, `SUPER_ADMIN`, … | Authorization |
 
 ## Seeded lists and their source
 
 | List | Count | Source / status |
 |---|---|---|
-| Temples | 16 | **Placeholders** ("Temple 01 (Placeholder - update name)"). Real names must come from the Sangha → `Database/seed/01_UpdateTempleNames.TEMPLATE.sql`. |
+| Temples | 5 | Barkur (01), Mangaluru (02), Kallianapura (03), Salikeri (04), Kinnimulky (05) — supplied by the Sangha. `TempleName` is `nvarchar(200)` (name with place). More to be added → `Database/seed/01_AddTemples.TEMPLATE.sql`. |
 | Organisations | 6 | Spec §14 |
 | Genders, Member statuses | 3, 3 | Spec §11, §16 |
 | Classes | 20 | Spec §12, with education *stage* |

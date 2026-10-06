@@ -3,14 +3,15 @@
 The platform holds information about children. These controls are implemented in V1 (✔) or planned (○).
 
 ## Authentication
-* ✔ 4-digit Phone Number Verification Code, cryptographically random, 5-minute expiry, **single use** (atomic update).
+* ✔ 4-digit Phone Number Verification Code, cryptographically random, 10-minute expiry (matches the DLT SMS text), **single use** (atomic update).
 * ✔ Stored as HMAC-SHA256 with a server secret — never stored or logged in plain text.
 * ✔ Brute force: 5 wrong attempts per code; per-number limits (1 / 30 s, 5 / hour); per-IP rate limits.
 * ✔ JWT access tokens (30 min, HS256, no personal data inside) + random refresh tokens (30 days) stored as SHA-256,
   **rotated on every use; reuse of a rotated token revokes every session** of the account.
 * ✔ Development code exposure only in the Development environment — startup fails otherwise. No hard-coded codes.
-* ○ Approved SMS provider (DLT-registered) — implement `IVerificationCodeSender`. Until then non-development
-  environments fail closed ("could not send code").
+* ✔ Delivered by SMS Gateway Hub using the DLT-registered sender/template. The request URL (API key + code) is never
+  logged — the HttpClient's request logging is removed; errors log only the provider error code and a masked number.
+  API key only in user-secrets / environment / Key Vault; startup fails if it is missing while SMS is enabled.
 * ○ Admin portal: separate strong authentication (password/SSO + MFA).
 
 ## Authorization
@@ -28,7 +29,7 @@ The platform holds information about children. These controls are implemented in
 * ✔ CORS closed by default; only configured origins.
 
 ## Secrets
-* ✔ No secrets in the repo or the Flutter app. `Jwt:SigningKey` and `PhoneVerification:CodeHashingKey` come from
+* ✔ No secrets in the repo or the Flutter app. `Jwt:SigningKey`, `PhoneVerification:CodeHashingKey` and `SMS:APIKey` come from
   user-secrets (dev) or environment variables / Key Vault. Missing or short keys stop startup outside Development.
 * ✔ `.gitignore` excludes keys, certificates, `.env`, local settings, logs, build output.
 

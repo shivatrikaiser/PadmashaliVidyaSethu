@@ -10,8 +10,7 @@ namespace PadmashaliVidyaSetu.Api.Data.Seed;
 /// Initial master data, applied through EF Core migrations (HasData).
 /// Administrators may rename / reorder / deactivate rows later; application logic only relies on <c>Code</c>.
 ///
-/// IMPORTANT: Temple names are placeholders. The real 16 temple names must be supplied by the
-/// Padmashali Vidyavardhaka Sangha (see Docs/MasterData.md for how to update them).
+/// Temples: 5 named so far; the remaining temples will be added by the Sangha later.
 /// </summary>
 public static class SeedData
 {
@@ -32,14 +31,18 @@ public static class SeedData
     private static T[] List<T>(params (string Code, string Name)[] items) where T : MasterDataEntity, new() =>
         items.Select((x, i) => M<T>(i + 1, x.Code, x.Name)).ToArray();
 
-    // ---------------------------------------------------------------- Temples (PLACEHOLDERS)
+    // ---------------------------------------------------------------- Temples
+    // Temple codes (01, 02, ...) are embedded in Registration IDs (PVS-<code>-NNNN) and must never change.
+    // Further temples will be added later with the next free codes (see Database/seed/01_AddTemples.TEMPLATE.sql).
+    private static readonly string[] TempleNames = ["Barkur", "Mangaluru", "Kallianapura", "Salikeri", "Kinnimulky"];
+
     public static Temple[] Temples =>
-        Enumerable.Range(1, 16)
-            .Select(i => M<Temple>(i, i.ToString("00"), $"Temple {i:00} (Placeholder - update name)"))
-            .ToArray();
+        TempleNames.Select((name, i) => M<Temple>(i + 1, (i + 1).ToString("00"), name)).ToArray();
 
     public static TempleRegistrationSequence[] TempleSequences =>
-        Enumerable.Range(1, 16).Select(i => new TempleRegistrationSequence { TempleId = i, LastSequenceNumber = 0 }).ToArray();
+        Enumerable.Range(1, TempleNames.Length)
+            .Select(i => new TempleRegistrationSequence { TempleId = i, LastSequenceNumber = 0 })
+            .ToArray();
 
     public static Organisation[] Organisations => List<Organisation>(
         ("DK", "DK District"),

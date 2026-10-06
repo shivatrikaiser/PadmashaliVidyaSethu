@@ -12,7 +12,7 @@ public class TempleConfiguration : IEntityTypeConfiguration<Temple>
     {
         b.ConfigureMasterData("Temples", "TempleId");
         b.Property(e => e.Code).HasColumnName("TempleCode").HasMaxLength(2);
-        b.Property(e => e.Name).HasColumnName("TempleName");
+        b.Property(e => e.Name).HasColumnName("TempleName").HasMaxLength(200); // name with place
         // The temple code is embedded in Registration IDs (PVS-TT-NNNN) so it must be exactly two digits.
         b.ToTable(t => t.HasCheckConstraint("CK_Temples_TempleCode", "[TempleCode] LIKE '[0-9][0-9]'"));
         b.HasData(SeedData.Temples);

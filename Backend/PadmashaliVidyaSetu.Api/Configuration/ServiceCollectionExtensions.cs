@@ -36,6 +36,13 @@ public static class ServiceCollectionExtensions
             .Validate<IHostEnvironment>((o, env) => env.IsDevelopment() || !IsDevelopmentSender(o),
                 "PhoneVerification:Sender 'Development' may only be used in Development.")
             .ValidateOnStart();
+        services.AddOptions<SmsOptions>().Bind(configuration.GetSection(SmsOptions.Section))
+            .ValidateDataAnnotations()
+            .Validate<IOptions<PhoneVerificationOptions>>(
+                (sms, verification) => !IsSender(verification.Value, VerificationSenders.SmsGatewayHub) || !sms.MissingSettings().Any(),
+                "PhoneVerification:Sender is SmsGatewayHub but SMS settings are incomplete (SMS:APIKey, OTPSenderId, " +
+                "OTPTemplateId, OTPEntityId, OTPTemplate with {#numeric#}, https SMSURL).")
+            .ValidateOnStart();
         services.AddOptions<RegistrationOptions>().Bind(configuration.GetSection(RegistrationOptions.Section)).ValidateDataAnnotations().ValidateOnStart();
         services.AddOptions<PinCodeLookupOptions>().Bind(configuration.GetSection(PinCodeLookupOptions.Section)).ValidateDataAnnotations().ValidateOnStart();
         services.AddOptions<RateLimitingOptions>().Bind(configuration.GetSection(RateLimitingOptions.Section));
@@ -63,8 +70,10 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    private static bool IsDevelopmentSender(PhoneVerificationOptions o) =>
-        o.Sender.Equals("Development", StringComparison.OrdinalIgnoreCase);
+    private static bool IsDevelopmentSender(PhoneVerificationOptions o) => IsSender(o, VerificationSenders.Development);
+
+    private static bool IsSender(PhoneVerificationOptions o, string sender) =>
+        o.Sender.Equals(sender, StringComparison.OrdinalIgnoreCase);
 
     public static IServiceCollection AddPvsAuthentication(this IServiceCollection services)
     {
@@ -132,10 +141,19 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<DevelopmentVerificationCodeSender>();
         services.AddSingleton<NotConfiguredVerificationCodeSender>();
-        services.AddSingleton<IVerificationCodeSender>(sp =>
-            IsDevelopmentSender(sp.GetRequiredService<IOptions<PhoneVerificationOptions>>().Value)
-                ? sp.GetRequiredService<DevelopmentVerificationCodeSender>()
-                : sp.GetRequiredService<NotConfiguredVerificationCodeSender>());
+        services.AddHttpClient<SmsGatewayHubVerificationCodeSender>((sp, client) =>
+                client.Timeout = TimeSpan.FromSeconds(sp.GetRequiredService<IOptions<SmsOptions>>().Value.TimeoutSeconds))
+            // The request URL carries the API key and the code: never let HttpClient log it.
+            .RemoveAllLoggers();
+        services.AddScoped<IVerificationCodeSender>(sp =>
+        {
+            var verification = sp.GetRequiredService<IOptions<PhoneVerificationOptions>>().Value;
+            if (IsSender(verification, VerificationSenders.SmsGatewayHub))
+                return sp.GetRequiredService<SmsGatewayHubVerificationCodeSender>();
+            if (IsDevelopmentSender(verification))
+                return sp.GetRequiredService<DevelopmentVerificationCodeSender>();
+            return sp.GetRequiredService<NotConfiguredVerificationCodeSender>();
+        });
 
         services.AddValidatorsFromAssemblyContaining<RegisterMemberRequestValidator>(ServiceLifetime.Singleton);
         return services;

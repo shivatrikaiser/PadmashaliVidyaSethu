@@ -8,7 +8,7 @@
 │ Android (primary),     │ ◀─────────────────────────────── │ Controllers → Services → EF   │ ◀─── │ Azure SQL        │
 │ iOS / Web later        │   JWT access + refresh tokens    │ Core (AppDbContext)           │      └──────────────────┘
 └────────────────────────┘                                  │                               │ ───▶ India Post PIN API
-                                                            │                               │ ───▶ SMS provider (TBD)
+                                                            │                               │ ───▶ SMS Gateway Hub (DLT)
                                                             └──────────────────────────────┘
 ```
 
@@ -90,6 +90,6 @@ Frontend tests live with the Flutter project (`test/`, `integration_test/`) beca
 * **New profile module** (e.g. Education): entity + configuration + migration → service + DTOs + validator →
   controller → update `ProfileCompletionService` section → Flutter repository/provider/screen → tests.
 * **New role:** roles are seeded (`Roles`); map them to policies in `Authorization/Policies.cs`.
-* **SMS provider:** implement `IVerificationCodeSender`, register it in `ServiceCollectionExtensions`, set
-  `PhoneVerification:Sender`.
+* **SMS provider:** SMS Gateway Hub is implemented (`SmsGatewayHubVerificationCodeSender`). Another provider =
+  implement `IVerificationCodeSender`, register it in `ServiceCollectionExtensions`, select it with `PhoneVerification:Sender`.
 * **PIN provider:** implement `IPinCodeProvider`.

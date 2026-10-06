@@ -53,8 +53,19 @@ dotnet run --launch-profile http          # http://localhost:5274  (health: /hea
 In Development the database `PadmashaliVidyaSetu` is created on LocalDB, migrated and seeded automatically.
 Without user-secrets the API uses temporary keys (warning in the log) — fine for a quick try.
 
-**Phone Number Verification Code in development:** no SMS is sent; the API returns the code and the app shows it
-in a "Development mode" box on the verification screen. This only works when `ASPNETCORE_ENVIRONMENT=Development`.
+**Phone Number Verification Code:** sent by SMS through **SMS Gateway Hub** (DLT template
+`Your Phone Number Verification Code for PVS is {#numeric#} Valid for 10 minutes.`, settings in the `SMS` section of
+`appsettings.json`). The API key is a secret — never put it in a file in the repo:
+
+```bash
+dotnet user-secrets set "SMS:APIKey" "<your SMS Gateway Hub API key>"     # development
+# servers: environment variable SMS__APIKey (or Key Vault)
+```
+
+In Development no SMS is sent by default (`PhoneVerification:Sender = Development`): the API returns the code and the
+app shows it in a "Development mode" box. To send real SMS from your PC, also run
+`dotnet user-secrets set "PhoneVerification:Sender" "SmsGatewayHub"`. Staging/Production always use SMS Gateway Hub and
+refuse to start if the SMS settings or API key are missing.
 
 ### 2. App
 ```bash
@@ -90,7 +101,7 @@ flutter drive --driver=test_driver/integration_test.dart --target=integration_te
   New migration: `dotnet ef migrations add <Name> --output-dir Migrations` (from the API folder).
 * Apply manually: `dotnet ef database update`.
 * Idempotent SQL for DBAs: `Database/schema/PadmashaliVidyaSetu_Schema_And_Seed.sql` (regenerate after migrations).
-* **Temple names are placeholders** — fill `Database/seed/01_UpdateTempleNames.TEMPLATE.sql` with the official names.
+* Temples seeded: Barkur, Mangaluru, Kallianapura, Salikeri, Kinnimulky (codes 01–05). Add more with `Database/seed/01_AddTemples.TEMPLATE.sql`.
 
 ## Build
 
@@ -115,6 +126,7 @@ See `Docs/Deployment.md` (release signing, secrets, hosting).
 |---|---|
 | App shows "Unable to reach the server" | API running? Emulator must use `10.0.2.2`, not `localhost`. Phone: use the PC's LAN IP and allow it in the debug network security config. |
 | `INSTALL_FAILED_INSUFFICIENT_STORAGE` | The emulator is full — use another AVD or wipe it in Device Manager. |
+| Code not received by SMS | API log shows `SMS Gateway Hub rejected message … <ErrorCode>`: check API key, sender id, DLT template/entity ids, route, and that the template text in `SMS:OTPTemplate` matches the DLT-approved text exactly. |
 | "Too many requests" when testing | Per-IP / per-number limits. Wait, or raise `RateLimiting:*` in `appsettings.Development.json`. |
 | Signed out after restarting the API | Set the user-secrets above (otherwise keys are regenerated each start). |
 | Windows desktop build: "requires symlink support" | Enable Windows Developer Mode (only needed for `-d windows`). |

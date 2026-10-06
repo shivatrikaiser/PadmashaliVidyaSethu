@@ -16,7 +16,7 @@ Engine: SQL Server 2019+ / Azure SQL. Schema source of truth: EF Core migrations
 ## Tables
 
 ### Master data (configurable lists)
-`Temples` (`TempleId`, `TempleName`, `TempleCode` CHECK 2 digits), `Organisations` (`OrganisationName`, `OrganisationCode`),
+`Temples` (`TempleId`, `TempleName` nvarchar(200) incl. place, `TempleCode` CHECK 2 digits), `Organisations` (`OrganisationName`, `OrganisationCode`),
 `Genders`, `MemberStatuses`, `Classes` (+`Stage`), `EducationLevels`, `Courses`, `Branches`, `Boards`, `Universities`,
 `CareerOptions`, `InterestAreas`, `Skills` (+`Category`: Technical/General/Creative), `Sports`, `Hobbies`,
 `CompetitiveExams`, `AchievementTypes`, `DisabilityTypes` (+`IsUserSubmitted`), `CommunicationTopics`,

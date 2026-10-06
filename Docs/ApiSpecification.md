@@ -32,7 +32,7 @@ Health check: `GET /health` (anonymous).
 | `POST /auth/token/refresh` | anon | `{ refreshToken }` → tokens (old refresh token revoked; reuse revokes all sessions) |
 | `POST /auth/logout` | bearer | `{ refreshToken }` |
 
-`developmentCode` is only returned when the API runs in **Development** with
+The code is sent by SMS (SMS Gateway Hub) and is valid for 10 minutes. `developmentCode` is only returned when the API runs in **Development** with
 `PhoneVerification:ExposeCodeInResponse=true`; startup fails if that is set elsewhere.
 
 ## Members (bearer)

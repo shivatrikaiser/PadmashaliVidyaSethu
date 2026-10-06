@@ -5689,8 +5689,8 @@ namespace PadmashaliVidyaSetu.Api.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
                         .HasColumnName("TempleName");
 
                     b.HasKey("Id");
@@ -5717,7 +5717,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                             CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
                             DisplayOrder = 10,
                             IsActive = true,
-                            Name = "Temple 01 (Placeholder - update name)"
+                            Name = "Barkur"
                         },
                         new
                         {
@@ -5727,7 +5727,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                             CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
                             DisplayOrder = 20,
                             IsActive = true,
-                            Name = "Temple 02 (Placeholder - update name)"
+                            Name = "Mangaluru"
                         },
                         new
                         {
@@ -5737,7 +5737,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                             CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
                             DisplayOrder = 30,
                             IsActive = true,
-                            Name = "Temple 03 (Placeholder - update name)"
+                            Name = "Kallianapura"
                         },
                         new
                         {
@@ -5747,7 +5747,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                             CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
                             DisplayOrder = 40,
                             IsActive = true,
-                            Name = "Temple 04 (Placeholder - update name)"
+                            Name = "Salikeri"
                         },
                         new
                         {
@@ -5757,117 +5757,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                             CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
                             DisplayOrder = 50,
                             IsActive = true,
-                            Name = "Temple 05 (Placeholder - update name)"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Code = "06",
-                            CreatedBy = "seed",
-                            CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DisplayOrder = 60,
-                            IsActive = true,
-                            Name = "Temple 06 (Placeholder - update name)"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Code = "07",
-                            CreatedBy = "seed",
-                            CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DisplayOrder = 70,
-                            IsActive = true,
-                            Name = "Temple 07 (Placeholder - update name)"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Code = "08",
-                            CreatedBy = "seed",
-                            CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DisplayOrder = 80,
-                            IsActive = true,
-                            Name = "Temple 08 (Placeholder - update name)"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Code = "09",
-                            CreatedBy = "seed",
-                            CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DisplayOrder = 90,
-                            IsActive = true,
-                            Name = "Temple 09 (Placeholder - update name)"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Code = "10",
-                            CreatedBy = "seed",
-                            CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DisplayOrder = 100,
-                            IsActive = true,
-                            Name = "Temple 10 (Placeholder - update name)"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Code = "11",
-                            CreatedBy = "seed",
-                            CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DisplayOrder = 110,
-                            IsActive = true,
-                            Name = "Temple 11 (Placeholder - update name)"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Code = "12",
-                            CreatedBy = "seed",
-                            CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DisplayOrder = 120,
-                            IsActive = true,
-                            Name = "Temple 12 (Placeholder - update name)"
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Code = "13",
-                            CreatedBy = "seed",
-                            CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DisplayOrder = 130,
-                            IsActive = true,
-                            Name = "Temple 13 (Placeholder - update name)"
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Code = "14",
-                            CreatedBy = "seed",
-                            CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DisplayOrder = 140,
-                            IsActive = true,
-                            Name = "Temple 14 (Placeholder - update name)"
-                        },
-                        new
-                        {
-                            Id = 15,
-                            Code = "15",
-                            CreatedBy = "seed",
-                            CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DisplayOrder = 150,
-                            IsActive = true,
-                            Name = "Temple 15 (Placeholder - update name)"
-                        },
-                        new
-                        {
-                            Id = 16,
-                            Code = "16",
-                            CreatedBy = "seed",
-                            CreatedDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DisplayOrder = 160,
-                            IsActive = true,
-                            Name = "Temple 16 (Placeholder - update name)"
+                            Name = "Kinnimulky"
                         });
                 });
 
@@ -6300,61 +6190,6 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         new
                         {
                             TempleId = 5,
-                            LastSequenceNumber = 0
-                        },
-                        new
-                        {
-                            TempleId = 6,
-                            LastSequenceNumber = 0
-                        },
-                        new
-                        {
-                            TempleId = 7,
-                            LastSequenceNumber = 0
-                        },
-                        new
-                        {
-                            TempleId = 8,
-                            LastSequenceNumber = 0
-                        },
-                        new
-                        {
-                            TempleId = 9,
-                            LastSequenceNumber = 0
-                        },
-                        new
-                        {
-                            TempleId = 10,
-                            LastSequenceNumber = 0
-                        },
-                        new
-                        {
-                            TempleId = 11,
-                            LastSequenceNumber = 0
-                        },
-                        new
-                        {
-                            TempleId = 12,
-                            LastSequenceNumber = 0
-                        },
-                        new
-                        {
-                            TempleId = 13,
-                            LastSequenceNumber = 0
-                        },
-                        new
-                        {
-                            TempleId = 14,
-                            LastSequenceNumber = 0
-                        },
-                        new
-                        {
-                            TempleId = 15,
-                            LastSequenceNumber = 0
-                        },
-                        new
-                        {
-                            TempleId = 16,
                             LastSequenceNumber = 0
                         });
                 });
