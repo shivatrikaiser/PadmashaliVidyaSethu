@@ -12,7 +12,7 @@ public interface IRegistrationIdGenerator
 
 /// <summary>
 /// Format: PVS-TT-NNNN — TT is the temple's 2-digit code, NNNN a 4-digit sequence continuous within the temple.
-/// Allocation is a single atomic MERGE on TempleRegistrationSequences, so concurrent registrations for the same
+/// Allocation is a single atomic MERGE on PVS_TempleRegistrationSequences, so concurrent registrations for the same
 /// temple can never receive the same number. If the surrounding transaction rolls back the number is released too.
 /// </summary>
 public sealed class RegistrationIdGenerator(AppDbContext db) : IRegistrationIdGenerator
@@ -22,7 +22,7 @@ public sealed class RegistrationIdGenerator(AppDbContext db) : IRegistrationIdGe
     public async Task<string> NextAsync(int templeId, string templeCode, CancellationToken ct)
     {
         var next = await db.Database.SqlQuery<int>($"""
-            MERGE dbo.TempleRegistrationSequences WITH (HOLDLOCK) AS target
+            MERGE dbo.PVS_TempleRegistrationSequences WITH (HOLDLOCK) AS target
             USING (SELECT {templeId} AS TempleId) AS source
                ON target.TempleId = source.TempleId
             WHEN MATCHED AND target.LastSequenceNumber < {MaxSequence} THEN

@@ -16,7 +16,7 @@ public sealed class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<App
     public AppDbContext CreateDbContext(string[] args)
     {
         var connection = Environment.GetEnvironmentVariable("PVS_DESIGN_CONNECTION") ?? LocalDevelopment;
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseSqlServer(connection).Options;
+        var options = new DbContextOptionsBuilder<AppDbContext>().UsePvsSqlServer(connection).Options;
         return new AppDbContext(options, new SystemCurrentUserService(), TimeProvider.System);
     }
 }

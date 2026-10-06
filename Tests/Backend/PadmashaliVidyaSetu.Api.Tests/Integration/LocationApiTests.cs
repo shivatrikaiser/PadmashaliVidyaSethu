@@ -65,15 +65,15 @@ public sealed class LocationApiTests(PvsApiFactory factory)
     {
         var client = await factory.CreateSignedInClientAsync();
 
-        var states = await client.GetFromJsonAsync<Envelope<List<MasterDataItemDto>>>("/api/v1/locations/countries/1/states");
-        var karnataka = states!.Data!.Single(s => s.Name == "Karnataka");
-        var districts = await client.GetFromJsonAsync<Envelope<List<MasterDataItemDto>>>($"/api/v1/locations/states/{karnataka.Id}/districts");
-        var dk = districts!.Data!.Single(d => d.Name == "Dakshina Kannada");
-        var taluks = await client.GetFromJsonAsync<Envelope<List<MasterDataItemDto>>>($"/api/v1/locations/districts/{dk.Id}/taluks");
+        var states = (await client.GetFromJsonAsync<Envelope<List<MasterDataItemDto>>>("/api/v1/locations/countries/1/states"))!.Data!;
+        var karnataka = states.Single(s => s.Name == "Karnataka");
+        var districts = (await client.GetFromJsonAsync<Envelope<List<MasterDataItemDto>>>($"/api/v1/locations/states/{karnataka.Id}/districts"))!.Data!;
+        var dk = districts.Single(d => d.Name == "Dakshina Kannada");
+        var taluks = (await client.GetFromJsonAsync<Envelope<List<MasterDataItemDto>>>($"/api/v1/locations/districts/{dk.Id}/taluks"))!.Data!;
 
-        Assert.Equal(36, states.Data.Count);
-        Assert.Equal(31, districts.Data.Count(d => d.Code.StartsWith("KA-")));
-        Assert.Contains(taluks!.Data!, t => t.Name == "Puttur");
+        Assert.Equal(36, states.Count);
+        Assert.Equal(31, districts.Count(d => d.Code.StartsWith("KA-")));
+        Assert.Contains(taluks, t => t.Name == "Puttur");
     }
 
     [Fact]
@@ -82,5 +82,15 @@ public sealed class LocationApiTests(PvsApiFactory factory)
         var client = await factory.CreateSignedInClientAsync();
         var response = await client.GetAsync("/api/v1/master-data/not-a-list");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task MasterData_WithoutTypes_ExplainsWhatToSend()
+    {
+        var client = await factory.CreateSignedInClientAsync();
+        var response = await client.GetAsync("/api/v1/master-data");
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<Envelope<object>>();
+        Assert.Contains(body!.Errors, e => e.Field == "types" && e.Message.Contains("between 1 and 25"));
     }
 }

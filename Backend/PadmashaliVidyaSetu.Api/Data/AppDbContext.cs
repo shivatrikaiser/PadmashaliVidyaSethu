@@ -63,6 +63,7 @@ public class AppDbContext(
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        modelBuilder.ApplyPvsNaming();
     }
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)

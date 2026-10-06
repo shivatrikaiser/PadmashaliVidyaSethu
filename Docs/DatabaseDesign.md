@@ -5,6 +5,21 @@ Engine: SQL Server 2019+ / Azure SQL. Schema source of truth: EF Core migrations
 
 ## Conventions
 
+* **Every SQL object name starts with `PVS_`.** Entity configurations use plain names; `SqlObjectNaming.ApplyPvsNaming`
+  (`Backend/PadmashaliVidyaSetu.Api/Data/SqlObjectNaming.cs`) adds the prefix to everything, including future tables:
+
+  | Object | Pattern | Example |
+  |--------|---------|---------|
+  | Table | `PVS_{Table}` | `PVS_Members` |
+  | Primary key | `PVS_PK_{Table}` | `PVS_PK_Members` |
+  | Foreign key | `PVS_FK_{Table}_{PrincipalTable}_{Columns}` | `PVS_FK_Members_Temples_TempleId` |
+  | Index (unique or not) | `PVS_IX_{Table}_{Columns}` | `PVS_IX_Accounts_MobileNumber` |
+  | Check constraint | `PVS_CK_{Table}_{Rule}` | `PVS_CK_Members_RegistrationId` |
+  | Default constraint | `PVS_DF_{Table}_{Column}` | `PVS_DF_Members_CreatedDate` |
+  | Migrations history | `PVS_EFMigrationsHistory` (PK `PVS_PK_EFMigrationsHistory`) | |
+
+  The integration test `DatabaseNamingTests` fails if any object in a migrated database lacks the prefix. Hand-written
+  SQL must use the prefixed names (`dbo.PVS_Temples`). The table names below omit the prefix for readability.
 * Every business table carries `CreatedDate`, `ModifiedDate`, `CreatedBy`, `ModifiedBy`, `IsActive`
   (stamped automatically in `AppDbContext.SaveChangesAsync`; actor = `account:{id}` or `system`).
 * Dates are UTC `datetime2(3)`; date of birth is `date`. **Age is never stored.**

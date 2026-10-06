@@ -17,14 +17,14 @@ INSERT INTO @New (TempleCode, TempleName, DisplayOrder) VALUES
 
 IF EXISTS (SELECT 1 FROM @New WHERE TempleName LIKE N'<%')
     THROW 50001, 'Fill in every temple name before running this script.', 1;
-IF EXISTS (SELECT 1 FROM @New n JOIN dbo.Temples t ON t.TempleCode = n.TempleCode OR t.TempleName = n.TempleName)
+IF EXISTS (SELECT 1 FROM @New n JOIN dbo.PVS_Temples t ON t.TempleCode = n.TempleCode OR t.TempleName = n.TempleName)
     THROW 50002, 'A temple with this code or name already exists.', 1;
 
-INSERT INTO dbo.Temples (TempleName, TempleCode, DisplayOrder, IsActive, CreatedDate, CreatedBy)
+INSERT INTO dbo.PVS_Temples (TempleName, TempleCode, DisplayOrder, IsActive, CreatedDate, CreatedBy)
 SELECT TempleName, TempleCode, DisplayOrder, 1, SYSUTCDATETIME(), 'script:AddTemples' FROM @New;
 
 -- Registration counters start at 0 (the API also creates them on first use).
-INSERT INTO dbo.TempleRegistrationSequences (TempleId, LastSequenceNumber)
-SELECT t.TempleId, 0 FROM dbo.Temples t JOIN @New n ON n.TempleCode = t.TempleCode;
+INSERT INTO dbo.PVS_TempleRegistrationSequences (TempleId, LastSequenceNumber)
+SELECT t.TempleId, 0 FROM dbo.PVS_Temples t JOIN @New n ON n.TempleCode = t.TempleCode;
 
 COMMIT;

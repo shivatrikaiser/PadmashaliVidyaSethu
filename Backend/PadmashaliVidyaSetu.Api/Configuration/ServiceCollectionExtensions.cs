@@ -61,7 +61,7 @@ public static class ServiceCollectionExtensions
                     "ConnectionStrings:DefaultConnection is not configured. Set it in appsettings.Development.json (LocalDB) " +
                     "or via the ConnectionStrings__DefaultConnection environment variable.");
 
-            options.UseSqlServer(connectionString, sql =>
+            options.UsePvsSqlServer(connectionString, sql =>
             {
                 sql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(10), errorNumbersToAdd: null);
                 sql.MigrationsAssembly(typeof(AppDbContext).Assembly.GetName().Name);

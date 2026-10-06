@@ -137,9 +137,9 @@ public sealed class RegistrationApiTests(PvsApiFactory factory)
         var id = (await response.Content.ReadFromJsonAsync<Envelope<RegistrationResultDto>>())!.Data!.RegistrationId;
 
         var otherUser = await factory.CreateSignedInClientAsync();
-        var types = await otherUser.GetFromJsonAsync<Envelope<List<MasterDataItemDto>>>("/api/v1/master-data/disability-types");
-        var added = Assert.Single(types!.Data!, t => t.Name == description);
-        Assert.Equal("OTHER", types.Data[^1].Code); // "Other" stays last
+        var types = (await otherUser.GetFromJsonAsync<Envelope<List<MasterDataItemDto>>>("/api/v1/master-data/disability-types"))!.Data!;
+        var added = Assert.Single(types, t => t.Name == description);
+        Assert.Equal("OTHER", types[^1].Code); // "Other" stays last
 
         var linked = await factory.WithDbAsync(db => db.MemberDisabilities.Where(d => d.RegistrationId == id).Select(d => d.DisabilityTypeId).ToListAsync());
         Assert.Equal([DisabilityHearing, added.Id], linked.Order().ToList());

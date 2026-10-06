@@ -12,8 +12,8 @@ using PadmashaliVidyaSetu.Api.Data;
 namespace PadmashaliVidyaSetu.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261006114313_TemplesAndSmsVerification")]
-    partial class TemplesAndSmsVerification
+    [Migration("20261006135106_InitialSchema")]
+    partial class InitialSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,12 +40,12 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Accounts_CreatedDate");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Accounts_IsActive");
 
                     b.Property<DateTime?>("LastLoginDate")
                         .HasColumnType("datetime2(3)");
@@ -66,14 +66,17 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2(3)");
 
-                    b.HasKey("AccountId");
+                    b.HasKey("AccountId")
+                        .HasName("PVS_PK_Accounts");
 
                     b.HasIndex("MobileNumber")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Accounts_MobileNumber");
 
-                    b.ToTable("Accounts", null, t =>
+                    b.ToTable("PVS_Accounts", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Accounts_MobileNumber", "[MobileNumber] LIKE '+[1-9]%'");
+                            t.HasCheckConstraint("CK_Accounts_MobileNumber", "[MobileNumber] LIKE '+[1-9]%'")
+                                .HasName("PVS_CK_Accounts_MobileNumber");
                         });
                 });
 
@@ -92,11 +95,13 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2(3)");
 
-                    b.HasKey("AccountId", "RoleId");
+                    b.HasKey("AccountId", "RoleId")
+                        .HasName("PVS_PK_AccountRoles");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("RoleId")
+                        .HasDatabaseName("PVS_IX_AccountRoles_RoleId");
 
-                    b.ToTable("AccountRoles", (string)null);
+                    b.ToTable("PVS_AccountRoles", (string)null);
                 });
 
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Accounts.PhoneVerificationChallenge", b =>
@@ -135,11 +140,13 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime?>("VerifiedDate")
                         .HasColumnType("datetime2(3)");
 
-                    b.HasKey("ChallengeId");
+                    b.HasKey("ChallengeId")
+                        .HasName("PVS_PK_PhoneVerificationChallenges");
 
-                    b.HasIndex("MobileNumber", "CreatedDate");
+                    b.HasIndex("MobileNumber", "CreatedDate")
+                        .HasDatabaseName("PVS_IX_PhoneVerificationChallenges_MobileNumber_CreatedDate");
 
-                    b.ToTable("PhoneVerificationChallenges", (string)null);
+                    b.ToTable("PVS_PhoneVerificationChallenges", (string)null);
                 });
 
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Accounts.RefreshToken", b =>
@@ -180,14 +187,17 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasColumnType("char(64)")
                         .IsFixedLength();
 
-                    b.HasKey("RefreshTokenId");
+                    b.HasKey("RefreshTokenId")
+                        .HasName("PVS_PK_RefreshTokens");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("AccountId")
+                        .HasDatabaseName("PVS_IX_RefreshTokens_AccountId");
 
                     b.HasIndex("TokenHash")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_RefreshTokens_TokenHash");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("PVS_RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Accounts.Role", b =>
@@ -212,7 +222,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Roles_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -220,7 +230,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Roles_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -234,17 +244,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Roles");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Roles_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Roles_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Roles_IsActive_DisplayOrder");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("PVS_Roles", (string)null);
 
                     b.HasData(
                         new
@@ -387,13 +401,16 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(45)");
 
-                    b.HasKey("AuditLogId");
+                    b.HasKey("AuditLogId")
+                        .HasName("PVS_PK_AuditLogs");
 
-                    b.HasIndex("CreatedDate");
+                    b.HasIndex("CreatedDate")
+                        .HasDatabaseName("PVS_IX_AuditLogs_CreatedDate");
 
-                    b.HasIndex("AccountId", "CreatedDate");
+                    b.HasIndex("AccountId", "CreatedDate")
+                        .HasDatabaseName("PVS_IX_AuditLogs_AccountId_CreatedDate");
 
-                    b.ToTable("AuditLogs", (string)null);
+                    b.ToTable("PVS_AuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Compliance.ConsentRecord", b =>
@@ -436,13 +453,16 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasColumnType("char(11)")
                         .IsFixedLength();
 
-                    b.HasKey("ConsentRecordId");
+                    b.HasKey("ConsentRecordId")
+                        .HasName("PVS_PK_ConsentRecords");
 
-                    b.HasIndex("RegistrationId");
+                    b.HasIndex("RegistrationId")
+                        .HasDatabaseName("PVS_IX_ConsentRecords_RegistrationId");
 
-                    b.HasIndex("AccountId", "ConsentType");
+                    b.HasIndex("AccountId", "ConsentType")
+                        .HasDatabaseName("PVS_IX_ConsentRecords_AccountId_ConsentType");
 
-                    b.ToTable("ConsentRecords", (string)null);
+                    b.ToTable("PVS_ConsentRecords", (string)null);
                 });
 
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Locations.City", b =>
@@ -467,7 +487,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Cities_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -478,7 +498,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Cities_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -508,23 +528,30 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<int?>("TalukId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Cities");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Cities_Code");
 
-                    b.HasIndex("DistrictId");
+                    b.HasIndex("DistrictId")
+                        .HasDatabaseName("PVS_IX_Cities_DistrictId");
 
-                    b.HasIndex("TalukId");
+                    b.HasIndex("TalukId")
+                        .HasDatabaseName("PVS_IX_Cities_TalukId");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Cities_IsActive_DisplayOrder");
 
                     b.HasIndex("PinCode", "Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Cities_PinCode_Name");
 
-                    b.ToTable("Cities", null, t =>
+                    b.ToTable("PVS_Cities", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Cities_PinCode", "[PinCode] LIKE '[1-9][0-9][0-9][0-9][0-9][0-9]'");
+                            t.HasCheckConstraint("CK_Cities_PinCode", "[PinCode] LIKE '[1-9][0-9][0-9][0-9][0-9][0-9]'")
+                                .HasName("PVS_CK_Cities_PinCode");
                         });
                 });
 
@@ -550,7 +577,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Countries_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -558,7 +585,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Countries_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -572,17 +599,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Countries");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Countries_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Countries_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Countries_IsActive_DisplayOrder");
 
-                    b.ToTable("Countries", (string)null);
+                    b.ToTable("PVS_Countries", (string)null);
 
                     b.HasData(
                         new
@@ -749,7 +780,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Districts_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -757,7 +788,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Districts_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -784,17 +815,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<int>("StateId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Districts");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Districts_Code");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Districts_IsActive_DisplayOrder");
 
                     b.HasIndex("StateId", "Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Districts_StateId_Name");
 
-                    b.ToTable("Districts", (string)null);
+                    b.ToTable("PVS_Districts", (string)null);
 
                     b.HasData(
                         new
@@ -1210,7 +1245,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_States_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -1218,7 +1253,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_States_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -1236,17 +1271,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_States");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_States_Code");
 
                     b.HasIndex("CountryId", "Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_States_CountryId_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_States_IsActive_DisplayOrder");
 
-                    b.ToTable("States", (string)null);
+                    b.ToTable("PVS_States", (string)null);
 
                     b.HasData(
                         new
@@ -1673,7 +1712,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Taluks_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -1684,7 +1723,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Taluks_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -1708,17 +1747,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(20)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Taluks");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Taluks_Code");
 
                     b.HasIndex("DistrictId", "Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Taluks_DistrictId_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Taluks_IsActive_DisplayOrder");
 
-                    b.ToTable("Taluks", (string)null);
+                    b.ToTable("PVS_Taluks", (string)null);
 
                     b.HasData(
                         new
@@ -2234,7 +2277,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_AchievementTypes_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -2242,7 +2285,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_AchievementTypes_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -2256,17 +2299,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_AchievementTypes");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_AchievementTypes_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_AchievementTypes_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_AchievementTypes_IsActive_DisplayOrder");
 
-                    b.ToTable("AchievementTypes", (string)null);
+                    b.ToTable("PVS_AchievementTypes", (string)null);
 
                     b.HasData(
                         new
@@ -2413,7 +2460,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Boards_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -2421,7 +2468,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Boards_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -2435,17 +2482,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Boards");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Boards_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Boards_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Boards_IsActive_DisplayOrder");
 
-                    b.ToTable("Boards", (string)null);
+                    b.ToTable("PVS_Boards", (string)null);
 
                     b.HasData(
                         new
@@ -2562,7 +2613,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Branches_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -2570,7 +2621,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Branches_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -2584,17 +2635,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Branches");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Branches_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Branches_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Branches_IsActive_DisplayOrder");
 
-                    b.ToTable("Branches", (string)null);
+                    b.ToTable("PVS_Branches", (string)null);
 
                     b.HasData(
                         new
@@ -2851,7 +2906,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_CareerOptions_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -2859,7 +2914,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_CareerOptions_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -2873,17 +2928,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_CareerOptions");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_CareerOptions_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_CareerOptions_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_CareerOptions_IsActive_DisplayOrder");
 
-                    b.ToTable("CareerOptions", (string)null);
+                    b.ToTable("PVS_CareerOptions", (string)null);
 
                     b.HasData(
                         new
@@ -3120,7 +3179,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_CommunicationChannels_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -3128,7 +3187,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_CommunicationChannels_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -3142,17 +3201,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_CommunicationChannels");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_CommunicationChannels_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_CommunicationChannels_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_CommunicationChannels_IsActive_DisplayOrder");
 
-                    b.ToTable("CommunicationChannels", (string)null);
+                    b.ToTable("PVS_CommunicationChannels", (string)null);
 
                     b.HasData(
                         new
@@ -3219,7 +3282,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_CommunicationTopics_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -3227,7 +3290,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_CommunicationTopics_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -3241,17 +3304,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_CommunicationTopics");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_CommunicationTopics_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_CommunicationTopics_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_CommunicationTopics_IsActive_DisplayOrder");
 
-                    b.ToTable("CommunicationTopics", (string)null);
+                    b.ToTable("PVS_CommunicationTopics", (string)null);
 
                     b.HasData(
                         new
@@ -3378,7 +3445,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_CompetitiveExams_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -3386,7 +3453,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_CompetitiveExams_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -3400,17 +3467,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_CompetitiveExams");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_CompetitiveExams_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_CompetitiveExams_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_CompetitiveExams_IsActive_DisplayOrder");
 
-                    b.ToTable("CompetitiveExams", (string)null);
+                    b.ToTable("PVS_CompetitiveExams", (string)null);
 
                     b.HasData(
                         new
@@ -3607,7 +3678,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Courses_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -3615,7 +3686,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Courses_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -3629,17 +3700,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Courses");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Courses_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Courses_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Courses_IsActive_DisplayOrder");
 
-                    b.ToTable("Courses", (string)null);
+                    b.ToTable("PVS_Courses", (string)null);
 
                     b.HasData(
                         new
@@ -3936,7 +4011,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_DisabilityTypes_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -3944,7 +4019,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_DisabilityTypes_IsActive");
 
                     b.Property<bool>("IsUserSubmitted")
                         .HasColumnType("bit");
@@ -3961,17 +4036,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_DisabilityTypes");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_DisabilityTypes_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_DisabilityTypes_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_DisabilityTypes_IsActive_DisplayOrder");
 
-                    b.ToTable("DisabilityTypes", (string)null);
+                    b.ToTable("PVS_DisabilityTypes", (string)null);
 
                     b.HasData(
                         new
@@ -4086,7 +4165,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_EducationLevels_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -4094,7 +4173,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_EducationLevels_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -4108,17 +4187,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_EducationLevels");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_EducationLevels_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_EducationLevels_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_EducationLevels_IsActive_DisplayOrder");
 
-                    b.ToTable("EducationLevels", (string)null);
+                    b.ToTable("PVS_EducationLevels", (string)null);
 
                     b.HasData(
                         new
@@ -4245,7 +4328,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Genders_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -4253,7 +4336,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Genders_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -4267,17 +4350,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Genders");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Genders_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Genders_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Genders_IsActive_DisplayOrder");
 
-                    b.ToTable("Genders", (string)null);
+                    b.ToTable("PVS_Genders", (string)null);
 
                     b.HasData(
                         new
@@ -4334,7 +4421,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Hobbies_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -4342,7 +4429,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Hobbies_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -4356,17 +4443,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Hobbies");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Hobbies_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Hobbies_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Hobbies_IsActive_DisplayOrder");
 
-                    b.ToTable("Hobbies", (string)null);
+                    b.ToTable("PVS_Hobbies", (string)null);
 
                     b.HasData(
                         new
@@ -4503,7 +4594,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_InterestAreas_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -4511,7 +4602,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_InterestAreas_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -4525,17 +4616,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_InterestAreas");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_InterestAreas_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_InterestAreas_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_InterestAreas_IsActive_DisplayOrder");
 
-                    b.ToTable("InterestAreas", (string)null);
+                    b.ToTable("PVS_InterestAreas", (string)null);
 
                     b.HasData(
                         new
@@ -4692,7 +4787,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_MemberStatuses_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -4700,7 +4795,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_MemberStatuses_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -4714,17 +4809,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_MemberStatuses");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_MemberStatuses_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_MemberStatuses_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_MemberStatuses_IsActive_DisplayOrder");
 
-                    b.ToTable("MemberStatuses", (string)null);
+                    b.ToTable("PVS_MemberStatuses", (string)null);
 
                     b.HasData(
                         new
@@ -4782,7 +4881,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Organisations_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -4790,7 +4889,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Organisations_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -4805,17 +4904,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasColumnType("nvarchar(150)")
                         .HasColumnName("OrganisationName");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Organisations");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Organisations_OrganisationCode");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Organisations_OrganisationName");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Organisations_IsActive_DisplayOrder");
 
-                    b.ToTable("Organisations", (string)null);
+                    b.ToTable("PVS_Organisations", (string)null);
 
                     b.HasData(
                         new
@@ -4902,7 +5005,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Classes_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -4910,7 +5013,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Classes_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -4930,19 +5033,24 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(20)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Classes");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Classes_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Classes_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Classes_IsActive_DisplayOrder");
 
-                    b.ToTable("Classes", null, t =>
+                    b.ToTable("PVS_Classes", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Classes_Stage", "[Stage] IN ('PrePrimary', 'Primary', 'HighSchool', 'PreUniversity', 'Vocational', 'UnderGraduate', 'PostGraduate', 'Professional', 'Other')");
+                            t.HasCheckConstraint("CK_Classes_Stage", "[Stage] IN ('PrePrimary', 'Primary', 'HighSchool', 'PreUniversity', 'Vocational', 'UnderGraduate', 'PostGraduate', 'Professional', 'Other')")
+                                .HasName("PVS_CK_Classes_Stage");
                         });
 
                     b.HasData(
@@ -5196,7 +5304,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Skills_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -5204,7 +5312,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Skills_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -5218,21 +5326,27 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Skills");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Skills_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Skills_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Skills_IsActive_DisplayOrder");
 
-                    b.HasIndex("Category", "IsActive", "DisplayOrder");
+                    b.HasIndex("Category", "IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Skills_Category_IsActive_DisplayOrder");
 
-                    b.ToTable("Skills", null, t =>
+                    b.ToTable("PVS_Skills", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Skills_Category", "[Category] IN ('Technical', 'General', 'Creative')");
+                            t.HasCheckConstraint("CK_Skills_Category", "[Category] IN ('Technical', 'General', 'Creative')")
+                                .HasName("PVS_CK_Skills_Category");
                         });
 
                     b.HasData(
@@ -5513,7 +5627,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Sports_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -5521,7 +5635,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Sports_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -5535,17 +5649,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Sports");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Sports_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Sports_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Sports_IsActive_DisplayOrder");
 
-                    b.ToTable("Sports", (string)null);
+                    b.ToTable("PVS_Sports", (string)null);
 
                     b.HasData(
                         new
@@ -5673,7 +5791,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Temples_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -5681,7 +5799,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Temples_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -5696,19 +5814,24 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasColumnType("nvarchar(200)")
                         .HasColumnName("TempleName");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Temples");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Temples_TempleCode");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Temples_TempleName");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Temples_IsActive_DisplayOrder");
 
-                    b.ToTable("Temples", null, t =>
+                    b.ToTable("PVS_Temples", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Temples_TempleCode", "[TempleCode] LIKE '[0-9][0-9]'");
+                            t.HasCheckConstraint("CK_Temples_TempleCode", "[TempleCode] LIKE '[0-9][0-9]'")
+                                .HasName("PVS_CK_Temples_TempleCode");
                         });
 
                     b.HasData(
@@ -5786,7 +5909,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Universities_CreatedDate");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
@@ -5794,7 +5917,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Universities_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -5808,17 +5931,21 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PVS_PK_Universities");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Universities_Code");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Universities_Name");
 
-                    b.HasIndex("IsActive", "DisplayOrder");
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_Universities_IsActive_DisplayOrder");
 
-                    b.ToTable("Universities", (string)null);
+                    b.ToTable("PVS_Universities", (string)null);
 
                     b.HasData(
                         new
@@ -5944,7 +6071,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Members_CreatedDate");
 
                     b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date");
@@ -5968,7 +6095,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_Members_IsActive");
 
                     b.Property<bool>("IsCurrentAddressSameAsPermanent")
                         .HasColumnType("bit");
@@ -6000,29 +6127,40 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<int>("TempleId")
                         .HasColumnType("int");
 
-                    b.HasKey("RegistrationId");
+                    b.HasKey("RegistrationId")
+                        .HasName("PVS_PK_Members");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("AccountId")
+                        .HasDatabaseName("PVS_IX_Members_AccountId");
 
-                    b.HasIndex("ClassId");
+                    b.HasIndex("ClassId")
+                        .HasDatabaseName("PVS_IX_Members_ClassId");
 
-                    b.HasIndex("DateOfBirth");
+                    b.HasIndex("DateOfBirth")
+                        .HasDatabaseName("PVS_IX_Members_DateOfBirth");
 
-                    b.HasIndex("GenderId");
+                    b.HasIndex("GenderId")
+                        .HasDatabaseName("PVS_IX_Members_GenderId");
 
-                    b.HasIndex("HighestEducationLevelId");
+                    b.HasIndex("HighestEducationLevelId")
+                        .HasDatabaseName("PVS_IX_Members_HighestEducationLevelId");
 
-                    b.HasIndex("OrganisationId");
+                    b.HasIndex("OrganisationId")
+                        .HasDatabaseName("PVS_IX_Members_OrganisationId");
 
-                    b.HasIndex("TempleId");
+                    b.HasIndex("TempleId")
+                        .HasDatabaseName("PVS_IX_Members_TempleId");
 
-                    b.HasIndex("MemberStatusId", "ClassId");
+                    b.HasIndex("MemberStatusId", "ClassId")
+                        .HasDatabaseName("PVS_IX_Members_MemberStatusId_ClassId");
 
-                    b.ToTable("Members", null, t =>
+                    b.ToTable("PVS_Members", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Members_ClassOrHighestEducation", "[ClassId] IS NULL OR [HighestEducationLevelId] IS NULL");
+                            t.HasCheckConstraint("CK_Members_ClassOrHighestEducation", "[ClassId] IS NULL OR [HighestEducationLevelId] IS NULL")
+                                .HasName("PVS_CK_Members_ClassOrHighestEducation");
 
-                            t.HasCheckConstraint("CK_Members_RegistrationId", "[RegistrationId] LIKE 'PVS-[0-9][0-9]-[0-9][0-9][0-9][0-9]'");
+                            t.HasCheckConstraint("CK_Members_RegistrationId", "[RegistrationId] LIKE 'PVS-[0-9][0-9]-[0-9][0-9][0-9][0-9]'")
+                                .HasName("PVS_CK_Members_RegistrationId");
                         });
                 });
 
@@ -6067,7 +6205,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(3)")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_MemberAddresses_CreatedDate");
 
                     b.Property<int>("DistrictId")
                         .HasColumnType("int");
@@ -6075,7 +6213,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(true, "PVS_DF_MemberAddresses_IsActive");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
@@ -6104,28 +6242,38 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<int>("TalukId")
                         .HasColumnType("int");
 
-                    b.HasKey("MemberAddressId");
+                    b.HasKey("MemberAddressId")
+                        .HasName("PVS_PK_MemberAddresses");
 
-                    b.HasIndex("CityId");
+                    b.HasIndex("CityId")
+                        .HasDatabaseName("PVS_IX_MemberAddresses_CityId");
 
-                    b.HasIndex("CountryId");
+                    b.HasIndex("CountryId")
+                        .HasDatabaseName("PVS_IX_MemberAddresses_CountryId");
 
-                    b.HasIndex("PinCode");
+                    b.HasIndex("PinCode")
+                        .HasDatabaseName("PVS_IX_MemberAddresses_PinCode");
 
-                    b.HasIndex("StateId");
+                    b.HasIndex("StateId")
+                        .HasDatabaseName("PVS_IX_MemberAddresses_StateId");
 
-                    b.HasIndex("TalukId");
+                    b.HasIndex("TalukId")
+                        .HasDatabaseName("PVS_IX_MemberAddresses_TalukId");
 
-                    b.HasIndex("DistrictId", "TalukId");
+                    b.HasIndex("DistrictId", "TalukId")
+                        .HasDatabaseName("PVS_IX_MemberAddresses_DistrictId_TalukId");
 
                     b.HasIndex("RegistrationId", "AddressType")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_MemberAddresses_RegistrationId_AddressType");
 
-                    b.ToTable("MemberAddresses", null, t =>
+                    b.ToTable("PVS_MemberAddresses", null, t =>
                         {
-                            t.HasCheckConstraint("CK_MemberAddresses_AddressType", "[AddressType] IN ('Permanent', 'Current')");
+                            t.HasCheckConstraint("CK_MemberAddresses_AddressType", "[AddressType] IN ('Permanent', 'Current')")
+                                .HasName("PVS_CK_MemberAddresses_AddressType");
 
-                            t.HasCheckConstraint("CK_MemberAddresses_PinCode", "[PinCode] LIKE '[1-9][0-9][0-9][0-9][0-9][0-9]'");
+                            t.HasCheckConstraint("CK_MemberAddresses_PinCode", "[PinCode] LIKE '[1-9][0-9][0-9][0-9][0-9][0-9]'")
+                                .HasName("PVS_CK_MemberAddresses_PinCode");
                         });
                 });
 
@@ -6147,11 +6295,13 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2(3)");
 
-                    b.HasKey("RegistrationId", "DisabilityTypeId");
+                    b.HasKey("RegistrationId", "DisabilityTypeId")
+                        .HasName("PVS_PK_MemberDisabilities");
 
-                    b.HasIndex("DisabilityTypeId");
+                    b.HasIndex("DisabilityTypeId")
+                        .HasDatabaseName("PVS_IX_MemberDisabilities_DisabilityTypeId");
 
-                    b.ToTable("MemberDisabilities", (string)null);
+                    b.ToTable("PVS_MemberDisabilities", (string)null);
                 });
 
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.TempleRegistrationSequence", b =>
@@ -6162,11 +6312,13 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<int>("LastSequenceNumber")
                         .HasColumnType("int");
 
-                    b.HasKey("TempleId");
+                    b.HasKey("TempleId")
+                        .HasName("PVS_PK_TempleRegistrationSequences");
 
-                    b.ToTable("TempleRegistrationSequences", null, t =>
+                    b.ToTable("PVS_TempleRegistrationSequences", null, t =>
                         {
-                            t.HasCheckConstraint("CK_TempleRegistrationSequences_Range", "[LastSequenceNumber] BETWEEN 0 AND 9999");
+                            t.HasCheckConstraint("CK_TempleRegistrationSequences_Range", "[LastSequenceNumber] BETWEEN 0 AND 9999")
+                                .HasName("PVS_CK_TempleRegistrationSequences_Range");
                         });
 
                     b.HasData(
@@ -6203,13 +6355,15 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .WithMany("AccountRoles")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_AccountRoles_Accounts_AccountId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.Accounts.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_AccountRoles_Roles_RoleId");
 
                     b.Navigation("Account");
 
@@ -6222,7 +6376,8 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .WithMany()
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_RefreshTokens_Accounts_AccountId");
 
                     b.Navigation("Account");
                 });
@@ -6233,12 +6388,14 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .WithMany()
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_ConsentRecords_Accounts_AccountId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.Members.Member", null)
                         .WithMany()
                         .HasForeignKey("RegistrationId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("PVS_FK_ConsentRecords_Members_RegistrationId");
                 });
 
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Locations.City", b =>
@@ -6247,12 +6404,14 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .WithMany()
                         .HasForeignKey("DistrictId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_Cities_Districts_DistrictId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.Locations.Taluk", "Taluk")
                         .WithMany()
                         .HasForeignKey("TalukId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("PVS_FK_Cities_Taluks_TalukId");
 
                     b.Navigation("District");
 
@@ -6265,7 +6424,8 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .WithMany("Districts")
                         .HasForeignKey("StateId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_Districts_States_StateId");
 
                     b.Navigation("State");
                 });
@@ -6276,7 +6436,8 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .WithMany("States")
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_States_Countries_CountryId");
 
                     b.Navigation("Country");
                 });
@@ -6287,7 +6448,8 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .WithMany("Taluks")
                         .HasForeignKey("DistrictId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_Taluks_Districts_DistrictId");
 
                     b.Navigation("District");
                 });
@@ -6298,41 +6460,48 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .WithMany()
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_Members_Accounts_AccountId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.SchoolClass", "Class")
                         .WithMany()
                         .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("PVS_FK_Members_Classes_ClassId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.Gender", "Gender")
                         .WithMany()
                         .HasForeignKey("GenderId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_Members_Genders_GenderId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.EducationLevel", "HighestEducationLevel")
                         .WithMany()
                         .HasForeignKey("HighestEducationLevelId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("PVS_FK_Members_EducationLevels_HighestEducationLevelId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.MemberStatus", "MemberStatus")
                         .WithMany()
                         .HasForeignKey("MemberStatusId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_Members_MemberStatuses_MemberStatusId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.Organisation", "Organisation")
                         .WithMany()
                         .HasForeignKey("OrganisationId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_Members_Organisations_OrganisationId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.Temple", "Temple")
                         .WithMany()
                         .HasForeignKey("TempleId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_Members_Temples_TempleId");
 
                     b.Navigation("Account");
 
@@ -6354,37 +6523,43 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.Locations.City", "City")
                         .WithMany()
                         .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("PVS_FK_MemberAddresses_Cities_CityId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.Locations.Country", "Country")
                         .WithMany()
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberAddresses_Countries_CountryId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.Locations.District", "District")
                         .WithMany()
                         .HasForeignKey("DistrictId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberAddresses_Districts_DistrictId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.Members.Member", "Member")
                         .WithMany("Addresses")
                         .HasForeignKey("RegistrationId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberAddresses_Members_RegistrationId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.Locations.State", "State")
                         .WithMany()
                         .HasForeignKey("StateId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberAddresses_States_StateId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.Locations.Taluk", "Taluk")
                         .WithMany()
                         .HasForeignKey("TalukId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberAddresses_Taluks_TalukId");
 
                     b.Navigation("City");
 
@@ -6405,13 +6580,15 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .WithMany()
                         .HasForeignKey("DisabilityTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberDisabilities_DisabilityTypes_DisabilityTypeId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.Members.Member", "Member")
                         .WithMany("Disabilities")
                         .HasForeignKey("RegistrationId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberDisabilities_Members_RegistrationId");
 
                     b.Navigation("DisabilityType");
 
@@ -6424,7 +6601,8 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .WithOne()
                         .HasForeignKey("PadmashaliVidyaSetu.Api.Entities.Members.TempleRegistrationSequence", "TempleId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_TempleRegistrationSequences_Temples_TempleId");
 
                     b.Navigation("Temple");
                 });

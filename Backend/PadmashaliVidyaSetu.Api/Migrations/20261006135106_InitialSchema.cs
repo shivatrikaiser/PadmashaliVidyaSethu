@@ -8,13 +8,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PadmashaliVidyaSetu.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialFoundation : Migration
+    public partial class InitialSchema : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Accounts",
+                name: "PVS_Accounts",
                 columns: table => new
                 {
                     AccountId = table.Column<int>(type: "int", nullable: false)
@@ -22,40 +22,44 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     MobileNumber = table.Column<string>(type: "varchar(16)", unicode: false, maxLength: 16, nullable: false),
                     MobileVerifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     LastLoginDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Accounts_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Accounts_IsActive")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Accounts", x => x.AccountId);
-                    table.CheckConstraint("CK_Accounts_MobileNumber", "[MobileNumber] LIKE '+[1-9]%'");
+                    table.PrimaryKey("PVS_PK_Accounts", x => x.AccountId);
+                    table.CheckConstraint("PVS_CK_Accounts_MobileNumber", "[MobileNumber] LIKE '+[1-9]%'");
                 });
 
             migrationBuilder.CreateTable(
-                name: "AchievementTypes",
+                name: "PVS_AchievementTypes",
                 columns: table => new
                 {
                     AchievementTypeId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_AchievementTypes_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_AchievementTypes_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AchievementTypes", x => x.AchievementTypeId);
+                    table.PrimaryKey("PVS_PK_AchievementTypes", x => x.AchievementTypeId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AuditLogs",
+                name: "PVS_AuditLogs",
                 columns: table => new
                 {
                     AuditLogId = table.Column<long>(type: "bigint", nullable: false)
@@ -70,334 +74,366 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AuditLogs", x => x.AuditLogId);
+                    table.PrimaryKey("PVS_PK_AuditLogs", x => x.AuditLogId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Boards",
+                name: "PVS_Boards",
                 columns: table => new
                 {
                     BoardId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Boards_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Boards_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Boards", x => x.BoardId);
+                    table.PrimaryKey("PVS_PK_Boards", x => x.BoardId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Branches",
+                name: "PVS_Branches",
                 columns: table => new
                 {
                     BranchId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Branches_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Branches_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Branches", x => x.BranchId);
+                    table.PrimaryKey("PVS_PK_Branches", x => x.BranchId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "CareerOptions",
+                name: "PVS_CareerOptions",
                 columns: table => new
                 {
                     CareerOptionId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_CareerOptions_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_CareerOptions_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CareerOptions", x => x.CareerOptionId);
+                    table.PrimaryKey("PVS_PK_CareerOptions", x => x.CareerOptionId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Classes",
+                name: "PVS_Classes",
                 columns: table => new
                 {
                     ClassId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Stage = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Classes_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Classes_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Classes", x => x.ClassId);
-                    table.CheckConstraint("CK_Classes_Stage", "[Stage] IN ('PrePrimary', 'Primary', 'HighSchool', 'PreUniversity', 'Vocational', 'UnderGraduate', 'PostGraduate', 'Professional', 'Other')");
+                    table.PrimaryKey("PVS_PK_Classes", x => x.ClassId);
+                    table.CheckConstraint("PVS_CK_Classes_Stage", "[Stage] IN ('PrePrimary', 'Primary', 'HighSchool', 'PreUniversity', 'Vocational', 'UnderGraduate', 'PostGraduate', 'Professional', 'Other')");
                 });
 
             migrationBuilder.CreateTable(
-                name: "CommunicationChannels",
+                name: "PVS_CommunicationChannels",
                 columns: table => new
                 {
                     CommunicationChannelId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_CommunicationChannels_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_CommunicationChannels_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CommunicationChannels", x => x.CommunicationChannelId);
+                    table.PrimaryKey("PVS_PK_CommunicationChannels", x => x.CommunicationChannelId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "CommunicationTopics",
+                name: "PVS_CommunicationTopics",
                 columns: table => new
                 {
                     CommunicationTopicId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_CommunicationTopics_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_CommunicationTopics_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CommunicationTopics", x => x.CommunicationTopicId);
+                    table.PrimaryKey("PVS_PK_CommunicationTopics", x => x.CommunicationTopicId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "CompetitiveExams",
+                name: "PVS_CompetitiveExams",
                 columns: table => new
                 {
                     CompetitiveExamId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_CompetitiveExams_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_CompetitiveExams_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CompetitiveExams", x => x.CompetitiveExamId);
+                    table.PrimaryKey("PVS_PK_CompetitiveExams", x => x.CompetitiveExamId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Countries",
+                name: "PVS_Countries",
                 columns: table => new
                 {
                     CountryId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Countries_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Countries_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Countries", x => x.CountryId);
+                    table.PrimaryKey("PVS_PK_Countries", x => x.CountryId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Courses",
+                name: "PVS_Courses",
                 columns: table => new
                 {
                     CourseId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Courses_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Courses_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Courses", x => x.CourseId);
+                    table.PrimaryKey("PVS_PK_Courses", x => x.CourseId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DisabilityTypes",
+                name: "PVS_DisabilityTypes",
                 columns: table => new
                 {
                     DisabilityTypeId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IsUserSubmitted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_DisabilityTypes_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_DisabilityTypes_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DisabilityTypes", x => x.DisabilityTypeId);
+                    table.PrimaryKey("PVS_PK_DisabilityTypes", x => x.DisabilityTypeId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "EducationLevels",
+                name: "PVS_EducationLevels",
                 columns: table => new
                 {
                     EducationLevelId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_EducationLevels_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_EducationLevels_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EducationLevels", x => x.EducationLevelId);
+                    table.PrimaryKey("PVS_PK_EducationLevels", x => x.EducationLevelId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Genders",
+                name: "PVS_Genders",
                 columns: table => new
                 {
                     GenderId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Genders_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Genders_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Genders", x => x.GenderId);
+                    table.PrimaryKey("PVS_PK_Genders", x => x.GenderId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Hobbies",
+                name: "PVS_Hobbies",
                 columns: table => new
                 {
                     HobbyId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Hobbies_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Hobbies_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Hobbies", x => x.HobbyId);
+                    table.PrimaryKey("PVS_PK_Hobbies", x => x.HobbyId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "InterestAreas",
+                name: "PVS_InterestAreas",
                 columns: table => new
                 {
                     InterestAreaId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_InterestAreas_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_InterestAreas_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_InterestAreas", x => x.InterestAreaId);
+                    table.PrimaryKey("PVS_PK_InterestAreas", x => x.InterestAreaId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MemberStatuses",
+                name: "PVS_MemberStatuses",
                 columns: table => new
                 {
                     MemberStatusId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_MemberStatuses_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_MemberStatuses_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MemberStatuses", x => x.MemberStatusId);
+                    table.PrimaryKey("PVS_PK_MemberStatuses", x => x.MemberStatusId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Organisations",
+                name: "PVS_Organisations",
                 columns: table => new
                 {
                     OrganisationId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Organisations_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Organisations_IsActive"),
                     OrganisationName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     OrganisationCode = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Organisations", x => x.OrganisationId);
+                    table.PrimaryKey("PVS_PK_Organisations", x => x.OrganisationId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "PhoneVerificationChallenges",
+                name: "PVS_PhoneVerificationChallenges",
                 columns: table => new
                 {
                     ChallengeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -411,114 +447,124 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PhoneVerificationChallenges", x => x.ChallengeId);
+                    table.PrimaryKey("PVS_PK_PhoneVerificationChallenges", x => x.ChallengeId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Roles",
+                name: "PVS_Roles",
                 columns: table => new
                 {
                     RoleId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Roles_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Roles_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Roles", x => x.RoleId);
+                    table.PrimaryKey("PVS_PK_Roles", x => x.RoleId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Skills",
+                name: "PVS_Skills",
                 columns: table => new
                 {
                     SkillId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Category = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Skills_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Skills_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Skills", x => x.SkillId);
-                    table.CheckConstraint("CK_Skills_Category", "[Category] IN ('Technical', 'General', 'Creative')");
+                    table.PrimaryKey("PVS_PK_Skills", x => x.SkillId);
+                    table.CheckConstraint("PVS_CK_Skills_Category", "[Category] IN ('Technical', 'General', 'Creative')");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Sports",
+                name: "PVS_Sports",
                 columns: table => new
                 {
                     SportId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Sports_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Sports_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Sports", x => x.SportId);
+                    table.PrimaryKey("PVS_PK_Sports", x => x.SportId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Temples",
+                name: "PVS_Temples",
                 columns: table => new
                 {
                     TempleId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Temples_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                    TempleName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Temples_IsActive"),
+                    TempleName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     TempleCode = table.Column<string>(type: "varchar(2)", unicode: false, maxLength: 2, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Temples", x => x.TempleId);
-                    table.CheckConstraint("CK_Temples_TempleCode", "[TempleCode] LIKE '[0-9][0-9]'");
+                    table.PrimaryKey("PVS_PK_Temples", x => x.TempleId);
+                    table.CheckConstraint("PVS_CK_Temples_TempleCode", "[TempleCode] LIKE '[0-9][0-9]'");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Universities",
+                name: "PVS_Universities",
                 columns: table => new
                 {
                     UniversityId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Universities_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Universities_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Universities", x => x.UniversityId);
+                    table.PrimaryKey("PVS_PK_Universities", x => x.UniversityId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "RefreshTokens",
+                name: "PVS_RefreshTokens",
                 columns: table => new
                 {
                     RefreshTokenId = table.Column<long>(type: "bigint", nullable: false)
@@ -533,45 +579,47 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RefreshTokens", x => x.RefreshTokenId);
+                    table.PrimaryKey("PVS_PK_RefreshTokens", x => x.RefreshTokenId);
                     table.ForeignKey(
-                        name: "FK_RefreshTokens_Accounts_AccountId",
+                        name: "PVS_FK_RefreshTokens_Accounts_AccountId",
                         column: x => x.AccountId,
-                        principalTable: "Accounts",
+                        principalTable: "PVS_Accounts",
                         principalColumn: "AccountId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "States",
+                name: "PVS_States",
                 columns: table => new
                 {
                     StateId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CountryId = table.Column<int>(type: "int", nullable: false),
                     PostalName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_States_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_States_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_States", x => x.StateId);
+                    table.PrimaryKey("PVS_PK_States", x => x.StateId);
                     table.ForeignKey(
-                        name: "FK_States_Countries_CountryId",
+                        name: "PVS_FK_States_Countries_CountryId",
                         column: x => x.CountryId,
-                        principalTable: "Countries",
+                        principalTable: "PVS_Countries",
                         principalColumn: "CountryId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AccountRoles",
+                name: "PVS_AccountRoles",
                 columns: table => new
                 {
                     AccountId = table.Column<int>(type: "int", nullable: false),
@@ -581,23 +629,23 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AccountRoles", x => new { x.AccountId, x.RoleId });
+                    table.PrimaryKey("PVS_PK_AccountRoles", x => new { x.AccountId, x.RoleId });
                     table.ForeignKey(
-                        name: "FK_AccountRoles_Accounts_AccountId",
+                        name: "PVS_FK_AccountRoles_Accounts_AccountId",
                         column: x => x.AccountId,
-                        principalTable: "Accounts",
+                        principalTable: "PVS_Accounts",
                         principalColumn: "AccountId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AccountRoles_Roles_RoleId",
+                        name: "PVS_FK_AccountRoles_Roles_RoleId",
                         column: x => x.RoleId,
-                        principalTable: "Roles",
+                        principalTable: "PVS_Roles",
                         principalColumn: "RoleId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Members",
+                name: "PVS_Members",
                 columns: table => new
                 {
                     RegistrationId = table.Column<string>(type: "char(11)", unicode: false, fixedLength: true, maxLength: 11, nullable: false),
@@ -615,63 +663,65 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     IsCurrentAddressSameAsPermanent = table.Column<bool>(type: "bit", nullable: false),
                     IsDisabled = table.Column<bool>(type: "bit", nullable: false),
                     RegistrationCompletedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Members_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Members_IsActive")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Members", x => x.RegistrationId);
-                    table.CheckConstraint("CK_Members_ClassOrHighestEducation", "[ClassId] IS NULL OR [HighestEducationLevelId] IS NULL");
-                    table.CheckConstraint("CK_Members_RegistrationId", "[RegistrationId] LIKE 'PVS-[0-9][0-9]-[0-9][0-9][0-9][0-9]'");
+                    table.PrimaryKey("PVS_PK_Members", x => x.RegistrationId);
+                    table.CheckConstraint("PVS_CK_Members_ClassOrHighestEducation", "[ClassId] IS NULL OR [HighestEducationLevelId] IS NULL");
+                    table.CheckConstraint("PVS_CK_Members_RegistrationId", "[RegistrationId] LIKE 'PVS-[0-9][0-9]-[0-9][0-9][0-9][0-9]'");
                     table.ForeignKey(
-                        name: "FK_Members_Accounts_AccountId",
+                        name: "PVS_FK_Members_Accounts_AccountId",
                         column: x => x.AccountId,
-                        principalTable: "Accounts",
+                        principalTable: "PVS_Accounts",
                         principalColumn: "AccountId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Members_Classes_ClassId",
+                        name: "PVS_FK_Members_Classes_ClassId",
                         column: x => x.ClassId,
-                        principalTable: "Classes",
+                        principalTable: "PVS_Classes",
                         principalColumn: "ClassId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Members_EducationLevels_HighestEducationLevelId",
+                        name: "PVS_FK_Members_EducationLevels_HighestEducationLevelId",
                         column: x => x.HighestEducationLevelId,
-                        principalTable: "EducationLevels",
+                        principalTable: "PVS_EducationLevels",
                         principalColumn: "EducationLevelId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Members_Genders_GenderId",
+                        name: "PVS_FK_Members_Genders_GenderId",
                         column: x => x.GenderId,
-                        principalTable: "Genders",
+                        principalTable: "PVS_Genders",
                         principalColumn: "GenderId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Members_MemberStatuses_MemberStatusId",
+                        name: "PVS_FK_Members_MemberStatuses_MemberStatusId",
                         column: x => x.MemberStatusId,
-                        principalTable: "MemberStatuses",
+                        principalTable: "PVS_MemberStatuses",
                         principalColumn: "MemberStatusId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Members_Organisations_OrganisationId",
+                        name: "PVS_FK_Members_Organisations_OrganisationId",
                         column: x => x.OrganisationId,
-                        principalTable: "Organisations",
+                        principalTable: "PVS_Organisations",
                         principalColumn: "OrganisationId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Members_Temples_TempleId",
+                        name: "PVS_FK_Members_Temples_TempleId",
                         column: x => x.TempleId,
-                        principalTable: "Temples",
+                        principalTable: "PVS_Temples",
                         principalColumn: "TempleId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "TempleRegistrationSequences",
+                name: "PVS_TempleRegistrationSequences",
                 columns: table => new
                 {
                     TempleId = table.Column<int>(type: "int", nullable: false),
@@ -679,18 +729,18 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TempleRegistrationSequences", x => x.TempleId);
-                    table.CheckConstraint("CK_TempleRegistrationSequences_Range", "[LastSequenceNumber] BETWEEN 0 AND 9999");
+                    table.PrimaryKey("PVS_PK_TempleRegistrationSequences", x => x.TempleId);
+                    table.CheckConstraint("PVS_CK_TempleRegistrationSequences_Range", "[LastSequenceNumber] BETWEEN 0 AND 9999");
                     table.ForeignKey(
-                        name: "FK_TempleRegistrationSequences_Temples_TempleId",
+                        name: "PVS_FK_TempleRegistrationSequences_Temples_TempleId",
                         column: x => x.TempleId,
-                        principalTable: "Temples",
+                        principalTable: "PVS_Temples",
                         principalColumn: "TempleId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Districts",
+                name: "PVS_Districts",
                 columns: table => new
                 {
                     DistrictId = table.Column<int>(type: "int", nullable: false)
@@ -698,28 +748,30 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     StateId = table.Column<int>(type: "int", nullable: false),
                     PostalName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
                     Source = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Districts_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Districts_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Districts", x => x.DistrictId);
+                    table.PrimaryKey("PVS_PK_Districts", x => x.DistrictId);
                     table.ForeignKey(
-                        name: "FK_Districts_States_StateId",
+                        name: "PVS_FK_Districts_States_StateId",
                         column: x => x.StateId,
-                        principalTable: "States",
+                        principalTable: "PVS_States",
                         principalColumn: "StateId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ConsentRecords",
+                name: "PVS_ConsentRecords",
                 columns: table => new
                 {
                     ConsentRecordId = table.Column<long>(type: "bigint", nullable: false)
@@ -734,23 +786,23 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ConsentRecords", x => x.ConsentRecordId);
+                    table.PrimaryKey("PVS_PK_ConsentRecords", x => x.ConsentRecordId);
                     table.ForeignKey(
-                        name: "FK_ConsentRecords_Accounts_AccountId",
+                        name: "PVS_FK_ConsentRecords_Accounts_AccountId",
                         column: x => x.AccountId,
-                        principalTable: "Accounts",
+                        principalTable: "PVS_Accounts",
                         principalColumn: "AccountId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ConsentRecords_Members_RegistrationId",
+                        name: "PVS_FK_ConsentRecords_Members_RegistrationId",
                         column: x => x.RegistrationId,
-                        principalTable: "Members",
+                        principalTable: "PVS_Members",
                         principalColumn: "RegistrationId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MemberDisabilities",
+                name: "PVS_MemberDisabilities",
                 columns: table => new
                 {
                     RegistrationId = table.Column<string>(type: "char(11)", unicode: false, fixedLength: true, maxLength: 11, nullable: false),
@@ -760,23 +812,23 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MemberDisabilities", x => new { x.RegistrationId, x.DisabilityTypeId });
+                    table.PrimaryKey("PVS_PK_MemberDisabilities", x => new { x.RegistrationId, x.DisabilityTypeId });
                     table.ForeignKey(
-                        name: "FK_MemberDisabilities_DisabilityTypes_DisabilityTypeId",
+                        name: "PVS_FK_MemberDisabilities_DisabilityTypes_DisabilityTypeId",
                         column: x => x.DisabilityTypeId,
-                        principalTable: "DisabilityTypes",
+                        principalTable: "PVS_DisabilityTypes",
                         principalColumn: "DisabilityTypeId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_MemberDisabilities_Members_RegistrationId",
+                        name: "PVS_FK_MemberDisabilities_Members_RegistrationId",
                         column: x => x.RegistrationId,
-                        principalTable: "Members",
+                        principalTable: "PVS_Members",
                         principalColumn: "RegistrationId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Taluks",
+                name: "PVS_Taluks",
                 columns: table => new
                 {
                     TalukId = table.Column<int>(type: "int", nullable: false)
@@ -784,28 +836,30 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     DistrictId = table.Column<int>(type: "int", nullable: false),
                     PostalName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
                     Source = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Taluks_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Taluks_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Taluks", x => x.TalukId);
+                    table.PrimaryKey("PVS_PK_Taluks", x => x.TalukId);
                     table.ForeignKey(
-                        name: "FK_Taluks_Districts_DistrictId",
+                        name: "PVS_FK_Taluks_Districts_DistrictId",
                         column: x => x.DistrictId,
-                        principalTable: "Districts",
+                        principalTable: "PVS_Districts",
                         principalColumn: "DistrictId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Cities",
+                name: "PVS_Cities",
                 columns: table => new
                 {
                     CityId = table.Column<int>(type: "int", nullable: false)
@@ -814,35 +868,37 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     DistrictId = table.Column<int>(type: "int", nullable: false),
                     TalukId = table.Column<int>(type: "int", nullable: true),
                     Source = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Cities_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_Cities_IsActive"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Code = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Cities", x => x.CityId);
-                    table.CheckConstraint("CK_Cities_PinCode", "[PinCode] LIKE '[1-9][0-9][0-9][0-9][0-9][0-9]'");
+                    table.PrimaryKey("PVS_PK_Cities", x => x.CityId);
+                    table.CheckConstraint("PVS_CK_Cities_PinCode", "[PinCode] LIKE '[1-9][0-9][0-9][0-9][0-9][0-9]'");
                     table.ForeignKey(
-                        name: "FK_Cities_Districts_DistrictId",
+                        name: "PVS_FK_Cities_Districts_DistrictId",
                         column: x => x.DistrictId,
-                        principalTable: "Districts",
+                        principalTable: "PVS_Districts",
                         principalColumn: "DistrictId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Cities_Taluks_TalukId",
+                        name: "PVS_FK_Cities_Taluks_TalukId",
                         column: x => x.TalukId,
-                        principalTable: "Taluks",
+                        principalTable: "PVS_Taluks",
                         principalColumn: "TalukId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MemberAddresses",
+                name: "PVS_MemberAddresses",
                 columns: table => new
                 {
                     MemberAddressId = table.Column<int>(type: "int", nullable: false)
@@ -858,57 +914,59 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     DistrictId = table.Column<int>(type: "int", nullable: false),
                     StateId = table.Column<int>(type: "int", nullable: false),
                     CountryId = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: false, defaultValueSql: "SYSUTCDATETIME()")
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_MemberAddresses_CreatedDate"),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2(3)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ModifiedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                        .Annotation("Relational:DefaultConstraintName", "PVS_DF_MemberAddresses_IsActive")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MemberAddresses", x => x.MemberAddressId);
-                    table.CheckConstraint("CK_MemberAddresses_AddressType", "[AddressType] IN ('Permanent', 'Current')");
-                    table.CheckConstraint("CK_MemberAddresses_PinCode", "[PinCode] LIKE '[1-9][0-9][0-9][0-9][0-9][0-9]'");
+                    table.PrimaryKey("PVS_PK_MemberAddresses", x => x.MemberAddressId);
+                    table.CheckConstraint("PVS_CK_MemberAddresses_AddressType", "[AddressType] IN ('Permanent', 'Current')");
+                    table.CheckConstraint("PVS_CK_MemberAddresses_PinCode", "[PinCode] LIKE '[1-9][0-9][0-9][0-9][0-9][0-9]'");
                     table.ForeignKey(
-                        name: "FK_MemberAddresses_Cities_CityId",
+                        name: "PVS_FK_MemberAddresses_Cities_CityId",
                         column: x => x.CityId,
-                        principalTable: "Cities",
+                        principalTable: "PVS_Cities",
                         principalColumn: "CityId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_MemberAddresses_Countries_CountryId",
+                        name: "PVS_FK_MemberAddresses_Countries_CountryId",
                         column: x => x.CountryId,
-                        principalTable: "Countries",
+                        principalTable: "PVS_Countries",
                         principalColumn: "CountryId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_MemberAddresses_Districts_DistrictId",
+                        name: "PVS_FK_MemberAddresses_Districts_DistrictId",
                         column: x => x.DistrictId,
-                        principalTable: "Districts",
+                        principalTable: "PVS_Districts",
                         principalColumn: "DistrictId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_MemberAddresses_Members_RegistrationId",
+                        name: "PVS_FK_MemberAddresses_Members_RegistrationId",
                         column: x => x.RegistrationId,
-                        principalTable: "Members",
+                        principalTable: "PVS_Members",
                         principalColumn: "RegistrationId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_MemberAddresses_States_StateId",
+                        name: "PVS_FK_MemberAddresses_States_StateId",
                         column: x => x.StateId,
-                        principalTable: "States",
+                        principalTable: "PVS_States",
                         principalColumn: "StateId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_MemberAddresses_Taluks_TalukId",
+                        name: "PVS_FK_MemberAddresses_Taluks_TalukId",
                         column: x => x.TalukId,
-                        principalTable: "Taluks",
+                        principalTable: "PVS_Taluks",
                         principalColumn: "TalukId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
-                table: "AchievementTypes",
+                table: "PVS_AchievementTypes",
                 columns: new[] { "AchievementTypeId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -927,7 +985,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Boards",
+                table: "PVS_Boards",
                 columns: new[] { "BoardId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -943,7 +1001,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Branches",
+                table: "PVS_Branches",
                 columns: new[] { "BranchId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -973,7 +1031,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "CareerOptions",
+                table: "PVS_CareerOptions",
                 columns: new[] { "CareerOptionId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1001,7 +1059,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Classes",
+                table: "PVS_Classes",
                 columns: new[] { "ClassId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name", "Stage" },
                 values: new object[,]
                 {
@@ -1028,7 +1086,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "CommunicationChannels",
+                table: "PVS_CommunicationChannels",
                 columns: new[] { "CommunicationChannelId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1039,7 +1097,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "CommunicationTopics",
+                table: "PVS_CommunicationTopics",
                 columns: new[] { "CommunicationTopicId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1056,7 +1114,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "CompetitiveExams",
+                table: "PVS_CompetitiveExams",
                 columns: new[] { "CompetitiveExamId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1080,7 +1138,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Countries",
+                table: "PVS_Countries",
                 columns: new[] { "CountryId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1101,7 +1159,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Courses",
+                table: "PVS_Courses",
                 columns: new[] { "CourseId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1135,7 +1193,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "DisabilityTypes",
+                table: "PVS_DisabilityTypes",
                 columns: new[] { "DisabilityTypeId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "IsUserSubmitted", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1150,7 +1208,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "EducationLevels",
+                table: "PVS_EducationLevels",
                 columns: new[] { "EducationLevelId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1167,7 +1225,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Genders",
+                table: "PVS_Genders",
                 columns: new[] { "GenderId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1177,7 +1235,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Hobbies",
+                table: "PVS_Hobbies",
                 columns: new[] { "HobbyId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1195,7 +1253,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "InterestAreas",
+                table: "PVS_InterestAreas",
                 columns: new[] { "InterestAreaId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1215,7 +1273,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "MemberStatuses",
+                table: "PVS_MemberStatuses",
                 columns: new[] { "MemberStatusId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1225,7 +1283,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Organisations",
+                table: "PVS_Organisations",
                 columns: new[] { "OrganisationId", "OrganisationCode", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "OrganisationName" },
                 values: new object[,]
                 {
@@ -1238,7 +1296,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Roles",
+                table: "PVS_Roles",
                 columns: new[] { "RoleId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1255,7 +1313,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Skills",
+                table: "PVS_Skills",
                 columns: new[] { "SkillId", "Category", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1285,7 +1343,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Sports",
+                table: "PVS_Sports",
                 columns: new[] { "SportId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1302,30 +1360,19 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Temples",
+                table: "PVS_Temples",
                 columns: new[] { "TempleId", "TempleCode", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "TempleName" },
                 values: new object[,]
                 {
-                    { 1, "01", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 10, true, null, null, "Temple 01 (Placeholder - update name)" },
-                    { 2, "02", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 20, true, null, null, "Temple 02 (Placeholder - update name)" },
-                    { 3, "03", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 30, true, null, null, "Temple 03 (Placeholder - update name)" },
-                    { 4, "04", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 40, true, null, null, "Temple 04 (Placeholder - update name)" },
-                    { 5, "05", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 50, true, null, null, "Temple 05 (Placeholder - update name)" },
-                    { 6, "06", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 60, true, null, null, "Temple 06 (Placeholder - update name)" },
-                    { 7, "07", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 70, true, null, null, "Temple 07 (Placeholder - update name)" },
-                    { 8, "08", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 80, true, null, null, "Temple 08 (Placeholder - update name)" },
-                    { 9, "09", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 90, true, null, null, "Temple 09 (Placeholder - update name)" },
-                    { 10, "10", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 100, true, null, null, "Temple 10 (Placeholder - update name)" },
-                    { 11, "11", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 110, true, null, null, "Temple 11 (Placeholder - update name)" },
-                    { 12, "12", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 120, true, null, null, "Temple 12 (Placeholder - update name)" },
-                    { 13, "13", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 130, true, null, null, "Temple 13 (Placeholder - update name)" },
-                    { 14, "14", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 140, true, null, null, "Temple 14 (Placeholder - update name)" },
-                    { 15, "15", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 150, true, null, null, "Temple 15 (Placeholder - update name)" },
-                    { 16, "16", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 160, true, null, null, "Temple 16 (Placeholder - update name)" }
+                    { 1, "01", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 10, true, null, null, "Barkur" },
+                    { 2, "02", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 20, true, null, null, "Mangaluru" },
+                    { 3, "03", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 30, true, null, null, "Kallianapura" },
+                    { 4, "04", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 40, true, null, null, "Salikeri" },
+                    { 5, "05", "seed", new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Utc), 50, true, null, null, "Kinnimulky" }
                 });
 
             migrationBuilder.InsertData(
-                table: "Universities",
+                table: "PVS_Universities",
                 columns: new[] { "UniversityId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name" },
                 values: new object[,]
                 {
@@ -1342,7 +1389,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "States",
+                table: "PVS_States",
                 columns: new[] { "StateId", "Code", "CountryId", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name", "PostalName" },
                 values: new object[,]
                 {
@@ -1385,7 +1432,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "TempleRegistrationSequences",
+                table: "PVS_TempleRegistrationSequences",
                 columns: new[] { "TempleId", "LastSequenceNumber" },
                 values: new object[,]
                 {
@@ -1393,22 +1440,11 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     { 2, 0 },
                     { 3, 0 },
                     { 4, 0 },
-                    { 5, 0 },
-                    { 6, 0 },
-                    { 7, 0 },
-                    { 8, 0 },
-                    { 9, 0 },
-                    { 10, 0 },
-                    { 11, 0 },
-                    { 12, 0 },
-                    { 13, 0 },
-                    { 14, 0 },
-                    { 15, 0 },
-                    { 16, 0 }
+                    { 5, 0 }
                 });
 
             migrationBuilder.InsertData(
-                table: "Districts",
+                table: "PVS_Districts",
                 columns: new[] { "DistrictId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedDate", "Name", "PostalName", "Source", "StateId" },
                 values: new object[,]
                 {
@@ -1446,7 +1482,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Taluks",
+                table: "PVS_Taluks",
                 columns: new[] { "TalukId", "Code", "CreatedBy", "CreatedDate", "DisplayOrder", "DistrictId", "IsActive", "ModifiedBy", "ModifiedDate", "Name", "PostalName", "Source" },
                 values: new object[,]
                 {
@@ -1493,587 +1529,587 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AccountRoles_RoleId",
-                table: "AccountRoles",
+                name: "PVS_IX_AccountRoles_RoleId",
+                table: "PVS_AccountRoles",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Accounts_MobileNumber",
-                table: "Accounts",
+                name: "PVS_IX_Accounts_MobileNumber",
+                table: "PVS_Accounts",
                 column: "MobileNumber",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_AchievementTypes_Code",
-                table: "AchievementTypes",
+                name: "PVS_IX_AchievementTypes_Code",
+                table: "PVS_AchievementTypes",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_AchievementTypes_IsActive_DisplayOrder",
-                table: "AchievementTypes",
+                name: "PVS_IX_AchievementTypes_IsActive_DisplayOrder",
+                table: "PVS_AchievementTypes",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AchievementTypes_Name",
-                table: "AchievementTypes",
+                name: "PVS_IX_AchievementTypes_Name",
+                table: "PVS_AchievementTypes",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuditLogs_AccountId_CreatedDate",
-                table: "AuditLogs",
+                name: "PVS_IX_AuditLogs_AccountId_CreatedDate",
+                table: "PVS_AuditLogs",
                 columns: new[] { "AccountId", "CreatedDate" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuditLogs_CreatedDate",
-                table: "AuditLogs",
+                name: "PVS_IX_AuditLogs_CreatedDate",
+                table: "PVS_AuditLogs",
                 column: "CreatedDate");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Boards_Code",
-                table: "Boards",
+                name: "PVS_IX_Boards_Code",
+                table: "PVS_Boards",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Boards_IsActive_DisplayOrder",
-                table: "Boards",
+                name: "PVS_IX_Boards_IsActive_DisplayOrder",
+                table: "PVS_Boards",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Boards_Name",
-                table: "Boards",
+                name: "PVS_IX_Boards_Name",
+                table: "PVS_Boards",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Branches_Code",
-                table: "Branches",
+                name: "PVS_IX_Branches_Code",
+                table: "PVS_Branches",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Branches_IsActive_DisplayOrder",
-                table: "Branches",
+                name: "PVS_IX_Branches_IsActive_DisplayOrder",
+                table: "PVS_Branches",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Branches_Name",
-                table: "Branches",
+                name: "PVS_IX_Branches_Name",
+                table: "PVS_Branches",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CareerOptions_Code",
-                table: "CareerOptions",
+                name: "PVS_IX_CareerOptions_Code",
+                table: "PVS_CareerOptions",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CareerOptions_IsActive_DisplayOrder",
-                table: "CareerOptions",
+                name: "PVS_IX_CareerOptions_IsActive_DisplayOrder",
+                table: "PVS_CareerOptions",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CareerOptions_Name",
-                table: "CareerOptions",
+                name: "PVS_IX_CareerOptions_Name",
+                table: "PVS_CareerOptions",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cities_Code",
-                table: "Cities",
+                name: "PVS_IX_Cities_Code",
+                table: "PVS_Cities",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cities_DistrictId",
-                table: "Cities",
+                name: "PVS_IX_Cities_DistrictId",
+                table: "PVS_Cities",
                 column: "DistrictId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cities_IsActive_DisplayOrder",
-                table: "Cities",
+                name: "PVS_IX_Cities_IsActive_DisplayOrder",
+                table: "PVS_Cities",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cities_PinCode_Name",
-                table: "Cities",
+                name: "PVS_IX_Cities_PinCode_Name",
+                table: "PVS_Cities",
                 columns: new[] { "PinCode", "Name" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cities_TalukId",
-                table: "Cities",
+                name: "PVS_IX_Cities_TalukId",
+                table: "PVS_Cities",
                 column: "TalukId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Classes_Code",
-                table: "Classes",
+                name: "PVS_IX_Classes_Code",
+                table: "PVS_Classes",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Classes_IsActive_DisplayOrder",
-                table: "Classes",
+                name: "PVS_IX_Classes_IsActive_DisplayOrder",
+                table: "PVS_Classes",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Classes_Name",
-                table: "Classes",
+                name: "PVS_IX_Classes_Name",
+                table: "PVS_Classes",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommunicationChannels_Code",
-                table: "CommunicationChannels",
+                name: "PVS_IX_CommunicationChannels_Code",
+                table: "PVS_CommunicationChannels",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommunicationChannels_IsActive_DisplayOrder",
-                table: "CommunicationChannels",
+                name: "PVS_IX_CommunicationChannels_IsActive_DisplayOrder",
+                table: "PVS_CommunicationChannels",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommunicationChannels_Name",
-                table: "CommunicationChannels",
+                name: "PVS_IX_CommunicationChannels_Name",
+                table: "PVS_CommunicationChannels",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommunicationTopics_Code",
-                table: "CommunicationTopics",
+                name: "PVS_IX_CommunicationTopics_Code",
+                table: "PVS_CommunicationTopics",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommunicationTopics_IsActive_DisplayOrder",
-                table: "CommunicationTopics",
+                name: "PVS_IX_CommunicationTopics_IsActive_DisplayOrder",
+                table: "PVS_CommunicationTopics",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommunicationTopics_Name",
-                table: "CommunicationTopics",
+                name: "PVS_IX_CommunicationTopics_Name",
+                table: "PVS_CommunicationTopics",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CompetitiveExams_Code",
-                table: "CompetitiveExams",
+                name: "PVS_IX_CompetitiveExams_Code",
+                table: "PVS_CompetitiveExams",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CompetitiveExams_IsActive_DisplayOrder",
-                table: "CompetitiveExams",
+                name: "PVS_IX_CompetitiveExams_IsActive_DisplayOrder",
+                table: "PVS_CompetitiveExams",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CompetitiveExams_Name",
-                table: "CompetitiveExams",
+                name: "PVS_IX_CompetitiveExams_Name",
+                table: "PVS_CompetitiveExams",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ConsentRecords_AccountId_ConsentType",
-                table: "ConsentRecords",
+                name: "PVS_IX_ConsentRecords_AccountId_ConsentType",
+                table: "PVS_ConsentRecords",
                 columns: new[] { "AccountId", "ConsentType" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ConsentRecords_RegistrationId",
-                table: "ConsentRecords",
+                name: "PVS_IX_ConsentRecords_RegistrationId",
+                table: "PVS_ConsentRecords",
                 column: "RegistrationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Countries_Code",
-                table: "Countries",
+                name: "PVS_IX_Countries_Code",
+                table: "PVS_Countries",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Countries_IsActive_DisplayOrder",
-                table: "Countries",
+                name: "PVS_IX_Countries_IsActive_DisplayOrder",
+                table: "PVS_Countries",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Countries_Name",
-                table: "Countries",
+                name: "PVS_IX_Countries_Name",
+                table: "PVS_Countries",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Courses_Code",
-                table: "Courses",
+                name: "PVS_IX_Courses_Code",
+                table: "PVS_Courses",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Courses_IsActive_DisplayOrder",
-                table: "Courses",
+                name: "PVS_IX_Courses_IsActive_DisplayOrder",
+                table: "PVS_Courses",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Courses_Name",
-                table: "Courses",
+                name: "PVS_IX_Courses_Name",
+                table: "PVS_Courses",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DisabilityTypes_Code",
-                table: "DisabilityTypes",
+                name: "PVS_IX_DisabilityTypes_Code",
+                table: "PVS_DisabilityTypes",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DisabilityTypes_IsActive_DisplayOrder",
-                table: "DisabilityTypes",
+                name: "PVS_IX_DisabilityTypes_IsActive_DisplayOrder",
+                table: "PVS_DisabilityTypes",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_DisabilityTypes_Name",
-                table: "DisabilityTypes",
+                name: "PVS_IX_DisabilityTypes_Name",
+                table: "PVS_DisabilityTypes",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Districts_Code",
-                table: "Districts",
+                name: "PVS_IX_Districts_Code",
+                table: "PVS_Districts",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Districts_IsActive_DisplayOrder",
-                table: "Districts",
+                name: "PVS_IX_Districts_IsActive_DisplayOrder",
+                table: "PVS_Districts",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Districts_StateId_Name",
-                table: "Districts",
+                name: "PVS_IX_Districts_StateId_Name",
+                table: "PVS_Districts",
                 columns: new[] { "StateId", "Name" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_EducationLevels_Code",
-                table: "EducationLevels",
+                name: "PVS_IX_EducationLevels_Code",
+                table: "PVS_EducationLevels",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_EducationLevels_IsActive_DisplayOrder",
-                table: "EducationLevels",
+                name: "PVS_IX_EducationLevels_IsActive_DisplayOrder",
+                table: "PVS_EducationLevels",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_EducationLevels_Name",
-                table: "EducationLevels",
+                name: "PVS_IX_EducationLevels_Name",
+                table: "PVS_EducationLevels",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Genders_Code",
-                table: "Genders",
+                name: "PVS_IX_Genders_Code",
+                table: "PVS_Genders",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Genders_IsActive_DisplayOrder",
-                table: "Genders",
+                name: "PVS_IX_Genders_IsActive_DisplayOrder",
+                table: "PVS_Genders",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Genders_Name",
-                table: "Genders",
+                name: "PVS_IX_Genders_Name",
+                table: "PVS_Genders",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Hobbies_Code",
-                table: "Hobbies",
+                name: "PVS_IX_Hobbies_Code",
+                table: "PVS_Hobbies",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Hobbies_IsActive_DisplayOrder",
-                table: "Hobbies",
+                name: "PVS_IX_Hobbies_IsActive_DisplayOrder",
+                table: "PVS_Hobbies",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Hobbies_Name",
-                table: "Hobbies",
+                name: "PVS_IX_Hobbies_Name",
+                table: "PVS_Hobbies",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_InterestAreas_Code",
-                table: "InterestAreas",
+                name: "PVS_IX_InterestAreas_Code",
+                table: "PVS_InterestAreas",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_InterestAreas_IsActive_DisplayOrder",
-                table: "InterestAreas",
+                name: "PVS_IX_InterestAreas_IsActive_DisplayOrder",
+                table: "PVS_InterestAreas",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_InterestAreas_Name",
-                table: "InterestAreas",
+                name: "PVS_IX_InterestAreas_Name",
+                table: "PVS_InterestAreas",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_MemberAddresses_CityId",
-                table: "MemberAddresses",
+                name: "PVS_IX_MemberAddresses_CityId",
+                table: "PVS_MemberAddresses",
                 column: "CityId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MemberAddresses_CountryId",
-                table: "MemberAddresses",
+                name: "PVS_IX_MemberAddresses_CountryId",
+                table: "PVS_MemberAddresses",
                 column: "CountryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MemberAddresses_DistrictId_TalukId",
-                table: "MemberAddresses",
+                name: "PVS_IX_MemberAddresses_DistrictId_TalukId",
+                table: "PVS_MemberAddresses",
                 columns: new[] { "DistrictId", "TalukId" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_MemberAddresses_PinCode",
-                table: "MemberAddresses",
+                name: "PVS_IX_MemberAddresses_PinCode",
+                table: "PVS_MemberAddresses",
                 column: "PinCode");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MemberAddresses_RegistrationId_AddressType",
-                table: "MemberAddresses",
+                name: "PVS_IX_MemberAddresses_RegistrationId_AddressType",
+                table: "PVS_MemberAddresses",
                 columns: new[] { "RegistrationId", "AddressType" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_MemberAddresses_StateId",
-                table: "MemberAddresses",
+                name: "PVS_IX_MemberAddresses_StateId",
+                table: "PVS_MemberAddresses",
                 column: "StateId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MemberAddresses_TalukId",
-                table: "MemberAddresses",
+                name: "PVS_IX_MemberAddresses_TalukId",
+                table: "PVS_MemberAddresses",
                 column: "TalukId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MemberDisabilities_DisabilityTypeId",
-                table: "MemberDisabilities",
+                name: "PVS_IX_MemberDisabilities_DisabilityTypeId",
+                table: "PVS_MemberDisabilities",
                 column: "DisabilityTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Members_AccountId",
-                table: "Members",
+                name: "PVS_IX_Members_AccountId",
+                table: "PVS_Members",
                 column: "AccountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Members_ClassId",
-                table: "Members",
+                name: "PVS_IX_Members_ClassId",
+                table: "PVS_Members",
                 column: "ClassId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Members_DateOfBirth",
-                table: "Members",
+                name: "PVS_IX_Members_DateOfBirth",
+                table: "PVS_Members",
                 column: "DateOfBirth");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Members_GenderId",
-                table: "Members",
+                name: "PVS_IX_Members_GenderId",
+                table: "PVS_Members",
                 column: "GenderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Members_HighestEducationLevelId",
-                table: "Members",
+                name: "PVS_IX_Members_HighestEducationLevelId",
+                table: "PVS_Members",
                 column: "HighestEducationLevelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Members_MemberStatusId_ClassId",
-                table: "Members",
+                name: "PVS_IX_Members_MemberStatusId_ClassId",
+                table: "PVS_Members",
                 columns: new[] { "MemberStatusId", "ClassId" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Members_OrganisationId",
-                table: "Members",
+                name: "PVS_IX_Members_OrganisationId",
+                table: "PVS_Members",
                 column: "OrganisationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Members_TempleId",
-                table: "Members",
+                name: "PVS_IX_Members_TempleId",
+                table: "PVS_Members",
                 column: "TempleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MemberStatuses_Code",
-                table: "MemberStatuses",
+                name: "PVS_IX_MemberStatuses_Code",
+                table: "PVS_MemberStatuses",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_MemberStatuses_IsActive_DisplayOrder",
-                table: "MemberStatuses",
+                name: "PVS_IX_MemberStatuses_IsActive_DisplayOrder",
+                table: "PVS_MemberStatuses",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_MemberStatuses_Name",
-                table: "MemberStatuses",
+                name: "PVS_IX_MemberStatuses_Name",
+                table: "PVS_MemberStatuses",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Organisations_IsActive_DisplayOrder",
-                table: "Organisations",
+                name: "PVS_IX_Organisations_IsActive_DisplayOrder",
+                table: "PVS_Organisations",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Organisations_OrganisationCode",
-                table: "Organisations",
+                name: "PVS_IX_Organisations_OrganisationCode",
+                table: "PVS_Organisations",
                 column: "OrganisationCode",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Organisations_OrganisationName",
-                table: "Organisations",
+                name: "PVS_IX_Organisations_OrganisationName",
+                table: "PVS_Organisations",
                 column: "OrganisationName",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_PhoneVerificationChallenges_MobileNumber_CreatedDate",
-                table: "PhoneVerificationChallenges",
+                name: "PVS_IX_PhoneVerificationChallenges_MobileNumber_CreatedDate",
+                table: "PVS_PhoneVerificationChallenges",
                 columns: new[] { "MobileNumber", "CreatedDate" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_RefreshTokens_AccountId",
-                table: "RefreshTokens",
+                name: "PVS_IX_RefreshTokens_AccountId",
+                table: "PVS_RefreshTokens",
                 column: "AccountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RefreshTokens_TokenHash",
-                table: "RefreshTokens",
+                name: "PVS_IX_RefreshTokens_TokenHash",
+                table: "PVS_RefreshTokens",
                 column: "TokenHash",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Roles_Code",
-                table: "Roles",
+                name: "PVS_IX_Roles_Code",
+                table: "PVS_Roles",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Roles_IsActive_DisplayOrder",
-                table: "Roles",
+                name: "PVS_IX_Roles_IsActive_DisplayOrder",
+                table: "PVS_Roles",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Roles_Name",
-                table: "Roles",
+                name: "PVS_IX_Roles_Name",
+                table: "PVS_Roles",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Skills_Category_IsActive_DisplayOrder",
-                table: "Skills",
+                name: "PVS_IX_Skills_Category_IsActive_DisplayOrder",
+                table: "PVS_Skills",
                 columns: new[] { "Category", "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Skills_Code",
-                table: "Skills",
+                name: "PVS_IX_Skills_Code",
+                table: "PVS_Skills",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Skills_IsActive_DisplayOrder",
-                table: "Skills",
+                name: "PVS_IX_Skills_IsActive_DisplayOrder",
+                table: "PVS_Skills",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Skills_Name",
-                table: "Skills",
+                name: "PVS_IX_Skills_Name",
+                table: "PVS_Skills",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sports_Code",
-                table: "Sports",
+                name: "PVS_IX_Sports_Code",
+                table: "PVS_Sports",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sports_IsActive_DisplayOrder",
-                table: "Sports",
+                name: "PVS_IX_Sports_IsActive_DisplayOrder",
+                table: "PVS_Sports",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sports_Name",
-                table: "Sports",
+                name: "PVS_IX_Sports_Name",
+                table: "PVS_Sports",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_States_Code",
-                table: "States",
+                name: "PVS_IX_States_Code",
+                table: "PVS_States",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_States_CountryId_Name",
-                table: "States",
+                name: "PVS_IX_States_CountryId_Name",
+                table: "PVS_States",
                 columns: new[] { "CountryId", "Name" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_States_IsActive_DisplayOrder",
-                table: "States",
+                name: "PVS_IX_States_IsActive_DisplayOrder",
+                table: "PVS_States",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Taluks_Code",
-                table: "Taluks",
+                name: "PVS_IX_Taluks_Code",
+                table: "PVS_Taluks",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Taluks_DistrictId_Name",
-                table: "Taluks",
+                name: "PVS_IX_Taluks_DistrictId_Name",
+                table: "PVS_Taluks",
                 columns: new[] { "DistrictId", "Name" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Taluks_IsActive_DisplayOrder",
-                table: "Taluks",
+                name: "PVS_IX_Taluks_IsActive_DisplayOrder",
+                table: "PVS_Taluks",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Temples_IsActive_DisplayOrder",
-                table: "Temples",
+                name: "PVS_IX_Temples_IsActive_DisplayOrder",
+                table: "PVS_Temples",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Temples_TempleCode",
-                table: "Temples",
+                name: "PVS_IX_Temples_TempleCode",
+                table: "PVS_Temples",
                 column: "TempleCode",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Temples_TempleName",
-                table: "Temples",
+                name: "PVS_IX_Temples_TempleName",
+                table: "PVS_Temples",
                 column: "TempleName",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Universities_Code",
-                table: "Universities",
+                name: "PVS_IX_Universities_Code",
+                table: "PVS_Universities",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Universities_IsActive_DisplayOrder",
-                table: "Universities",
+                name: "PVS_IX_Universities_IsActive_DisplayOrder",
+                table: "PVS_Universities",
                 columns: new[] { "IsActive", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Universities_Name",
-                table: "Universities",
+                name: "PVS_IX_Universities_Name",
+                table: "PVS_Universities",
                 column: "Name",
                 unique: true);
         }
@@ -2082,112 +2118,112 @@ namespace PadmashaliVidyaSetu.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AccountRoles");
+                name: "PVS_AccountRoles");
 
             migrationBuilder.DropTable(
-                name: "AchievementTypes");
+                name: "PVS_AchievementTypes");
 
             migrationBuilder.DropTable(
-                name: "AuditLogs");
+                name: "PVS_AuditLogs");
 
             migrationBuilder.DropTable(
-                name: "Boards");
+                name: "PVS_Boards");
 
             migrationBuilder.DropTable(
-                name: "Branches");
+                name: "PVS_Branches");
 
             migrationBuilder.DropTable(
-                name: "CareerOptions");
+                name: "PVS_CareerOptions");
 
             migrationBuilder.DropTable(
-                name: "CommunicationChannels");
+                name: "PVS_CommunicationChannels");
 
             migrationBuilder.DropTable(
-                name: "CommunicationTopics");
+                name: "PVS_CommunicationTopics");
 
             migrationBuilder.DropTable(
-                name: "CompetitiveExams");
+                name: "PVS_CompetitiveExams");
 
             migrationBuilder.DropTable(
-                name: "ConsentRecords");
+                name: "PVS_ConsentRecords");
 
             migrationBuilder.DropTable(
-                name: "Courses");
+                name: "PVS_Courses");
 
             migrationBuilder.DropTable(
-                name: "Hobbies");
+                name: "PVS_Hobbies");
 
             migrationBuilder.DropTable(
-                name: "InterestAreas");
+                name: "PVS_InterestAreas");
 
             migrationBuilder.DropTable(
-                name: "MemberAddresses");
+                name: "PVS_MemberAddresses");
 
             migrationBuilder.DropTable(
-                name: "MemberDisabilities");
+                name: "PVS_MemberDisabilities");
 
             migrationBuilder.DropTable(
-                name: "PhoneVerificationChallenges");
+                name: "PVS_PhoneVerificationChallenges");
 
             migrationBuilder.DropTable(
-                name: "RefreshTokens");
+                name: "PVS_RefreshTokens");
 
             migrationBuilder.DropTable(
-                name: "Skills");
+                name: "PVS_Skills");
 
             migrationBuilder.DropTable(
-                name: "Sports");
+                name: "PVS_Sports");
 
             migrationBuilder.DropTable(
-                name: "TempleRegistrationSequences");
+                name: "PVS_TempleRegistrationSequences");
 
             migrationBuilder.DropTable(
-                name: "Universities");
+                name: "PVS_Universities");
 
             migrationBuilder.DropTable(
-                name: "Roles");
+                name: "PVS_Roles");
 
             migrationBuilder.DropTable(
-                name: "Cities");
+                name: "PVS_Cities");
 
             migrationBuilder.DropTable(
-                name: "DisabilityTypes");
+                name: "PVS_DisabilityTypes");
 
             migrationBuilder.DropTable(
-                name: "Members");
+                name: "PVS_Members");
 
             migrationBuilder.DropTable(
-                name: "Taluks");
+                name: "PVS_Taluks");
 
             migrationBuilder.DropTable(
-                name: "Accounts");
+                name: "PVS_Accounts");
 
             migrationBuilder.DropTable(
-                name: "Classes");
+                name: "PVS_Classes");
 
             migrationBuilder.DropTable(
-                name: "EducationLevels");
+                name: "PVS_EducationLevels");
 
             migrationBuilder.DropTable(
-                name: "Genders");
+                name: "PVS_Genders");
 
             migrationBuilder.DropTable(
-                name: "MemberStatuses");
+                name: "PVS_MemberStatuses");
 
             migrationBuilder.DropTable(
-                name: "Organisations");
+                name: "PVS_Organisations");
 
             migrationBuilder.DropTable(
-                name: "Temples");
+                name: "PVS_Temples");
 
             migrationBuilder.DropTable(
-                name: "Districts");
+                name: "PVS_Districts");
 
             migrationBuilder.DropTable(
-                name: "States");
+                name: "PVS_States");
 
             migrationBuilder.DropTable(
-                name: "Countries");
+                name: "PVS_Countries");
         }
     }
 }

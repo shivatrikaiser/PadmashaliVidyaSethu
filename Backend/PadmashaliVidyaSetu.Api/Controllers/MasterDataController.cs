@@ -18,7 +18,7 @@ public sealed class MasterDataController(IMasterDataService masterData, IPinCode
     /// <summary>Several lists in one call, e.g. <c>?types=temples,genders,member-statuses</c>.</summary>
     [HttpGet("master-data")]
     public async Task<ActionResult<ApiResponse<IReadOnlyDictionary<string, IReadOnlyList<MasterDataItemDto>>>>> GetMany(
-        [FromQuery] string types, CancellationToken ct)
+        [FromQuery] string? types, CancellationToken ct)
     {
         var requested = (types ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (requested.Length is 0 or > 25)
