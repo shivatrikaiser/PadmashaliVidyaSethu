@@ -1,0 +1,117 @@
+/* ---------------------------------------------------------------- Row 1: cards */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.card {
+  --tone: var(--pvs-primary);
+  --tint: #e8f0fb;
+
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 14px;
+  align-items: center;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--tint) 0%, var(--pvs-surface) 85%);
+  border: 1px solid var(--pvs-border);
+  border-left: 5px solid var(--tone);
+  box-shadow: 0 2px 8px rgb(28 36 48 / 0.06);
+
+  &.blue {
+    --tone: #2a78d6;
+    --tint: #e3eefb;
+  }
+
+  &.green {
+    --tone: #1b8f62;
+    --tint: #e1f4ec;
+  }
+
+  &.violet {
+    --tone: #4a3aa7;
+    --tint: #ebe8f8;
+  }
+
+  &.orange {
+    --tone: #c4561f;
+    --tint: #fcebe2;
+  }
+
+  .icon {
+    grid-row: 1 / span 2;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--tone);
+
+    svg {
+      width: 26px;
+      height: 26px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  }
+
+  .value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--pvs-text);
+  }
+
+  .label {
+    font-size: 0.9rem;
+    color: var(--pvs-text-muted);
+  }
+}
+
+/* ---------------------------------------------------------------- Chart rows */
+.row {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  &.wide-left {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  }
+
+  &.wide-right {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+
+  .panel {
+    margin: 0;
+    min-width: 0;
+  }
+}
+
+.panel h2 {
+  margin-bottom: 12px;
+
+  small {
+    font-weight: 400;
+  }
+}
+
+.table-wrap.flat {
+  border: 0;
+  border-radius: 0;
+}
+
+@media (max-width: 960px) {
+  .row.wide-left,
+  .row.wide-right {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

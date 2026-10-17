@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using PadmashaliVidyaSetu.Api.Authentication;
 using PadmashaliVidyaSetu.Api.Common;
@@ -67,6 +67,7 @@ public sealed class RegistrationService(
         // Rules 1-4: Class Studying only for students; Highest Education only for working / unemployed.
         SchoolClass? schoolClass = null;
         EducationLevel? highestEducation = null;
+        string? highestEducationOther = null;
         if (status?.Code == MasterCodes.StatusStudent)
         {
             schoolClass = await ActiveAsync(db.Classes, r.ClassId);
@@ -78,6 +79,8 @@ public sealed class RegistrationService(
         {
             highestEducation = await ActiveAsync(db.EducationLevels, r.HighestEducationLevelId);
             if (highestEducation is null) errors.Add(new("highestEducationLevelId", "Please select your highest education."));
+            highestEducationOther = OtherText(highestEducation?.Code, r.HighestEducationLevelOtherText,
+                "highestEducationLevelOtherText", "Please specify your highest education.", errors);
             if (r.ClassId is not null)
                 errors.Add(new("classId", "Class Studying applies only when Current Status is Student."));
         }
@@ -93,8 +96,8 @@ public sealed class RegistrationService(
             ? permanent is null ? null : CopyAddress(permanent, AddressTypes.Current)
             : await BuildAddressAsync(r.CurrentAddress!, "currentAddress", AddressTypes.Current, errors, ct);
 
-        var disabilityTypeIds = r.IsDisabled
-            ? await ResolveDisabilityTypesAsync(r.DisabilityTypeIds ?? [], r.OtherDisabilityDescription, errors, ct)
+        var disabilities = r.IsDisabled
+            ? await ResolveDisabilitiesAsync(r.DisabilityTypeIds ?? [], r.OtherDisabilityDescription, errors, ct)
             : [];
 
         if (errors.Count > 0) throw new RequestValidationException(errors);
@@ -114,6 +117,7 @@ public sealed class RegistrationService(
             MemberStatusId = status!.Id,
             ClassId = schoolClass?.Id,
             HighestEducationLevelId = highestEducation?.Id,
+            HighestEducationLevelOtherText = highestEducationOther,
             OrganisationId = organisation!.Id,
             IsCurrentAddressSameAsPermanent = r.CurrentAddressSameAsPermanent,
             IsDisabled = r.IsDisabled,
@@ -121,13 +125,12 @@ public sealed class RegistrationService(
         };
         member.Addresses.Add(permanent!);
         member.Addresses.Add(current!);
-        foreach (var typeId in disabilityTypeIds)
+        foreach (var (typeId, otherText) in disabilities)
         {
-            member.Disabilities.Add(new MemberDisability { DisabilityTypeId = typeId, CreatedDate = now, CreatedBy = currentUser.AuditName });
-        }
-        foreach (var pending in db.ChangeTracker.Entries<DisabilityType>().Where(e => e.State == EntityState.Added))
-        {
-            member.Disabilities.Add(new MemberDisability { DisabilityType = pending.Entity, CreatedDate = now, CreatedBy = currentUser.AuditName });
+            member.Disabilities.Add(new MemberDisability
+            {
+                DisabilityTypeId = typeId, OtherText = otherText, CreatedDate = now, CreatedBy = currentUser.AuditName,
+            });
         }
         db.Members.Add(member);
 
@@ -245,11 +248,10 @@ public sealed class RegistrationService(
     };
 
     /// <summary>
-    /// Returns the IDs of existing disability types to link. When "Other" is chosen, the description is matched to
-    /// an existing type or added as a new (user-submitted) type, which then appears in everyone's dropdown.
-    /// A newly added type is left in the change tracker and linked by the caller.
+    /// The disability types to link. "Other" is linked like any type, with the member's description as its
+    /// <c>OtherText</c> (reviewed and mapped to a proper type by administrators).
     /// </summary>
-    private async Task<List<int>> ResolveDisabilityTypesAsync(
+    private async Task<List<(int TypeId, string? OtherText)>> ResolveDisabilitiesAsync(
         IReadOnlyList<int> ids, string? otherDescription, List<ApiError> errors, CancellationToken ct)
     {
         var distinctIds = ids.Distinct().ToList();
@@ -260,34 +262,20 @@ public sealed class RegistrationService(
             return [];
         }
 
-        var other = types.FirstOrDefault(t => t.Code == MasterCodes.DisabilityOther);
-        var result = types.Where(t => t != other).Select(t => t.Id).ToList();
-        if (other is null) return result;
+        var otherText = OtherText(types.Any(t => t.Code == MasterCodes.Other) ? MasterCodes.Other : null, otherDescription,
+            "otherDisabilityDescription", "Please specify the type of disability.", errors);
+        return types.Select(t => (t.Id, t.Code == MasterCodes.Other ? otherText : null)).ToList();
+    }
 
-        var description = otherDescription.Tidy();
-        if (description.Length == 0)
-        {
-            errors.Add(new("otherDisabilityDescription", "Please specify the type of disability."));
-            return [];
-        }
-
-        var existing = await db.DisabilityTypes.FirstOrDefaultAsync(t => t.Name == description, ct);
-        if (existing is not null)
-        {
-            // A deactivated (rejected) submission is not re-linked; the member keeps "Other".
-            result.Add(existing.IsActive ? existing.Id : other.Id);
-            return result.Distinct().ToList();
-        }
-
-        db.DisabilityTypes.Add(new DisabilityType
-        {
-            Name = description,
-            Code = await LocationResolver.UniqueCodeAsync(db.DisabilityTypes, $"USR-{LocationResolver.Slug(description)}", ct),
-            DisplayOrder = other.DisplayOrder - 1, // listed just before "Other"
-            IsUserSubmitted = true,
-        });
-        audit.Add(AuditActions.DisabilityTypeSubmitted, "DisabilityType", null, description);
-        return result;
+    /// <summary>
+    /// Free text for a list's "Other" choice: required when <paramref name="selectedCode"/> is OTHER, ignored otherwise.
+    /// </summary>
+    private static string? OtherText(string? selectedCode, string? text, string field, string requiredMessage, List<ApiError> errors)
+    {
+        if (selectedCode != MasterCodes.Other) return null;
+        var tidy = text.Tidy();
+        if (tidy.Length == 0) errors.Add(new(field, requiredMessage));
+        return tidy.Length == 0 ? null : tidy;
     }
 
     private void AddConsent(int accountId, string registrationId, string type, DateTime now) =>

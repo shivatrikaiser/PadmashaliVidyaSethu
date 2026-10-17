@@ -1,0 +1,40 @@
+<h1>Admin users</h1>
+
+<form class="panel filters" (ngSubmit)="grant()">
+  <label>Mobile number
+    <input name="mobile" [(ngModel)]="mobileNumber" inputmode="numeric" maxlength="13" placeholder="10-digit mobile number" />
+  </label>
+  <label>Role
+    <select name="role" [(ngModel)]="roleCode">
+      <option value="ADMIN">Admin</option>
+      <option value="SUPER_ADMIN">Super Admin (also admin users and sensitive data)</option>
+    </select>
+  </label>
+  <div class="actions"><button type="submit" [disabled]="busy() || !mobileNumber.trim()">Grant access</button></div>
+  <p class="muted hint">The person signs in to the admin portal with this number. If they have never signed in, their account is created now.</p>
+</form>
+
+@if (error()) { <p class="alert">{{ error() }}</p> }
+@if (message()) { <p class="notice">{{ message() }}</p> }
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Mobile number</th><th>Roles</th><th>Last sign-in</th></tr></thead>
+    <tbody>
+      @for (u of users(); track u.accountId) {
+        <tr>
+          <td>{{ u.mobileNumber }}</td>
+          <td>
+            @for (role of u.roles; track role) {
+              <span class="chip">
+                {{ role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin' }}
+                <button type="button" class="chip-remove" title="Remove this role" (click)="revoke(u, role)" [disabled]="busy()">×</button>
+              </span>
+            }
+          </td>
+          <td>{{ u.lastLoginDate ? (u.lastLoginDate | date: 'dd MMM yyyy, HH:mm') : 'Never' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -22,3 +22,5 @@ public sealed record AuthTokensResponse(
     int RegisteredMemberCount);
 
 public sealed record RefreshTokenRequest(string? RefreshToken);
+
+public sealed record AdminMeDto(string MaskedMobileNumber, IReadOnlyList<string> Roles);

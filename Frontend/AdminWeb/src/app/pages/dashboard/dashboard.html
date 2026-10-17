@@ -1,0 +1,102 @@
+<div class="page-head">
+  <h1>Dashboard</h1>
+  <a routerLink="/members" class="button secondary">Search members</a>
+</div>
+
+@if (error()) {
+  <p class="alert">{{ error() }}</p>
+}
+
+@if (summary(); as s) {
+  <!-- Row 1: headline cards -->
+  <section class="cards">
+    <div class="card blue">
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0Zm-12 9a8 8 0 0 1 16 0" /></svg>
+      </span>
+      <span class="value">{{ s.activeMembers }}</span>
+      <span class="label">Active members</span>
+    </div>
+    <div class="card green">
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+      </span>
+      <span class="value">{{ s.registeredLast30Days }}</span>
+      <span class="label">Registered in last 30 days</span>
+    </div>
+    <div class="card violet">
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm3 15h2" /></svg>
+      </span>
+      <span class="value">{{ s.accounts }}</span>
+      <span class="label">Mobile numbers (accounts)</span>
+    </div>
+    <div class="card orange">
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM5.6 5.6l12.8 12.8" /></svg>
+      </span>
+      <span class="value">{{ s.inactiveMembers }}</span>
+      <span class="label">Deactivated members</span>
+    </div>
+  </section>
+
+  <!-- Row 2: temple (column) + current status (pie) -->
+  <section class="row wide-left">
+    <div class="panel">
+      <h2>Temple wise</h2>
+      <app-chart kind="column" [items]="s.byTemple" [tickLabel]="templeTick" [height]="300" ariaLabel="Members by temple" />
+    </div>
+    <div class="panel">
+      <h2>Current status</h2>
+      <app-chart kind="pie" [items]="s.byStatus" [height]="220" ariaLabel="Members by current status" />
+    </div>
+  </section>
+
+  <!-- Row 3: gender (pie) + age group (bar) -->
+  <section class="row wide-right">
+    <div class="panel">
+      <h2>Gender</h2>
+      <app-chart kind="pie" [items]="s.byGender" [height]="220" ariaLabel="Members by gender" />
+    </div>
+    <div class="panel">
+      <h2>Age group</h2>
+      <app-chart kind="bar" [items]="s.byAgeGroup" [height]="260" ariaLabel="Members by age group" />
+    </div>
+  </section>
+
+  <!-- Row 4: organisation (column) + students by school stage (pie) -->
+  <section class="row wide-left">
+    <div class="panel">
+      <h2>Organisation wise</h2>
+      <app-chart kind="column" [items]="s.byOrganisation" [height]="280" ariaLabel="Members by organisation" />
+    </div>
+    <div class="panel">
+      <h2>Students by school stage</h2>
+      <app-chart kind="pie" [items]="s.studentsByStage" [height]="220" ariaLabel="Students by school stage" />
+    </div>
+  </section>
+
+  <!-- Row 5: top districts -->
+  <section class="panel">
+    <h2>Top districts <small class="muted">(permanent address)</small></h2>
+    <div class="table-wrap flat">
+      <table>
+        <thead><tr><th class="num">#</th><th>District</th><th class="num">Members</th><th class="num">Share</th></tr></thead>
+        <tbody>
+          @for (d of s.byDistrict; track d.label; let i = $index) {
+            <tr>
+              <td class="num">{{ i + 1 }}</td>
+              <td>{{ d.label }}</td>
+              <td class="num">{{ d.count }}</td>
+              <td class="num">{{ share(d.count) }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="4" class="muted">No data yet.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+} @else if (!error()) {
+  <p class="muted">Loading…</p>
+}

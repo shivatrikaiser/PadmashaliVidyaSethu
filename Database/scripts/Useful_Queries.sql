@@ -10,8 +10,34 @@ WHERE m.IsActive = 1
 GROUP BY t.TempleName, s.Name, c.Name
 ORDER BY t.TempleName, s.Name, c.Name;
 
--- Disability types added by members ("Other - please specify") awaiting review
-SELECT DisabilityTypeId, Name, Code, CreatedDate FROM dbo.PVS_DisabilityTypes WHERE IsUserSubmitted = 1 ORDER BY CreatedDate DESC;
+-- "Other" values typed by members, awaiting a proper master record (create it, then re-map the member)
+SELECT 'Highest Education' AS List, m.RegistrationId, m.HighestEducationLevelOtherText AS OtherText, m.CreatedDate
+FROM dbo.PVS_Members m WHERE m.HighestEducationLevelOtherText IS NOT NULL
+UNION ALL
+SELECT 'Disability Type', RegistrationId, OtherText, CreatedDate FROM dbo.PVS_MemberDisabilities WHERE OtherText IS NOT NULL
+UNION ALL
+SELECT 'Skill', RegistrationId, OtherText, CreatedDate FROM dbo.PVS_MemberSkills WHERE OtherText IS NOT NULL
+UNION ALL
+SELECT 'Interest Area', RegistrationId, OtherText, CreatedDate FROM dbo.PVS_MemberInterestAreas WHERE OtherText IS NOT NULL
+UNION ALL
+SELECT 'Sport', RegistrationId, OtherText, CreatedDate FROM dbo.PVS_MemberSports WHERE OtherText IS NOT NULL
+UNION ALL
+SELECT 'Hobby', RegistrationId, OtherText, CreatedDate FROM dbo.PVS_MemberHobbies WHERE OtherText IS NOT NULL
+UNION ALL
+SELECT 'Career Option', RegistrationId, OtherText, CreatedDate FROM dbo.PVS_MemberCareerAspirations WHERE OtherText IS NOT NULL
+UNION ALL
+SELECT 'Competitive Exam', RegistrationId, OtherText, CreatedDate FROM dbo.PVS_MemberCompetitiveExams WHERE OtherText IS NOT NULL
+UNION ALL
+SELECT 'Education Level', RegistrationId, EducationLevelOtherText, CreatedDate FROM dbo.PVS_MemberEducation WHERE EducationLevelOtherText IS NOT NULL
+UNION ALL
+SELECT 'Course', RegistrationId, CourseOtherText, CreatedDate FROM dbo.PVS_MemberEducation WHERE CourseOtherText IS NOT NULL
+UNION ALL
+SELECT 'Branch', RegistrationId, BranchOtherText, CreatedDate FROM dbo.PVS_MemberEducation WHERE BranchOtherText IS NOT NULL
+UNION ALL
+SELECT 'Board', RegistrationId, BoardOtherText, CreatedDate FROM dbo.PVS_MemberEducation WHERE BoardOtherText IS NOT NULL
+UNION ALL
+SELECT 'Achievement Type', RegistrationId, AchievementTypeOtherText, CreatedDate FROM dbo.PVS_AcademicAchievements WHERE AchievementTypeOtherText IS NOT NULL
+ORDER BY List, OtherText;
 
 -- Districts / taluks learned automatically from PIN-code lookups or typed by members (review & merge)
 SELECT 'District' AS Kind, d.Name, s.Name AS Parent, d.Source FROM dbo.PVS_Districts d JOIN dbo.PVS_States s ON s.StateId = d.StateId WHERE d.Source <> 'Seed'

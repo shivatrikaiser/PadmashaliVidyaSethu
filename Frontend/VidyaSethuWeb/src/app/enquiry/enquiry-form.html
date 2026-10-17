@@ -1,0 +1,176 @@
+@let e = t().enquiry;
+
+@if (!enabled) {
+  <div class="notice warning" role="note" data-testid="enquiry-disabled">
+    <vs-icon name="info" [size]="22" />
+    <div>
+      <p>
+        <strong>{{ e.status.notEnabledTitle }}</strong>
+      </p>
+      <p>{{ e.status.notEnabled }}</p>
+      @if (companyEmail) {
+        <p>
+          {{ e.status.notEnabledEmail(companyEmail) }}
+          <a [href]="'mailto:' + companyEmail">{{ companyEmail }}</a>
+        </p>
+      }
+    </div>
+  </div>
+}
+
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate [attr.aria-busy]="state() === 'sending'">
+  @switch (state()) {
+    @case ('success') {
+      <p class="notice success" role="status" data-testid="enquiry-success">
+        {{ e.status.success }}
+      </p>
+    }
+    @case ('error') {
+      <p class="notice error" role="alert" data-testid="enquiry-error">{{ e.status.error }}</p>
+    }
+    @case ('tooFast') {
+      <p class="notice warning" role="alert" data-testid="enquiry-too-fast">
+        {{ e.status.tooFast }}
+      </p>
+    }
+    @case ('invalid') {
+      <p class="notice error" role="alert" data-testid="enquiry-invalid">{{ e.errors.summary }}</p>
+    }
+  }
+
+  <div class="field">
+    <label [for]="id('category')">{{ e.categoryLabel }}</label>
+    <select [id]="id('category')" formControlName="category">
+      @for (c of categories; track c) {
+        <option [value]="c">{{ e.categories[c] }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label [for]="id('name')"
+        >{{ e.nameLabel }} <span class="req" aria-hidden="true">*</span></label
+      >
+      <input
+        [id]="id('name')"
+        formControlName="name"
+        autocomplete="name"
+        maxlength="100"
+        required
+        [attr.aria-invalid]="showError('name')"
+        [attr.aria-describedby]="showError('name') ? id('name-error') : null"
+      />
+      @if (showError('name')) {
+        <p class="error" [id]="id('name-error')">{{ e.errors.name }}</p>
+      }
+    </div>
+
+    <div class="field">
+      <label [for]="id('organization')">{{ e.organizationLabel }}</label>
+      <input
+        [id]="id('organization')"
+        formControlName="organization"
+        autocomplete="organization"
+        maxlength="150"
+      />
+    </div>
+  </div>
+
+  <fieldset class="contact">
+    <legend>{{ e.contactHint }}</legend>
+    <div class="row">
+      <div class="field">
+        <label [for]="id('email')">{{ e.emailLabel }}</label>
+        <input
+          [id]="id('email')"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          maxlength="254"
+          [attr.aria-invalid]="showError('email') || showContactError()"
+          [attr.aria-describedby]="
+            showError('email') ? id('email-error') : showContactError() ? id('contact-error') : null
+          "
+        />
+        @if (showError('email')) {
+          <p class="error" [id]="id('email-error')">{{ e.errors.email }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label [for]="id('phone')">{{ e.phoneLabel }}</label>
+        <input
+          [id]="id('phone')"
+          type="tel"
+          formControlName="phone"
+          autocomplete="tel"
+          maxlength="20"
+          [attr.aria-invalid]="showError('phone') || showContactError()"
+          [attr.aria-describedby]="
+            showError('phone') ? id('phone-error') : showContactError() ? id('contact-error') : null
+          "
+        />
+        @if (showError('phone')) {
+          <p class="error" [id]="id('phone-error')">{{ e.errors.phone }}</p>
+        }
+      </div>
+    </div>
+    @if (showContactError()) {
+      <p class="error" [id]="id('contact-error')">{{ e.errors.emailOrPhone }}</p>
+    }
+  </fieldset>
+
+  <div class="field">
+    <label [for]="id('message')"
+      >{{ e.messageLabel }} <span class="req" aria-hidden="true">*</span></label
+    >
+    <textarea
+      [id]="id('message')"
+      formControlName="message"
+      rows="6"
+      [attr.maxlength]="messageMax"
+      required
+      [attr.aria-invalid]="showError('message')"
+      [attr.aria-describedby]="
+        id('privacy-note') + (showError('message') ? ' ' + id('message-error') : '')
+      "
+    ></textarea>
+    @if (showError('message')) {
+      <p class="error" [id]="id('message-error')">{{ e.errors.message(messageMin, messageMax) }}</p>
+    }
+    <p class="hint" [id]="id('privacy-note')">{{ e.privacyNote }}</p>
+  </div>
+
+  <!-- Honeypot: invisible to people and assistive technology, not focusable. -->
+  <div class="hp" aria-hidden="true">
+    <label [for]="id('website')">{{ e.honeypotLabel }}</label>
+    <input [id]="id('website')" formControlName="website" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <div class="field consent">
+    <input
+      [id]="id('consent')"
+      type="checkbox"
+      formControlName="consent"
+      [attr.aria-invalid]="showError('consent')"
+      [attr.aria-describedby]="showError('consent') ? id('consent-error') : null"
+    />
+    <label [for]="id('consent')">
+      {{ e.consentLabel }} <a routerLink="/privacy">{{ e.privacyLink }}</a
+      >.
+    </label>
+    @if (showError('consent')) {
+      <p class="error" [id]="id('consent-error')">{{ e.errors.consent }}</p>
+    }
+  </div>
+
+  <button
+    type="submit"
+    class="btn large"
+    [disabled]="!enabled || state() === 'sending'"
+    data-testid="enquiry-submit"
+  >
+    {{ state() === 'sending' ? e.sending : e.submit }}
+  </button>
+</form>

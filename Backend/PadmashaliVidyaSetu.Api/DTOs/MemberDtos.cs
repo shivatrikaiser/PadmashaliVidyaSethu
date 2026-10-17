@@ -23,6 +23,7 @@ public sealed record RegisterMemberRequest(
     int? MemberStatusId,
     int? ClassId,
     int? HighestEducationLevelId,
+    string? HighestEducationLevelOtherText,
     int? OrganisationId,
     AddressRequest? PermanentAddress,
     bool CurrentAddressSameAsPermanent,

@@ -6047,6 +6047,61 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.AcademicAchievement", b =>
+                {
+                    b.Property<int>("AcademicAchievementId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AcademicAchievementId"));
+
+                    b.Property<int>("AchievementTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AchievementTypeOtherText")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_AcademicAchievements_CreatedDate");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true, "PVS_DF_AcademicAchievements_IsActive");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<string>("RegistrationId")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .IsUnicode(false)
+                        .HasColumnType("char(11)")
+                        .IsFixedLength();
+
+                    b.HasKey("AcademicAchievementId")
+                        .HasName("PVS_PK_AcademicAchievements");
+
+                    b.HasIndex("AchievementTypeId")
+                        .HasDatabaseName("PVS_IX_AcademicAchievements_AchievementTypeId");
+
+                    b.HasIndex("RegistrationId")
+                        .HasDatabaseName("PVS_IX_AcademicAchievements_RegistrationId");
+
+                    b.ToTable("PVS_AcademicAchievements", (string)null);
+                });
+
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.Member", b =>
                 {
                     b.Property<string>("RegistrationId")
@@ -6088,6 +6143,10 @@ namespace PadmashaliVidyaSetu.Api.Migrations
 
                     b.Property<int?>("HighestEducationLevelId")
                         .HasColumnType("int");
+
+                    b.Property<string>("HighestEducationLevelOtherText")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -6274,6 +6333,74 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberCareerAspiration", b =>
+                {
+                    b.Property<string>("RegistrationId")
+                        .HasMaxLength(11)
+                        .IsUnicode(false)
+                        .HasColumnType("char(11)")
+                        .IsFixedLength();
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("CareerOptionId");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_MemberCareerAspirations_CreatedDate");
+
+                    b.Property<string>("OtherText")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("RegistrationId", "ItemId")
+                        .HasName("PVS_PK_MemberCareerAspirations");
+
+                    b.HasIndex("ItemId")
+                        .HasDatabaseName("PVS_IX_MemberCareerAspirations_CareerOptionId");
+
+                    b.ToTable("PVS_MemberCareerAspirations", (string)null);
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberCompetitiveExam", b =>
+                {
+                    b.Property<string>("RegistrationId")
+                        .HasMaxLength(11)
+                        .IsUnicode(false)
+                        .HasColumnType("char(11)")
+                        .IsFixedLength();
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("CompetitiveExamId");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_MemberCompetitiveExams_CreatedDate");
+
+                    b.Property<string>("OtherText")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("RegistrationId", "ItemId")
+                        .HasName("PVS_PK_MemberCompetitiveExams");
+
+                    b.HasIndex("ItemId")
+                        .HasDatabaseName("PVS_IX_MemberCompetitiveExams_CompetitiveExamId");
+
+                    b.ToTable("PVS_MemberCompetitiveExams", (string)null);
+                });
+
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberDisability", b =>
                 {
                     b.Property<string>("RegistrationId")
@@ -6292,6 +6419,10 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2(3)");
 
+                    b.Property<string>("OtherText")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
                     b.HasKey("RegistrationId", "DisabilityTypeId")
                         .HasName("PVS_PK_MemberDisabilities");
 
@@ -6299,6 +6430,227 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasDatabaseName("PVS_IX_MemberDisabilities_DisabilityTypeId");
 
                     b.ToTable("PVS_MemberDisabilities", (string)null);
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberEducation", b =>
+                {
+                    b.Property<int>("MemberEducationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MemberEducationId"));
+
+                    b.Property<int?>("BoardId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("BoardOtherText")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int?>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("BranchOtherText")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CourseOtherText")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_MemberEducation_CreatedDate");
+
+                    b.Property<int>("EducationLevelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EducationLevelOtherText")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true, "PVS_DF_MemberEducation_IsActive");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<string>("RegistrationId")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .IsUnicode(false)
+                        .HasColumnType("char(11)")
+                        .IsFixedLength();
+
+                    b.HasKey("MemberEducationId")
+                        .HasName("PVS_PK_MemberEducation");
+
+                    b.HasIndex("BoardId")
+                        .HasDatabaseName("PVS_IX_MemberEducation_BoardId");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("PVS_IX_MemberEducation_BranchId");
+
+                    b.HasIndex("CourseId")
+                        .HasDatabaseName("PVS_IX_MemberEducation_CourseId");
+
+                    b.HasIndex("EducationLevelId")
+                        .HasDatabaseName("PVS_IX_MemberEducation_EducationLevelId");
+
+                    b.HasIndex("RegistrationId")
+                        .HasDatabaseName("PVS_IX_MemberEducation_RegistrationId");
+
+                    b.ToTable("PVS_MemberEducation", (string)null);
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberHobby", b =>
+                {
+                    b.Property<string>("RegistrationId")
+                        .HasMaxLength(11)
+                        .IsUnicode(false)
+                        .HasColumnType("char(11)")
+                        .IsFixedLength();
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("HobbyId");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_MemberHobbies_CreatedDate");
+
+                    b.Property<string>("OtherText")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("RegistrationId", "ItemId")
+                        .HasName("PVS_PK_MemberHobbies");
+
+                    b.HasIndex("ItemId")
+                        .HasDatabaseName("PVS_IX_MemberHobbies_HobbyId");
+
+                    b.ToTable("PVS_MemberHobbies", (string)null);
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberInterestArea", b =>
+                {
+                    b.Property<string>("RegistrationId")
+                        .HasMaxLength(11)
+                        .IsUnicode(false)
+                        .HasColumnType("char(11)")
+                        .IsFixedLength();
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("InterestAreaId");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_MemberInterestAreas_CreatedDate");
+
+                    b.Property<string>("OtherText")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("RegistrationId", "ItemId")
+                        .HasName("PVS_PK_MemberInterestAreas");
+
+                    b.HasIndex("ItemId")
+                        .HasDatabaseName("PVS_IX_MemberInterestAreas_InterestAreaId");
+
+                    b.ToTable("PVS_MemberInterestAreas", (string)null);
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberSkill", b =>
+                {
+                    b.Property<string>("RegistrationId")
+                        .HasMaxLength(11)
+                        .IsUnicode(false)
+                        .HasColumnType("char(11)")
+                        .IsFixedLength();
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("SkillId");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_MemberSkills_CreatedDate");
+
+                    b.Property<string>("OtherText")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("RegistrationId", "ItemId")
+                        .HasName("PVS_PK_MemberSkills");
+
+                    b.HasIndex("ItemId")
+                        .HasDatabaseName("PVS_IX_MemberSkills_SkillId");
+
+                    b.ToTable("PVS_MemberSkills", (string)null);
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberSport", b =>
+                {
+                    b.Property<string>("RegistrationId")
+                        .HasMaxLength(11)
+                        .IsUnicode(false)
+                        .HasColumnType("char(11)")
+                        .IsFixedLength();
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("SportId");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_MemberSports_CreatedDate");
+
+                    b.Property<string>("OtherText")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("RegistrationId", "ItemId")
+                        .HasName("PVS_PK_MemberSports");
+
+                    b.HasIndex("ItemId")
+                        .HasDatabaseName("PVS_IX_MemberSports_SportId");
+
+                    b.ToTable("PVS_MemberSports", (string)null);
                 });
 
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.TempleRegistrationSequence", b =>
@@ -6343,6 +6695,51 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         {
                             TempleId = 5,
                             LastSequenceNumber = 0
+                        });
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Settings.AppBranding", b =>
+                {
+                    b.Property<int>("AppBrandingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<string>("PoweredBy")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<byte[]>("SponsorLogo")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("SponsorLogoContentType")
+                        .HasMaxLength(30)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<string>("SponsorName")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("AppBrandingId")
+                        .HasName("PVS_PK_AppBranding");
+
+                    b.ToTable("PVS_AppBranding", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_AppBranding_Singleton", "[AppBrandingId] = 1")
+                                .HasName("PVS_CK_AppBranding_Singleton");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            AppBrandingId = 1,
+                            PoweredBy = "IQ Explore"
                         });
                 });
 
@@ -6449,6 +6846,27 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasConstraintName("PVS_FK_Taluks_Districts_DistrictId");
 
                     b.Navigation("District");
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.AcademicAchievement", b =>
+                {
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.AchievementType", "AchievementType")
+                        .WithMany()
+                        .HasForeignKey("AchievementTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_AcademicAchievements_AchievementTypes_AchievementTypeId");
+
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.Members.Member", "Member")
+                        .WithMany()
+                        .HasForeignKey("RegistrationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_AcademicAchievements_Members_RegistrationId");
+
+                    b.Navigation("AchievementType");
+
+                    b.Navigation("Member");
                 });
 
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.Member", b =>
@@ -6571,6 +6989,48 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Navigation("Taluk");
                 });
 
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberCareerAspiration", b =>
+                {
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.CareerOption", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberCareerAspirations_CareerOptions_CareerOptionId");
+
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.Members.Member", "Member")
+                        .WithMany()
+                        .HasForeignKey("RegistrationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberCareerAspirations_Members_RegistrationId");
+
+                    b.Navigation("Item");
+
+                    b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberCompetitiveExam", b =>
+                {
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.CompetitiveExam", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberCompetitiveExams_CompetitiveExams_CompetitiveExamId");
+
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.Members.Member", "Member")
+                        .WithMany()
+                        .HasForeignKey("RegistrationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberCompetitiveExams_Members_RegistrationId");
+
+                    b.Navigation("Item");
+
+                    b.Navigation("Member");
+                });
+
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberDisability", b =>
                 {
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.DisabilityType", "DisabilityType")
@@ -6588,6 +7048,135 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasConstraintName("PVS_FK_MemberDisabilities_Members_RegistrationId");
 
                     b.Navigation("DisabilityType");
+
+                    b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberEducation", b =>
+                {
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.Board", "Board")
+                        .WithMany()
+                        .HasForeignKey("BoardId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("PVS_FK_MemberEducation_Boards_BoardId");
+
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("PVS_FK_MemberEducation_Branches_BranchId");
+
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("PVS_FK_MemberEducation_Courses_CourseId");
+
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.EducationLevel", "EducationLevel")
+                        .WithMany()
+                        .HasForeignKey("EducationLevelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberEducation_EducationLevels_EducationLevelId");
+
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.Members.Member", "Member")
+                        .WithMany()
+                        .HasForeignKey("RegistrationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberEducation_Members_RegistrationId");
+
+                    b.Navigation("Board");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Course");
+
+                    b.Navigation("EducationLevel");
+
+                    b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberHobby", b =>
+                {
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.Hobby", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberHobbies_Hobbies_HobbyId");
+
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.Members.Member", "Member")
+                        .WithMany()
+                        .HasForeignKey("RegistrationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberHobbies_Members_RegistrationId");
+
+                    b.Navigation("Item");
+
+                    b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberInterestArea", b =>
+                {
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.InterestArea", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberInterestAreas_InterestAreas_InterestAreaId");
+
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.Members.Member", "Member")
+                        .WithMany()
+                        .HasForeignKey("RegistrationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberInterestAreas_Members_RegistrationId");
+
+                    b.Navigation("Item");
+
+                    b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberSkill", b =>
+                {
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.Skill", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberSkills_Skills_SkillId");
+
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.Members.Member", "Member")
+                        .WithMany()
+                        .HasForeignKey("RegistrationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberSkills_Members_RegistrationId");
+
+                    b.Navigation("Item");
+
+                    b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Members.MemberSport", b =>
+                {
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.Sport", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberSports_Sports_SportId");
+
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.Members.Member", "Member")
+                        .WithMany()
+                        .HasForeignKey("RegistrationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_MemberSports_Members_RegistrationId");
+
+                    b.Navigation("Item");
 
                     b.Navigation("Member");
                 });

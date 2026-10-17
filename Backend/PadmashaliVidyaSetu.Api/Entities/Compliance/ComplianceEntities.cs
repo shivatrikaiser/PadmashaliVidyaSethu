@@ -48,5 +48,15 @@ public static class AuditActions
     public const string RefreshTokenReuseDetected = "Auth.RefreshTokenReuseDetected";
     public const string LoggedOut = "Auth.LoggedOut";
     public const string MemberRegistered = "Member.Registered";
-    public const string DisabilityTypeSubmitted = "MasterData.DisabilityTypeSubmitted";
+    public const string MemberActivated = "Admin.MemberActivated";
+    public const string MemberDeactivated = "Admin.MemberDeactivated";
+    public const string MembersExported = "Admin.MembersExported";
+    public const string ListItemCreated = "Admin.ListItemCreated";
+    public const string ListItemUpdated = "Admin.ListItemUpdated";
+    public const string OtherValueMapped = "Admin.OtherValueMapped";
+    public const string RoleGranted = "Admin.RoleGranted";
+    public const string RoleRevoked = "Admin.RoleRevoked";
+    public const string LocationUpdated = "Admin.LocationUpdated";
+    public const string TalukMerged = "Admin.TalukMerged";
+    public const string BrandingUpdated = "Admin.BrandingUpdated";
 }

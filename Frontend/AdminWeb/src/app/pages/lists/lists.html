@@ -1,0 +1,57 @@
+<h1>Master lists</h1>
+
+<div class="panel filters">
+  <label class="wide">List
+    <select [(ngModel)]="type" (ngModelChange)="load()">
+      @for (t of types(); track t.type) { <option [value]="t.type">{{ t.label }}</option> }
+    </select>
+  </label>
+</div>
+
+<form class="panel filters" (ngSubmit)="add()">
+  <label class="wide">New entry
+    <input name="newName" [(ngModel)]="newName" maxlength="200"
+           [placeholder]="type === 'temples' ? 'Temple name, Place' : 'Name'" />
+  </label>
+  @if (type === 'temples') {
+    <label class="narrow">Code
+      <input name="newCode" [(ngModel)]="newCode" maxlength="2" placeholder="17" inputmode="numeric" />
+    </label>
+  }
+  <div class="actions"><button type="submit" [disabled]="busy() || !newName.trim()">Add</button></div>
+  @if (type === 'temples') {
+    <p class="muted hint">The 2-digit temple code becomes part of every Registration ID (PVS-<b>17</b>-0001) and can never change.</p>
+  }
+</form>
+
+@if (error()) { <p class="alert">{{ error() }}</p> }
+@if (message()) { <p class="notice">{{ message() }}</p> }
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Name</th><th class="num">Order</th><th>Code</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+      @for (item of items(); track item.id) {
+        <tr [class.inactive]="!item.isActive">
+          <td><input [(ngModel)]="item.editName" [name]="'name' + item.id" /></td>
+          <td class="num"><input type="number" class="order" [(ngModel)]="item.editOrder" [name]="'order' + item.id" /></td>
+          <td><code>{{ item.code }}</code></td>
+          <td>
+            {{ item.isActive ? 'Active' : 'Inactive' }}
+            @if (item.isProtected) { <span class="badge" title="Used by the application - can be renamed, not deactivated">Required</span> }
+          </td>
+          <td class="row-actions">
+            <button type="button" (click)="save(item)" [disabled]="busy() || !changed(item)">Save</button>
+            @if (!item.isProtected || !item.isActive) {
+              <button type="button" class="secondary" (click)="toggle(item)" [disabled]="busy()">
+                {{ item.isActive ? 'Deactivate' : 'Activate' }}
+              </button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

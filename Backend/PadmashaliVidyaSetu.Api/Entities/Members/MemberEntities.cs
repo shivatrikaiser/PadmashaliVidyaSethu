@@ -41,6 +41,9 @@ public class Member : AuditableEntity
     public int? HighestEducationLevelId { get; set; }
     public EducationLevel? HighestEducationLevel { get; set; }
 
+    /// <summary>Typed text when Highest Education is "Other"; otherwise null.</summary>
+    public string? HighestEducationLevelOtherText { get; set; }
+
     public int OrganisationId { get; set; }
     public Organisation Organisation { get; set; } = null!;
 
@@ -95,6 +98,9 @@ public class MemberDisability
 
     public int DisabilityTypeId { get; set; }
     public DisabilityType DisabilityType { get; set; } = null!;
+
+    /// <summary>Typed text when the disability type is "Other"; otherwise null.</summary>
+    public string? OtherText { get; set; }
 
     public DateTime CreatedDate { get; set; }
     public string? CreatedBy { get; set; }

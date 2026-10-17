@@ -1,0 +1,62 @@
+<h1>Splash sponsor</h1>
+<p class="muted">
+  Shown at the bottom of the app's splash screen. Leave the sponsor empty (and remove the logo) to hide the sponsor
+  card; leave "Powered by" empty to hide that line.
+</p>
+
+@if (error()) { <p class="alert">{{ error() }}</p> }
+@if (message()) { <p class="notice">{{ message() }}</p> }
+
+<div class="layout">
+  <section class="panel">
+    <form class="fields" (ngSubmit)="save()">
+      <label>Sponsor name
+        <input name="sponsor" [(ngModel)]="sponsorName" maxlength="150" placeholder="e.g. Sri Laxmi Silks" />
+      </label>
+      <label>Powered by
+        <input name="poweredBy" [(ngModel)]="poweredBy" maxlength="150" placeholder="e.g. IQ Explore" />
+      </label>
+      <div><button type="submit" [disabled]="busy()">Save text</button></div>
+    </form>
+
+    <h2>Sponsor logo <small class="muted">(optional - PNG, JPEG or WebP, up to 300 KB)</small></h2>
+    <div class="logo-row">
+      @if (logoUrl(); as url) {
+        <img class="logo" [src]="url" alt="Sponsor logo" />
+        <button type="button" class="secondary" (click)="removeLogo()" [disabled]="busy()">Remove logo</button>
+      } @else {
+        <span class="muted">No logo.</span>
+      }
+      <label class="button secondary file">
+        {{ logoUrl() ? 'Replace logo' : 'Upload logo' }}
+        <input #file type="file" accept="image/png,image/jpeg,image/webp" (change)="upload(file)" [disabled]="busy()" />
+      </label>
+    </div>
+
+    @if (branding()?.modifiedDate; as modified) {
+      <p class="muted small">Last changed {{ modified | date: 'dd MMM yyyy, HH:mm' }}</p>
+    }
+  </section>
+
+  <!-- Preview of the splash footer (same layout as the app) -->
+  <section class="preview" aria-label="Preview">
+    <p class="preview-title">Preview</p>
+    <div class="phone">
+      @if (sponsorName.trim() || logoUrl()) {
+        <div class="card">
+          <span class="laurel" aria-hidden="true">✦</span>
+          <div class="card-text">
+            <span class="label">Sponsored by:</span>
+            @if (logoUrl(); as url) { <img [src]="url" alt="" /> }
+            @if (sponsorName.trim()) { <strong>{{ sponsorName.trim() }}</strong> }
+          </div>
+          <span class="laurel" aria-hidden="true">✦</span>
+        </div>
+      }
+      @if (poweredBy.trim()) {
+        <p class="powered">Powered by : <b>{{ poweredBy.trim() }}</b></p>
+      }
+      <div class="waves" aria-hidden="true"></div>
+    </div>
+  </section>
+</div>

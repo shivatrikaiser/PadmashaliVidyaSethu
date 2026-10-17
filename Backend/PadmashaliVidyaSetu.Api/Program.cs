@@ -25,7 +25,9 @@ var app = builder.Build();
 if (app.Services.GetRequiredService<IOptions<DatabaseOptions>>().Value.ApplyMigrationsOnStartup)
 {
     await using var scope = app.Services.CreateAsyncScope();
-    await scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
+    var database = scope.ServiceProvider.GetRequiredService<AppDbContext>().Database;
+    LocalDatabaseGuard.EnsureLocal(database.GetConnectionString()!, "Applying migrations on startup");
+    await database.MigrateAsync();
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

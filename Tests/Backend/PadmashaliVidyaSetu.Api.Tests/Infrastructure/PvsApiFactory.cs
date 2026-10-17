@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using PadmashaliVidyaSetu.Api.Data;
+using PadmashaliVidyaSetu.Api.Entities.Accounts;
 using PadmashaliVidyaSetu.Api.Services.Locations;
 
 namespace PadmashaliVidyaSetu.Api.Tests.Infrastructure;
@@ -81,6 +82,36 @@ public sealed class PvsApiFactory : WebApplicationFactory<Program>, IAsyncLifeti
         var tokens = await SignInAsync(client, mobile ?? NewMobileNumber());
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokens.AccessToken);
         return client;
+    }
+
+    /// <summary>A client signed in as an administrator (ADMIN or SUPER_ADMIN). Returns the mobile number too.</summary>
+    public async Task<(HttpClient Client, string Mobile)> CreateAdminClientAsync(string roleCode = "ADMIN")
+    {
+        var mobile = NewMobileNumber();
+        var client = CreateClient();
+        var tokens = await SignInAsync(client, mobile);
+        await WithDbAsync(async db =>
+        {
+            var accountId = await db.Accounts.Where(a => a.MobileNumber == "+91" + mobile).Select(a => a.AccountId).SingleAsync();
+            var roleId = await db.Roles.Where(r => r.Code == roleCode).Select(r => r.Id).SingleAsync();
+            db.AccountRoles.Add(new AccountRole { AccountId = accountId, RoleId = roleId, CreatedDate = DateTime.UtcNow });
+            return await db.SaveChangesAsync();
+        });
+
+        // Roles are read when tokens are issued: refresh to get them into the access token.
+        var refreshed = await client.PostAsJsonAsync("/api/v1/auth/token/refresh", new { refreshToken = tokens.RefreshToken });
+        refreshed.EnsureSuccessStatusCode();
+        var access = (await refreshed.Content.ReadFromJsonAsync<Envelope<TestTokens>>())!.Data!.AccessToken;
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", access);
+        return (client, mobile);
+    }
+
+    /// <summary>Registers a member with the given request body and returns the Registration ID.</summary>
+    public static async Task<string> RegisterMemberAsync(HttpClient client, object request)
+    {
+        var response = await client.PostAsJsonAsync("/api/v1/members", request);
+        if (!response.IsSuccessStatusCode) throw new InvalidOperationException(await response.Content.ReadAsStringAsync());
+        return (await response.Content.ReadFromJsonAsync<Envelope<PadmashaliVidyaSetu.Api.DTOs.RegistrationResultDto>>())!.Data!.RegistrationId;
     }
 
     public static async Task<TestTokens> SignInAsync(HttpClient client, string mobile)

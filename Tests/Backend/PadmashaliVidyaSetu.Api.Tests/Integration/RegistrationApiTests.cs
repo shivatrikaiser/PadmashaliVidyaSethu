@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using PadmashaliVidyaSetu.Api.DTOs;
@@ -123,7 +123,7 @@ public sealed class RegistrationApiTests(PvsApiFactory factory)
     }
 
     [Fact]
-    public async Task DisabledYes_Other_AddsNewTypeVisibleToEveryone()
+    public async Task DisabledYes_Other_StoresTextInSeparateColumn_WithoutAddingType()
     {
         var client = await factory.CreateSignedInClientAsync();
         var description = "Rare Condition " + Guid.NewGuid().ToString("N")[..6];
@@ -136,13 +136,42 @@ public sealed class RegistrationApiTests(PvsApiFactory factory)
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var id = (await response.Content.ReadFromJsonAsync<Envelope<RegistrationResultDto>>())!.Data!.RegistrationId;
 
-        var otherUser = await factory.CreateSignedInClientAsync();
-        var types = (await otherUser.GetFromJsonAsync<Envelope<List<MasterDataItemDto>>>("/api/v1/master-data/disability-types"))!.Data!;
-        var added = Assert.Single(types, t => t.Name == description);
-        Assert.Equal("OTHER", types[^1].Code); // "Other" stays last
+        var linked = await factory.WithDbAsync(db => db.MemberDisabilities.Where(d => d.RegistrationId == id)
+            .OrderBy(d => d.DisabilityTypeId).Select(d => new { d.DisabilityTypeId, d.OtherText }).ToListAsync());
+        Assert.Equal([new { DisabilityTypeId = DisabilityHearing, OtherText = (string?)null }, new { DisabilityTypeId = DisabilityOther, OtherText = (string?)description }], linked);
 
-        var linked = await factory.WithDbAsync(db => db.MemberDisabilities.Where(d => d.RegistrationId == id).Select(d => d.DisabilityTypeId).ToListAsync());
-        Assert.Equal([DisabilityHearing, added.Id], linked.Order().ToList());
+        var types = (await client.GetFromJsonAsync<Envelope<List<MasterDataItemDto>>>("/api/v1/master-data/disability-types"))!.Data!;
+        Assert.DoesNotContain(types, t => t.Name == description);
+
+        var profile = await client.GetFromJsonAsync<Envelope<MemberProfileDto>>($"/api/v1/members/{id}");
+        Assert.Contains(profile!.Data!.DisabilityTypes, t => t.Name == $"Other: {description}");
+    }
+
+    [Theory]
+    [InlineData("Diploma in Yoga", HttpStatusCode.Created)]
+    [InlineData("", HttpStatusCode.BadRequest)]
+    public async Task HighestEducation_Other_RequiresTextAndStoresIt(string text, HttpStatusCode expected)
+    {
+        var client = await factory.CreateSignedInClientAsync();
+        var otherId = await factory.WithDbAsync(db => db.EducationLevels.Where(e => e.Code == "OTHER").Select(e => e.Id).SingleAsync());
+        var request = Adult(StatusWorking);
+        request["highestEducationLevelId"] = otherId;
+        request["highestEducationLevelOtherText"] = text;
+
+        var response = await client.PostAsJsonAsync("/api/v1/members", request);
+
+        Assert.Equal(expected, response.StatusCode);
+        if (expected == HttpStatusCode.Created)
+        {
+            var id = (await response.Content.ReadFromJsonAsync<Envelope<RegistrationResultDto>>())!.Data!.RegistrationId;
+            var stored = await factory.WithDbAsync(db => db.Members.Where(m => m.RegistrationId == id).Select(m => m.HighestEducationLevelOtherText).SingleAsync());
+            Assert.Equal(text, stored);
+        }
+        else
+        {
+            var body = await response.Content.ReadFromJsonAsync<Envelope<object>>();
+            Assert.Contains(body!.Errors, e => e.Field == "highestEducationLevelOtherText");
+        }
     }
 
     [Fact]

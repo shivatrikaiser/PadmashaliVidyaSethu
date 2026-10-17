@@ -31,7 +31,10 @@ class MasterDataItem {
 /// Codes the app relies on. Everything else about master data comes from the server.
 abstract final class MasterCodes {
   static const statusStudent = 'STUDENT';
-  static const disabilityOther = 'OTHER';
+  static const disabilityOther = other;
+
+  /// Every selectable list has an "Other" row; choosing it asks for the value as free text.
+  static const other = 'OTHER';
 }
 
 /// Keys for `/api/v1/master-data/{type}`.

@@ -1,0 +1,73 @@
+<p><a routerLink="/members">← Members</a></p>
+
+@if (error()) {
+  <p class="alert">{{ error() }}</p>
+}
+@if (message()) {
+  <p class="notice">{{ message() }}</p>
+}
+
+@if (detail(); as d) {
+  <div class="page-head">
+    <h1>
+      {{ d.profile.fullName }} <small class="muted">{{ d.profile.registrationId }}</small>
+      @if (!d.isActive) { <span class="badge">Deactivated</span> }
+    </h1>
+    @if (d.isActive) {
+      <button type="button" class="danger" (click)="setActive(false)" [disabled]="busy()">Deactivate</button>
+    } @else {
+      <button type="button" (click)="setActive(true)" [disabled]="busy()">Reactivate</button>
+    }
+  </div>
+
+  <section class="panel">
+    <h2>Personal details</h2>
+    <dl class="details">
+      <dt>Father's name</dt><dd>{{ d.profile.fatherName }}</dd>
+      <dt>Mother's name</dt><dd>{{ d.profile.motherName }}</dd>
+      <dt>Date of birth</dt><dd>{{ d.profile.dateOfBirth | date: 'dd MMM yyyy' }} (age {{ d.profile.age }})</dd>
+      <dt>Gender</dt><dd>{{ d.profile.gender.name }}</dd>
+      <dt>Mobile number</dt><dd>{{ d.mobileNumber }}</dd>
+      <dt>Temple</dt><dd>{{ d.profile.temple.name }}</dd>
+      <dt>Organisation</dt><dd>{{ d.profile.organisation.name }}</dd>
+      <dt>Current status</dt><dd>{{ d.profile.memberStatus.name }}</dd>
+      @if (d.profile.class) { <dt>Class studying</dt><dd>{{ d.profile.class.name }}</dd> }
+      @if (d.profile.highestEducationLevel) { <dt>Highest education</dt><dd>{{ d.profile.highestEducationLevel.name }}</dd> }
+      <dt>Registered</dt><dd>{{ d.profile.registrationCompletedDate | date: 'dd MMM yyyy, HH:mm' }}</dd>
+    </dl>
+  </section>
+
+  <section class="panel">
+    <h2>Addresses</h2>
+    @for (a of d.profile.addresses; track a.addressType) {
+      <h3>{{ a.addressType }}</h3>
+      <p>
+        {{ a.addressLine1 }}@if (a.addressLine2) {, {{ a.addressLine2 }}}<br />
+        {{ a.cityVillageName }}, {{ a.taluk.name }} taluk, {{ a.district.name }} district<br />
+        {{ a.state.name }}, {{ a.country.name }} - {{ a.pinCode }}
+      </p>
+    }
+  </section>
+
+  <section class="panel">
+    <h2>Disability</h2>
+    @if (d.canSeeSensitiveData) {
+      <p>{{ d.profile.isDisabled ? 'Yes' : 'No' }}</p>
+      @if (d.profile.disabilityTypes.length) {
+        <ul>@for (t of d.profile.disabilityTypes; track t.id) { <li>{{ t.name }}</li> }</ul>
+      }
+    } @else {
+      <p class="muted">Sensitive information - visible to Super Admins only.</p>
+    }
+  </section>
+
+  <section class="panel">
+    <h2>Consents</h2>
+    <ul>
+      @for (c of d.consents; track $index) {
+        <li>{{ c.consentType }} (policy {{ c.policyVersion }}) - {{ c.isGranted ? 'given' : 'withdrawn' }}
+          on {{ c.recordedDate | date: 'dd MMM yyyy' }}</li>
+      }
+    </ul>
+  </section>
+}

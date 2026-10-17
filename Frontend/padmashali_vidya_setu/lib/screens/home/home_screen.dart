@@ -6,6 +6,7 @@ import '../../models/member_models.dart';
 import '../../providers/providers.dart';
 import '../../routing/routes.dart';
 import '../../utils/l10n.dart';
+import '../../widgets/brand.dart';
 import '../../widgets/common.dart';
 
 /// Member home: welcome, profile completion by section, quick links, and the (initially empty)
@@ -24,7 +25,13 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.appTitle),
+        title: Row(
+          children: [
+            const BrandMark(size: 36),
+            const SizedBox(width: 10),
+            Flexible(child: Text(l10n.appTitle, overflow: TextOverflow.ellipsis)),
+          ],
+        ),
         actions: [
           if ((session.account?.members.length ?? 0) > 1) _MemberSwitcher(session: session),
           _AccountMenu(canAddMember: session.account?.canAddMember ?? false),

@@ -9,7 +9,12 @@ class AddressDraft {
   String addressLine2 = '';
   String pinCode = '';
   String cityVillageName = '';
+
+  /// The place chosen from the PIN lookup (a `PVS_Cities` row); null when typed by hand.
   int? cityId;
+
+  /// "My place is not listed" - the member types the City / Village instead of choosing it.
+  bool cityNotListed = false;
 
   MasterDataItem? country;
   MasterDataItem? state;
@@ -29,11 +34,12 @@ class AddressDraft {
     localities = result.localities;
     talukNotListed = false;
     talukId = result.suggestedTalukId;
+    cityNotListed = false;
     if (localities.length == 1) {
-      cityId = localities.single.cityId;
-      cityVillageName = localities.single.name;
+      selectLocality(localities.single);
     } else if (!localities.any((l) => l.cityId == cityId)) {
       cityId = null;
+      cityVillageName = '';
     }
   }
 
@@ -42,15 +48,32 @@ class AddressDraft {
     cityId = null;
   }
 
+  /// The member picked one of the places linked to the PIN code.
+  void selectLocality(Locality locality) {
+    cityNotListed = false;
+    cityId = locality.cityId;
+    cityVillageName = locality.name;
+    if (locality.talukId != null && !talukNotListed) talukId = locality.talukId;
+  }
+
+  /// The member's place is not in the PIN code's list - they type it.
+  void selectPlaceNotListed() {
+    cityNotListed = true;
+    cityId = null;
+    cityVillageName = '';
+  }
+
+  /// True when the City / Village is chosen from the PIN code's places (otherwise it is typed).
+  bool get choosesCityFromList => localities.isNotEmpty && !cityNotListed;
+
   Map<String, Object?> toJson() {
-    // Only send cityId when the typed name still matches the chosen locality.
-    final matchedCity = localities.where((l) => l.cityId == cityId && l.name == Validators.tidy(cityVillageName));
+    final chosen = choosesCityFromList ? localities.where((l) => l.cityId == cityId).firstOrNull : null;
     return {
       'addressLine1': Validators.tidy(addressLine1),
       'addressLine2': Validators.tidy(addressLine2).isEmpty ? null : Validators.tidy(addressLine2),
       'pinCode': pinCode.trim(),
-      'cityVillageName': Validators.tidy(cityVillageName),
-      'cityId': matchedCity.isEmpty ? null : cityId,
+      'cityVillageName': chosen?.name ?? Validators.tidy(cityVillageName),
+      'cityId': chosen?.cityId,
       'talukId': talukNotListed ? null : talukId,
       'newTalukName': talukNotListed ? Validators.tidy(newTalukName) : null,
       'districtId': district?.id,
@@ -76,6 +99,10 @@ class RegistrationDraft {
   MasterDataItem? memberStatus;
   int? classId;
   int? highestEducationLevelId;
+  String? highestEducationLevelCode;
+  String highestEducationLevelOtherText = '';
+
+  bool get highestEducationIsOther => !showsClassStudying && highestEducationLevelCode == MasterCodes.other;
 
   int? templeId;
   int? organisationId;
@@ -107,6 +134,8 @@ class RegistrationDraft {
     // Keep only the field relevant to the new status (matches the backend rule).
     if (showsClassStudying) {
       highestEducationLevelId = null;
+      highestEducationLevelCode = null;
+      highestEducationLevelOtherText = '';
     } else {
       classId = null;
     }
@@ -130,6 +159,7 @@ class RegistrationDraft {
     'memberStatusId': memberStatus?.id,
     'classId': showsClassStudying ? classId : null,
     'highestEducationLevelId': showsClassStudying ? null : highestEducationLevelId,
+    'highestEducationLevelOtherText': highestEducationIsOther ? Validators.tidy(highestEducationLevelOtherText) : null,
     'organisationId': organisationId,
     'permanentAddress': permanentAddress.toJson(),
     'currentAddressSameAsPermanent': currentSameAsPermanent,

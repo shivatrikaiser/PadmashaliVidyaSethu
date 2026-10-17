@@ -1,4 +1,4 @@
-# Padmashali Vidya Setu
+# Padmashali Vidya Sethu
 
 > Connecting Our Young Padmashalis for a Brighter Future
 
@@ -14,6 +14,8 @@ and the admin portal are the next phases (see `Docs/ProfileModules.md`).
 | Layer | Technology |
 |---|---|
 | Mobile app | Flutter 3.41 / Dart 3.11, Material 3, Riverpod, go_router, Dio — Android first; iOS/Web ready |
+| Admin portal | Angular 21 (web) - `Frontend/AdminWeb` |
+| VidyaSethu public website | Angular 21, prerendered static site - `Frontend/VidyaSethuWeb` (separate product site, no backend; lists PVS as an organization) |
 | API | ASP.NET Core Web API on .NET 10, EF Core 10, FluentValidation, Serilog, JWT |
 | Database | SQL Server / Azure SQL (LocalDB for development) |
 
@@ -22,13 +24,14 @@ and the admin portal are the next phases (see `Docs/ProfileModules.md`).
 ```
 PVS/
 ├── Backend/          ASP.NET Core API (PadmashaliVidyaSetu.slnx)
-├── Frontend/         Flutter app (padmashali_vidya_setu/)
+├── Frontend/         Flutter app (padmashali_vidya_setu/), web admin portal (AdminWeb/),
+│                     VidyaSethu public website (VidyaSethuWeb/)
 ├── Database/         Generated SQL schema + seed, operational scripts
 ├── Tests/            Backend unit + integration tests (Flutter tests live in the Flutter project)
 ├── Docs/             Architecture, database, API, flows, security, deployment, master data, UI screenshots
 ├── Deployment/       Environment notes
 ├── RunBackend/       Start_Backend_API.bat
-└── RunFrontend/      Start_Frontend_App.bat
+└── RunFrontend/      Start_Frontend_App.bat, Start_Admin_Web.bat
 ```
 
 ## Prerequisites
@@ -77,6 +80,16 @@ The Android emulator reaches the API at `http://10.0.2.2:5274` automatically. Fo
 `Frontend/padmashali_vidya_setu/config/README.md`.
 
 Or just double-click `RunBackend/Start_Backend_API.bat` then `RunFrontend/Start_Frontend_App.bat`.
+
+### 3. Admin portal (web)
+With the API running, double-click `RunFrontend/Start_Admin_Web.bat` (opens http://localhost:4200). Sign-in needs a
+mobile number with the ADMIN or SUPER_ADMIN role - grant it with `Database/seed/03_GrantAdminRole.TEMPLATE.sql`.
+Details: `Frontend/AdminWeb/README.md`.
+
+### 4. VidyaSethu public website
+The product website for https://vidyasethu.co.in - independent of the PVS API, app and database. Double-click
+`RunFrontend/Start_VidyaSethu_Web.bat` (opens http://localhost:4300). Build, tests, the PVS link configuration and
+Azure deployment: `Frontend/VidyaSethuWeb/README.md`.
 
 ## Tests
 

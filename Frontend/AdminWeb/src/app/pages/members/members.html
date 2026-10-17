@@ -1,0 +1,101 @@
+<div class="page-head">
+  <h1>Members</h1>
+  <button type="button" class="secondary" (click)="export()" [disabled]="exporting()">
+    {{ exporting() ? 'Preparing…' : 'Export to Excel (CSV)' }}
+  </button>
+</div>
+
+<form class="filters panel" (ngSubmit)="search()">
+  <label class="wide">Search
+    <input name="search" [(ngModel)]="filters.search" placeholder="Name, father/mother name, Registration ID or mobile" />
+  </label>
+  <label>Temple
+    <select name="temple" [(ngModel)]="filters.templeId">
+      <option [ngValue]="null">All</option>
+      @for (t of temples(); track t.id) { <option [ngValue]="t.id">{{ t.name }}</option> }
+    </select>
+  </label>
+  <label>Current status
+    <select name="status" [(ngModel)]="filters.memberStatusId">
+      <option [ngValue]="null">All</option>
+      @for (s of statuses(); track s.id) { <option [ngValue]="s.id">{{ s.name }}</option> }
+    </select>
+  </label>
+  <label>Class studying
+    <select name="class" [(ngModel)]="filters.classId">
+      <option [ngValue]="null">All</option>
+      @for (c of classes(); track c.id) { <option [ngValue]="c.id">{{ c.name }}</option> }
+    </select>
+  </label>
+  <label>State
+    <select name="state" [(ngModel)]="stateId" (ngModelChange)="onStateChange()">
+      <option [ngValue]="null">All</option>
+      @for (s of states(); track s.id) { <option [ngValue]="s.id">{{ s.name }}</option> }
+    </select>
+  </label>
+  <label>District
+    <select name="district" [(ngModel)]="filters.districtId" [disabled]="!stateId">
+      <option [ngValue]="null">All</option>
+      @for (d of districts(); track d.id) { <option [ngValue]="d.id">{{ d.name }}</option> }
+    </select>
+  </label>
+  <label class="narrow">Age from
+    <input name="ageFrom" type="number" min="0" [(ngModel)]="filters.ageFrom" />
+  </label>
+  <label class="narrow">Age to
+    <input name="ageTo" type="number" min="0" [(ngModel)]="filters.ageTo" />
+  </label>
+  <label>Show
+    <select name="active" [(ngModel)]="filters.isActive">
+      <option [ngValue]="true">Active</option>
+      <option [ngValue]="false">Deactivated</option>
+      <option [ngValue]="null">All</option>
+    </select>
+  </label>
+  <div class="actions">
+    <button type="submit" [disabled]="loading()">Search</button>
+    <button type="button" class="link" (click)="clear()">Clear</button>
+  </div>
+</form>
+
+@if (error()) {
+  <p class="alert">{{ error() }}</p>
+}
+
+@if (result(); as r) {
+  <p class="muted">{{ r.totalCount }} member(s)</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Registration ID</th><th>Name</th><th>Age</th><th>Temple</th><th>Status</th><th>Class / Education</th>
+          <th>District</th><th>Mobile</th><th>Registered</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (m of r.items; track m.registrationId) {
+          <tr [class.inactive]="!m.isActive">
+            <td><a [routerLink]="['/members', m.registrationId]">{{ m.registrationId }}</a></td>
+            <td>{{ m.fullName }} @if (!m.isActive) { <span class="badge">Deactivated</span> }</td>
+            <td>{{ m.age }}</td>
+            <td>{{ m.temple }}</td>
+            <td>{{ m.memberStatus }}</td>
+            <td>{{ m.classOrEducation }}</td>
+            <td>{{ m.district }}</td>
+            <td>{{ m.mobileNumber }}</td>
+            <td>{{ m.registrationCompletedDate | date: 'dd MMM yyyy' }}</td>
+          </tr>
+        } @empty {
+          <tr><td colspan="9" class="muted">No members match these filters.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (pages(r) > 1) {
+    <div class="pager">
+      <button type="button" class="secondary" [disabled]="r.page <= 1 || loading()" (click)="search(r.page - 1)">Previous</button>
+      <span>Page {{ r.page }} of {{ pages(r) }}</span>
+      <button type="button" class="secondary" [disabled]="r.page >= pages(r) || loading()" (click)="search(r.page + 1)">Next</button>
+    </div>
+  }
+}

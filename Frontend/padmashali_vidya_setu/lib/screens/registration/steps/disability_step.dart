@@ -78,7 +78,7 @@ class _DisabilityStepState extends State<DisabilityStep> {
                     child: TextFormField(
                       key: const Key('otherDisabilityField'),
                       controller: _other,
-                      maxLength: 100,
+                      maxLength: 150,
                       decoration: InputDecoration(
                         labelText: l10n.pleaseSpecify,
                         errorText: widget.serverErrors['otherDisabilityDescription'],

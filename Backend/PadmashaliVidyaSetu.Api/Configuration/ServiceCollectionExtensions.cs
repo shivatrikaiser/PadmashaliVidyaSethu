@@ -11,6 +11,7 @@ using PadmashaliVidyaSetu.Api.Common;
 using PadmashaliVidyaSetu.Api.Data;
 using PadmashaliVidyaSetu.Api.Logging;
 using PadmashaliVidyaSetu.Api.Middleware;
+using PadmashaliVidyaSetu.Api.Services.Admin;
 using PadmashaliVidyaSetu.Api.Services.Auth;
 using PadmashaliVidyaSetu.Api.Services.Locations;
 using PadmashaliVidyaSetu.Api.Services.MasterData;
@@ -131,6 +132,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRegistrationService, RegistrationService>();
         services.AddSingleton<IProfileCompletionService, ProfileCompletionService>();
         services.AddScoped<IMemberService, MemberService>();
+        services.AddScoped<IAdminMemberService, AdminMemberService>();
+        services.AddScoped<IAdminReportService, AdminReportService>();
+        services.AddScoped<IAdminListService, AdminListService>();
+        services.AddScoped<IOtherValueService, OtherValueService>();
+        services.AddScoped<IAdminUserService, AdminUserService>();
+        services.AddScoped<ILocationReviewService, LocationReviewService>();
+        services.AddScoped<IBrandingService, BrandingService>();
 
         services.AddHttpClient<IPinCodeProvider, IndiaPostPinCodeProvider>((sp, client) =>
         {
@@ -181,13 +189,21 @@ public static class ServiceCollectionExtensions
 
         services.AddCors();
         services.AddOptions<Microsoft.AspNetCore.Cors.Infrastructure.CorsOptions>()
-            .Configure<IOptions<CorsSettings>>((cors, settings) => cors.AddDefaultPolicy(p =>
+            .Configure<IOptions<CorsSettings>, IHostEnvironment>((cors, settings, env) => cors.AddDefaultPolicy(p =>
             {
                 var origins = settings.Value.AllowedOrigins;
-                if (origins.Length > 0) p.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod();
+                var anyLocalhost = settings.Value.AllowAnyLocalhostOrigin && env.IsDevelopment();
+                if (origins.Length == 0 && !anyLocalhost) return;
+                p.SetIsOriginAllowed(origin => origins.Contains(origin, StringComparer.OrdinalIgnoreCase)
+                        || (anyLocalhost && IsLocalhost(origin)))
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
             }));
         return services;
     }
+
+    private static bool IsLocalhost(string origin) =>
+        Uri.TryCreate(origin, UriKind.Absolute, out var uri) && uri.IsLoopback && uri.Scheme is "http" or "https";
 }
 
 public sealed class DatabaseHealthCheck(AppDbContext db) : IHealthCheck

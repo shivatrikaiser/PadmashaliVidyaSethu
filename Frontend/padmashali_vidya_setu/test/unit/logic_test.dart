@@ -145,12 +145,14 @@ void main() {
       expect(a.toJson()['cityId'], 7);
     });
 
-    test('city id is dropped when the user types a different locality', () {
+    test('"place not listed" sends the typed name without a city id', () {
       final a = AddressDraft()
         ..localities = const [Locality(cityId: 7, name: 'Puttur')]
-        ..cityId = 7
+        ..selectLocality(const Locality(cityId: 7, name: 'Puttur'))
+        ..selectPlaceNotListed()
         ..cityVillageName = 'Kabaka';
       expect(a.toJson()['cityId'], isNull);
+      expect(a.toJson()['cityVillageName'], 'Kabaka');
     });
   });
 

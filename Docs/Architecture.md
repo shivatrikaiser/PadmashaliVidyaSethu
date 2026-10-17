@@ -80,7 +80,7 @@ Frontend tests live with the Flutter project (`test/`, `integration_test/`) beca
 | D5 | PIN look-ups are cached in `Cities`; unknown districts/taluks are learned automatically (`Source = PinLookup`). | Each PIN hits the external service once; the app works when the provider is down (manual State/District selection). |
 | D6 | Legacy postal names (`PostalName`) on states/districts/taluks. | India Post returns "Shimoga", "Bangalore", "Mangalore"; these map onto Shivamogga, Bengaluru Urban, Mangaluru. |
 | D7 | Indian mobile numbers and Indian addresses only in V1. | Phone provider and PIN data are India-specific. International (e.g. Dubai) support needs an E.164 phone field and a non-PIN address form — planned. |
-| D8 | "Other" disability text becomes a new `DisabilityTypes` row (flagged `IsUserSubmitted`), shown to everyone, listed just before "Other". | Spec §19. Admins can rename/deactivate. Same pattern for "My taluk is not listed". |
+| D8 | Choosing "Other" in a list links the member to the list's `OTHER` row and stores the typed text in a separate `...OtherText` column; it never creates a master row. | Admins review the texts, create the proper row and re-map members (`Docs/MasterData.md`). "My taluk is not listed" still adds a taluk row. |
 | D9 | Guardian consent required below 18; consents stored as immutable `ConsentRecords`. | Children's data; spec §35. |
 | D10 | Unbuilt profile modules appear on the dashboard as "Coming soon" with 0 %. | Spec §52: never present mocked functionality as real. |
 | D11 | Riverpod 2.6 / go_router 17 | Riverpod 3 / go_router 18 need a newer Dart SDK than installed (3.11.5); not upgraded per spec §49. |

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../models/master_data_item.dart';
 import '../../../providers/providers.dart';
 import '../../../utils/l10n.dart';
+import '../../../utils/validators.dart';
 import '../../../widgets/master_data_choice.dart';
 import '../../../widgets/master_data_dropdown.dart';
 import 'step_base.dart';
@@ -22,6 +23,14 @@ class CurrentStatusStep extends RegistrationStep {
 }
 
 class _CurrentStatusStepState extends State<CurrentStatusStep> {
+  late final _educationOther = TextEditingController(text: widget.draft.highestEducationLevelOtherText);
+
+  @override
+  void dispose() {
+    _educationOther.dispose();
+    super.dispose();
+  }
+
   void _applyDefault(List<MasterDataItem> statuses) {
     // Rule 1: Current Status defaults to Student.
     if (widget.draft.memberStatus != null || !mounted) return;
@@ -73,9 +82,31 @@ class _CurrentStatusStepState extends State<CurrentStatusStep> {
             value: draft.highestEducationLevelId,
             errorText: widget.serverErrors['highestEducationLevelId'],
             onChanged: (e) {
-              setState(() => draft.highestEducationLevelId = e.id);
+              setState(() {
+                draft.highestEducationLevelId = e.id;
+                draft.highestEducationLevelCode = e.code;
+              });
               widget.onFieldChanged('highestEducationLevelId');
             },
+          ),
+        if (draft.highestEducationIsOther)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: TextFormField(
+              key: const Key('highestEducationOtherField'),
+              controller: _educationOther,
+              maxLength: 150,
+              decoration: InputDecoration(
+                labelText: l10n.pleaseSpecify,
+                errorText: widget.serverErrors['highestEducationLevelOtherText'],
+                counterText: '',
+              ),
+              validator: (v) => Validators.requiredText(v)?.text(l10n),
+              onChanged: (v) {
+                draft.highestEducationLevelOtherText = v;
+                widget.onFieldChanged('highestEducationLevelOtherText');
+              },
+            ),
           ),
       ],
     );

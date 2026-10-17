@@ -1,0 +1,37 @@
+<h1>"Other" values</h1>
+<p class="muted">
+  Texts members typed after choosing "Other". Map each one to an existing entry, or add it as a new entry - every
+  member who typed it is moved to that entry and the text is cleared.
+</p>
+
+@if (error()) { <p class="alert">{{ error() }}</p> }
+@if (message()) { <p class="notice">{{ message() }}</p> }
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>List</th><th>Typed text</th><th class="num">Members</th><th>Map to existing entry</th><th></th></tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.listType + row.text) {
+        <tr>
+          <td>{{ row.listLabel }}</td>
+          <td><strong>{{ row.text }}</strong></td>
+          <td class="num">{{ row.memberCount }}</td>
+          <td>
+            <select [(ngModel)]="row.targetId" [name]="'target' + $index">
+              <option [ngValue]="null">Choose…</option>
+              @for (t of targets()[row.listType] ?? []; track t.id) { <option [ngValue]="t.id">{{ t.name }}</option> }
+            </select>
+          </td>
+          <td class="row-actions">
+            <button type="button" (click)="map(row)" [disabled]="busy() || !row.targetId">Map</button>
+            <button type="button" class="secondary" (click)="createAndMap(row)" [disabled]="busy()">Add as new entry</button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="5" class="muted">{{ loaded() ? 'Nothing to review.' : 'Loading…' }}</td></tr>
+      }
+    </tbody>
+  </table>
+</div>

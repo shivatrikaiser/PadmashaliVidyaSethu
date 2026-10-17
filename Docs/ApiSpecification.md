@@ -80,6 +80,38 @@ guardian consent required under 18; max 10 members per account; duplicate name +
 | `GET /locations/districts/{id}/taluks` | Taluks |
 | `GET /locations/pin-codes/{pin}` | `{ pinCode, country, state, district, localities[{cityId,name,talukId}], taluks[], suggestedTalukId }`; 404 unknown PIN; 503 provider down (select manually) |
 
+## App content (anonymous)
+
+| Method & path | Purpose |
+|---|---|
+| `GET /app/branding` | Splash-screen sponsor name, "Powered by" text, whether a sponsor logo exists and its version |
+| `GET /app/branding/sponsor-logo?v={version}` | The sponsor logo image (cacheable; the version changes with every edit) |
+
+## Admin portal (bearer, role ADMIN or SUPER_ADMIN)
+
+Used by `Frontend/AdminWeb`. Members get 403.
+
+| Method & path | Purpose |
+|---|---|
+| `GET /admin/me` | Signed-in administrator (masked mobile, roles) |
+| `GET /admin/members?search=&templeId=&memberStatusId=&classId=&districtId=&ageFrom=&ageTo=&isActive=&page=&pageSize=` | Member search, paged (max 100 per page) |
+| `GET /admin/members/export?<same filters>` | CSV for Excel (UTF-8 BOM, up to 50,000 rows) |
+| `GET /admin/members/{registrationId}` | Full profile + mobile, status, consents (disability details: Super Admin only) |
+| `PUT /admin/members/{registrationId}/status` `{ isActive }` | Deactivate / reactivate (nothing is deleted) |
+| `GET /admin/reports/summary` | Totals and breakdowns (temple, status, gender, age group, district, month) |
+| `GET /admin/lists`, `GET /admin/lists/{type}` | Configurable lists incl. inactive entries - **Super Admin only** (all `/admin/lists` and `/admin/other-values` endpoints) |
+| `POST /admin/lists/{type}` `{ name, code?, displayOrder? }` | Add (code required for temples: 2 digits) |
+| `PUT /admin/lists/{type}/{id}` `{ name?, displayOrder?, isActive? }` | Rename / reorder / (de)activate; required codes cannot be deactivated |
+| `GET /admin/other-values` | "Other" texts typed by members, with member counts |
+| `POST /admin/other-values/map` `{ listType, text, targetId }` | Move every member who typed the text to a list entry |
+| `GET /admin/locations?includeSeed=` | Districts / taluks added by PIN lookups or members, with address counts |
+| `PUT /admin/locations/{districts\|taluks}/{id}` `{ name?, isActive? }` | Rename / (de)activate |
+| `POST /admin/locations/taluks/{id}/merge` `{ targetTalukId }` | Move all addresses to another taluk of the same district |
+| `GET /admin/branding`, `PUT /admin/branding` `{ sponsorName, poweredBy }`, `POST /admin/branding/sponsor-logo` (multipart `file`, PNG/JPEG/WebP <= 300 KB), `DELETE /admin/branding/sponsor-logo` | Splash sponsor - **Super Admin only** |
+| `GET /admin/users`, `POST /admin/users` `{ mobileNumber, roleCode }`, `DELETE /admin/users/{accountId}/roles/{roleCode}` | Admin users - **Super Admin only**; removing a role signs the person out |
+
+Every change is written to `PVS_AuditLogs` (`Admin.*` actions).
+
 ## Rate limits (defaults, per client IP)
 
 Verification endpoints 10 / 10 min; refresh 30 / min; PIN lookup 30 / min; everything 300 / min.

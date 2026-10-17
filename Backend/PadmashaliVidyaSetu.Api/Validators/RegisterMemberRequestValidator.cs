@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.Options;
 using PadmashaliVidyaSetu.Api.Common;
 using PadmashaliVidyaSetu.Api.Configuration;
+using DataConfig = PadmashaliVidyaSetu.Api.Data.Configurations.ConfigurationExtensions;
 using PadmashaliVidyaSetu.Api.DTOs;
 
 namespace PadmashaliVidyaSetu.Api.Validators;
@@ -55,10 +56,8 @@ public sealed class RegisterMemberRequestValidator : AbstractValidator<RegisterM
             .Empty().WithMessage("Disability type applies only when 'Is Disabled' is Yes.")
             .When(x => !x.IsDisabled);
         RuleForEach(x => x.DisabilityTypeIds).GreaterThan(0);
-        RuleFor(x => x.OtherDisabilityDescription)
-            .MaximumLength(100)
-            .Matches(@"^[\p{L}\p{M}\d][\p{L}\p{M}\d .,'/()\-]*$").WithMessage("Please use letters and numbers only.")
-            .When(x => !string.IsNullOrWhiteSpace(x.OtherDisabilityDescription));
+        RuleFor(x => x.OtherDisabilityDescription).OtherText();
+        RuleFor(x => x.HighestEducationLevelOtherText).OtherText();
 
         RuleFor(x => x.AcceptPrivacyPolicy)
             .Equal(true).WithMessage("Please accept the privacy policy to continue.");
@@ -102,4 +101,12 @@ internal static class ValidatorExtensions
             .Must(v => v.Tidy().Length >= 2).WithMessage($"The {label} is too short.")
             .MaximumLength(150).WithMessage($"The {label} is too long.")
             .Matches(RegisterMemberRequestValidator.NamePattern).WithMessage($"The {label} can contain letters, spaces, dots and hyphens only.");
+
+    /// <summary>Free text typed after choosing "Other" in a list. Whether it is required is checked by the service.</summary>
+    public static IRuleBuilderOptions<T, string?> OtherText<T>(this IRuleBuilder<T, string?> rule) =>
+        rule
+            .MaximumLength(DataConfig.OtherTextLength)
+            .Must(v => string.IsNullOrWhiteSpace(v) || OtherTextPattern.IsMatch(v)).WithMessage("Please use letters and numbers only.");
+
+    private static readonly System.Text.RegularExpressions.Regex OtherTextPattern = new(@"^[\p{L}\p{M}\d][\p{L}\p{M}\d .,'/()&+\-]*$");
 }

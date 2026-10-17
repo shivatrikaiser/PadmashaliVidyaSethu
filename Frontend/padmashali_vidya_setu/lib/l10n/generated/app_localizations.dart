@@ -97,8 +97,20 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Padmashali Vidya Setu'**
+  /// **'Padmashali Vidya Sethu'**
   String get appTitle;
+
+  /// No description provided for @sponsoredBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsored by:'**
+  String get sponsoredBy;
+
+  /// No description provided for @poweredBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Powered by'**
+  String get poweredBy;
 
   /// No description provided for @appTagline.
   ///
@@ -109,7 +121,7 @@ abstract class AppLocalizations {
   /// No description provided for @organisationName.
   ///
   /// In en, this message translates to:
-  /// **'Padmashali Vidyavardhaka Sangha'**
+  /// **'D K Jilla Padmashali Vidyavardhaka Sangha (R), Udupi'**
   String get organisationName;
 
   /// No description provided for @welcomeHeading.
@@ -121,7 +133,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeBody.
   ///
   /// In en, this message translates to:
-  /// **'Create your education and career profile with the Padmashali Vidyavardhaka Sangha. Registration takes only a few minutes — you can complete the rest of your profile later.'**
+  /// **'Create your education and career profile with the D. K. Jilla Padmashali Vidyavardhaka Sangha (R), Udupi. Registration takes only a few minutes — you can complete the rest of your profile later.'**
   String get welcomeBody;
 
   /// No description provided for @welcomeFeatureEducation.
@@ -505,8 +517,14 @@ abstract class AppLocalizations {
   /// No description provided for @cityVillageHelp.
   ///
   /// In en, this message translates to:
-  /// **'Choose from the list or type your locality.'**
+  /// **'Places under this PIN code'**
   String get cityVillageHelp;
+
+  /// No description provided for @cityNotListed.
+  ///
+  /// In en, this message translates to:
+  /// **'My place is not listed'**
+  String get cityNotListed;
 
   /// No description provided for @taluk.
   ///
@@ -613,7 +631,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicyBody.
   ///
   /// In en, this message translates to:
-  /// **'This is a placeholder. The Padmashali Vidyavardhaka Sangha will publish the final privacy policy here.\n\nSummary of current practice:\n• We collect only the information needed for education, career and support programs.\n• Information is never shown in any public directory.\n• Disability information is visible only to you and specifically authorised Sangha staff.\n• You can ask the Sangha to correct or delete your information.\n• Communication from the Sangha will be sent only on the channels and topics you choose.'**
+  /// **'This is a placeholder. The D. K. Jilla Padmashali Vidyavardhaka Sangha (R), Udupi will publish the final privacy policy here.\n\nSummary of current practice:\n• We collect only the information needed for education, career and support programs.\n• Information is never shown in any public directory.\n• Disability information is visible only to you and specifically authorised Sangha staff.\n• You can ask the Sangha to correct or delete your information.\n• Communication from the Sangha will be sent only on the channels and topics you choose.'**
   String get privacyPolicyBody;
 
   /// No description provided for @guardianConsent.
@@ -643,7 +661,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeToPvs.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Padmashali Vidya Setu.'**
+  /// **'Welcome to Padmashali Vidya Sethu.'**
   String get welcomeToPvs;
 
   /// No description provided for @basicProfileCreated.
@@ -757,7 +775,7 @@ abstract class AppLocalizations {
   /// No description provided for @signOutConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Sign out of Padmashali Vidya Setu on this device?'**
+  /// **'Sign out of Padmashali Vidya Sethu on this device?'**
   String get signOutConfirm;
 
   /// No description provided for @notifications.

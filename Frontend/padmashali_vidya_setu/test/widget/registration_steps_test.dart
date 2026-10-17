@@ -41,6 +41,24 @@ void main() {
       expect(find.byKey(const Key('highestEducationField')), findsOneWidget);
     });
 
+    testWidgets('Highest Education "Other" asks to specify and sends the text', (tester) async {
+      final draft = await pumpStep(tester);
+      await tester.tap(find.byKey(const Key('choice-WORKING')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('highestEducationOtherField')), findsNothing);
+
+      await tester.tap(find.byKey(const Key('highestEducationField')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Other').last);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('highestEducationOtherField')), findsOneWidget);
+
+      await tester.enterText(find.byKey(const Key('highestEducationOtherField')), ' Diploma in Yoga ');
+      final json = draft.toJson(otherDisabilityTypeId: null);
+      expect(json['highestEducationLevelId'], 14);
+      expect(json['highestEducationLevelOtherText'], 'Diploma in Yoga');
+    });
+
     testWidgets('Unemployed hides Class Studying and asks for Highest Education', (tester) async {
       await pumpStep(tester);
 
@@ -234,7 +252,39 @@ void main() {
       expect(find.text('Dakshina Kannada'), findsOneWidget);
       expect(find.text('Karnataka'), findsOneWidget);
       expect(find.text('Puttur'), findsOneWidget); // taluk dropdown, filtered by district
-      expect(find.byKey(const Key('permanentAddress.localityMenu')), findsOneWidget); // several localities
+      // Several places for the PIN: chosen from a list, not typed.
+      expect(find.byKey(const Key('permanentAddress.cityId')), findsOneWidget);
+      expect(find.byKey(const Key('permanentAddress.cityVillageName')), findsNothing);
+    });
+
+    testWidgets('PIN places are offered as City / Village; "not listed" asks to type it', (tester) async {
+      final draft = RegistrationDraft();
+      await pumpLocalized(
+        tester,
+        Form(
+          child: AddressStep(draft: draft, serverErrors: const {}, onFieldChanged: (_) {}),
+        ),
+        overrides: testOverrides(masterData: FakeMasterDataRepository()),
+      );
+      await tester.enterText(find.byKey(const Key('permanentAddress.pinCode')), '574201');
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('permanentAddress.cityId')));
+      await tester.pumpAndSettle();
+      expect(find.text('Bolwar').last, findsOneWidget);
+      await tester.tap(find.text('Puttur(D.K.)').last);
+      await tester.pumpAndSettle();
+      final a = draft.permanentAddress;
+      expect(a.toJson()['cityId'], 2);
+      expect(a.toJson()['cityVillageName'], 'Puttur(D.K.)');
+
+      await tester.tap(find.byKey(const Key('permanentAddress.cityId')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('My place is not listed').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const Key('permanentAddress.cityVillageName')), 'Kabaka');
+      expect(a.toJson()['cityId'], isNull);
+      expect(a.toJson()['cityVillageName'], 'Kabaka');
     });
 
     testWidgets('unknown PIN shows a hint and allows manual selection', (tester) async {

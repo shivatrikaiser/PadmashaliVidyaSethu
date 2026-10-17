@@ -35,6 +35,7 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
         b.HasOne(e => e.MemberStatus).WithMany().HasForeignKey(e => e.MemberStatusId).OnDelete(DeleteBehavior.Restrict);
         b.HasOne(e => e.Class).WithMany().HasForeignKey(e => e.ClassId).OnDelete(DeleteBehavior.Restrict);
         b.HasOne(e => e.HighestEducationLevel).WithMany().HasForeignKey(e => e.HighestEducationLevelId).OnDelete(DeleteBehavior.Restrict);
+        b.Property(e => e.HighestEducationLevelOtherText).HasMaxLength(ConfigurationExtensions.OtherTextLength);
         b.HasOne(e => e.Organisation).WithMany().HasForeignKey(e => e.OrganisationId).OnDelete(DeleteBehavior.Restrict);
 
         // Reporting / filtering indexes (admin segments by temple, status, class, organisation, age).
@@ -87,6 +88,7 @@ public class MemberDisabilityConfiguration : IEntityTypeConfiguration<MemberDisa
         b.Property(e => e.RegistrationId).HasMaxLength(11).IsFixedLength().IsUnicode(false);
         b.Property(e => e.CreatedDate).HasColumnType("datetime2(3)");
         b.Property(e => e.CreatedBy).HasMaxLength(ConfigurationExtensions.AuditUserLength);
+        b.Property(e => e.OtherText).HasMaxLength(ConfigurationExtensions.OtherTextLength);
         b.HasOne(e => e.Member).WithMany(m => m.Disabilities).HasForeignKey(e => e.RegistrationId).OnDelete(DeleteBehavior.Cascade);
         b.HasOne(e => e.DisabilityType).WithMany().HasForeignKey(e => e.DisabilityTypeId).OnDelete(DeleteBehavior.Restrict);
     }

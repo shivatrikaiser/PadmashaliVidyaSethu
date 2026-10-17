@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:padmashali_vidya_setu/app.dart';
 import 'package:padmashali_vidya_setu/screens/auth/phone_screen.dart';
+import 'package:padmashali_vidya_setu/widgets/brand.dart';
 import 'package:padmashali_vidya_setu/widgets/code_input.dart';
 
 import '../helpers.dart';
@@ -16,7 +17,14 @@ void main() {
     await tester.pumpWidget(ProviderScope(overrides: testOverrides(), child: const PvsApp()));
     await tester.pumpAndSettle();
 
-    expect(find.text('Padmashali Vidya Setu'), findsWidgets);
+    // Logo, then sponsor and "Powered by" from the admin portal, then the welcome text - all on one screen.
+    expect(find.byType(BrandLogo), findsOneWidget);
+    expect(find.byKey(const Key('welcomeSponsor')), findsOneWidget);
+    expect(find.byKey(const Key('welcomePoweredBy')), findsOneWidget);
+    expect(
+      tester.getBottomLeft(find.byKey(const Key('getStartedButton'))).dy,
+      lessThan(tester.view.physicalSize.height / tester.view.devicePixelRatio),
+    );
     expect(find.byKey(const Key('getStartedButton')), findsOneWidget);
 
     await tester.ensureVisible(find.byKey(const Key('getStartedButton')));

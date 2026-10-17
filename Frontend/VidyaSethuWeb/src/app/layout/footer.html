@@ -1,0 +1,64 @@
+<footer class="footer">
+  <div class="container grid">
+    <div class="about">
+      <a routerLink="/" class="brand" [attr.aria-label]="t().siteName + ' - ' + t().nav.home">
+        <vs-logo [size]="44" [inverse]="true" />
+      </a>
+      <p>{{ t().footer.tagline }}</p>
+      <p class="small">{{ t().footer.orgDisclaimer }}</p>
+    </div>
+
+    <nav [attr.aria-label]="t().common.footerNav" class="columns">
+      <div>
+        <h2>{{ t().footer.platform }}</h2>
+        <ul>
+          <li>
+            <a routerLink="/about">{{ t().nav.about }}</a>
+          </li>
+          <li>
+            <a routerLink="/features">{{ t().nav.features }}</a>
+          </li>
+          <li>
+            <a routerLink="/organizations">{{ t().nav.organizations }}</a>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h2>{{ t().footer.audiences }}</h2>
+        <ul>
+          <li>
+            <a routerLink="/for-organizations">{{ t().nav.forOrganizations }}</a>
+          </li>
+          <li>
+            <a routerLink="/for-students">{{ t().nav.forStudents }}</a>
+          </li>
+          <li>
+            <a routerLink="/for-job-seekers">{{ t().nav.forJobSeekers }}</a>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h2>{{ t().footer.company }}</h2>
+        <ul>
+          <li>
+            <a routerLink="/contact">{{ t().nav.contact }}</a>
+          </li>
+          <li>
+            <a routerLink="/privacy">{{ t().nav.privacy }}</a>
+          </li>
+          <li>
+            <a routerLink="/terms">{{ t().nav.terms }}</a>
+          </li>
+          <li>
+            <a routerLink="/accessibility">{{ t().nav.accessibility }}</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+  <div class="container legal">
+    <p>{{ t().footer.copyright(year, company.legalName) }}</p>
+    <p>{{ t().footer.productOf(company.legalName) }}</p>
+  </div>
+</footer>

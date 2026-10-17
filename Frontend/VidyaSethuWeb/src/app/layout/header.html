@@ -1,0 +1,35 @@
+<a class="skip-link" href="#main" (click)="skipToMain($event)">{{ t().common.skipToContent }}</a>
+<header class="bar">
+  <div class="container inner">
+    <a routerLink="/" class="brand" [attr.aria-label]="t().siteName + ' - ' + t().nav.home">
+      <vs-logo [size]="48" />
+    </a>
+
+    <button
+      type="button"
+      class="menu-button"
+      [attr.aria-expanded]="open()"
+      aria-controls="site-nav"
+      [attr.aria-label]="open() ? t().common.closeMenu : t().common.openMenu"
+      (click)="toggle()"
+    >
+      <vs-icon [name]="open() ? 'close' : 'menu'" />
+    </button>
+
+    <nav id="site-nav" class="nav" [class.open]="open()" [attr.aria-label]="t().common.primaryNav">
+      <ul>
+        @for (link of links; track link.path) {
+          <li>
+            <a
+              [routerLink]="link.path"
+              routerLinkActive="active"
+              ariaCurrentWhenActive="page"
+              (click)="close()"
+              >{{ t().nav[link.label] }}</a
+            >
+          </li>
+        }
+      </ul>
+    </nav>
+  </div>
+</header>

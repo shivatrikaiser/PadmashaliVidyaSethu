@@ -36,8 +36,21 @@ Codes the application logic relies on — do not change:
 
 ## Values added at runtime
 * **PIN lookups** add `Cities` and, when unknown, `Districts`/`Taluks`/`States` with `Source = 'PinLookup'`.
-* **Members** add taluks ("My taluk is not listed", `Source = 'UserSubmitted'`) and disability types ("Other",
-  `IsUserSubmitted = 1`). They are visible to everyone immediately.
+* **Members** add taluks ("My taluk is not listed", `Source = 'UserSubmitted'`). They are visible to everyone immediately.
+* **"Other" + free text.** Lists that cannot be captured in advance (Education Levels, Courses, Branches, Boards,
+  Universities, Career Options, Interest Areas, Skills, Sports, Hobbies, Competitive Exams, Achievement Types,
+  Disability Types) each have an `OTHER` row. Choosing it shows a text box; the member is linked to the `OTHER` row
+  and the text is stored in a separate column next to the reference - it never creates a master row:
+  * single choice: `<Reference>OtherText` on the same table, e.g. `PVS_Members.HighestEducationLevelOtherText`;
+  * multiple choice: `OtherText` on the link row - `PVS_MemberDisabilities`, `PVS_MemberSkills`,
+    `PVS_MemberInterestAreas`, `PVS_MemberSports`, `PVS_MemberHobbies`, `PVS_MemberCareerAspirations`,
+    `PVS_MemberCompetitiveExams`;
+  * records: `PVS_MemberEducation` (`EducationLevelOtherText`, `CourseOtherText`, `BranchOtherText`, `BoardOtherText`),
+    `PVS_AcademicAchievements` (`AchievementTypeOtherText`).
+
+  Administrators review these texts (`Database/scripts/Useful_Queries.sql`), create the proper master row and re-map
+  the member to it (then clear the text). Registration fills Highest Education and Disability Types today; the other
+  tables are filled by the profile screens.
 * Review these periodically (`Database/scripts/Useful_Queries.sql`): rename, merge or set `IsActive = 0`.
   Deactivated values disappear from dropdowns but stay valid on existing records.
 

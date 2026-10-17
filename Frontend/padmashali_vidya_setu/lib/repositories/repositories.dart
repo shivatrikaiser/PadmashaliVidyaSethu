@@ -1,4 +1,5 @@
 import '../core/api/api_client.dart';
+import '../models/app_branding.dart';
 import '../models/auth_models.dart';
 import '../models/location_models.dart';
 import '../models/master_data_item.dart';
@@ -37,6 +38,9 @@ class MasterDataRepository {
 
   Future<PinLookupResult> lookupPinCode(String pinCode) =>
       _api.get('/api/v1/locations/pin-codes/$pinCode', PinLookupResult.fromJson);
+
+  /// Splash-screen sponsor / "Powered by" (public, works before sign-in).
+  Future<AppBranding> branding() => _api.get('/api/v1/app/branding', AppBranding.fromJson);
 }
 
 class MemberRepository {

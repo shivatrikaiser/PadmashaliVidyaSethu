@@ -9,21 +9,28 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Padmashali Vidya Setu';
+  String get appTitle => 'Padmashali Vidya Sethu';
+
+  @override
+  String get sponsoredBy => 'Sponsored by:';
+
+  @override
+  String get poweredBy => 'Powered by';
 
   @override
   String get appTagline =>
       'Connecting Our Young Padmashalis for a Brighter Future';
 
   @override
-  String get organisationName => 'Padmashali Vidyavardhaka Sangha';
+  String get organisationName =>
+      'D K Jilla Padmashali Vidyavardhaka Sangha (R), Udupi';
 
   @override
   String get welcomeHeading => 'Welcome';
 
   @override
   String get welcomeBody =>
-      'Create your education and career profile with the Padmashali Vidyavardhaka Sangha. Registration takes only a few minutes — you can complete the rest of your profile later.';
+      'Create your education and career profile with the D. K. Jilla Padmashali Vidyavardhaka Sangha (R), Udupi. Registration takes only a few minutes — you can complete the rest of your profile later.';
 
   @override
   String get welcomeFeatureEducation => 'Education & achievements';
@@ -233,7 +240,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cityVillage => 'City / Village';
 
   @override
-  String get cityVillageHelp => 'Choose from the list or type your locality.';
+  String get cityVillageHelp => 'Places under this PIN code';
+
+  @override
+  String get cityNotListed => 'My place is not listed';
 
   @override
   String get taluk => 'Taluk';
@@ -289,7 +299,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyPolicyBody =>
-      'This is a placeholder. The Padmashali Vidyavardhaka Sangha will publish the final privacy policy here.\n\nSummary of current practice:\n• We collect only the information needed for education, career and support programs.\n• Information is never shown in any public directory.\n• Disability information is visible only to you and specifically authorised Sangha staff.\n• You can ask the Sangha to correct or delete your information.\n• Communication from the Sangha will be sent only on the channels and topics you choose.';
+      'This is a placeholder. The D. K. Jilla Padmashali Vidyavardhaka Sangha (R), Udupi will publish the final privacy policy here.\n\nSummary of current practice:\n• We collect only the information needed for education, career and support programs.\n• Information is never shown in any public directory.\n• Disability information is visible only to you and specifically authorised Sangha staff.\n• You can ask the Sangha to correct or delete your information.\n• Communication from the Sangha will be sent only on the channels and topics you choose.';
 
   @override
   String get guardianConsent =>
@@ -305,7 +315,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registrationIdLabel => 'Registration ID';
 
   @override
-  String get welcomeToPvs => 'Welcome to Padmashali Vidya Setu.';
+  String get welcomeToPvs => 'Welcome to Padmashali Vidya Sethu.';
 
   @override
   String get basicProfileCreated => 'Your basic profile has been created.';
@@ -371,7 +381,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signOutConfirm =>
-      'Sign out of Padmashali Vidya Setu on this device?';
+      'Sign out of Padmashali Vidya Sethu on this device?';
 
   @override
   String get notifications => 'Notifications';

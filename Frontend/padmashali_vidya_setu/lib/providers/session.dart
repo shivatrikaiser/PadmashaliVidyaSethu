@@ -52,15 +52,21 @@ class SessionNotifier extends StateNotifier<SessionState> {
   final MemberRepository _members;
 
   /// On app start: resume a stored session if it is still valid.
-  Future<void> bootstrap() async {
+  /// Restores the stored session. The result is applied no sooner than [minimumDuration] (the splash screen's
+  /// display time); the check itself runs immediately.
+  Future<void> bootstrap({Duration minimumDuration = Duration.zero}) async {
+    final minimum = Future<void>.delayed(minimumDuration);
     if (await _tokens.read() == null) {
+      await minimum;
       state = const SessionState(status: SessionStatus.signedOut);
       return;
     }
     try {
       final account = await _members.myAccount();
+      await minimum;
       state = SessionState(status: SessionStatus.signedIn, account: account);
     } on ApiException catch (e) {
+      await minimum;
       if (e.isUnauthorized) {
         await _tokens.clear();
         state = const SessionState(status: SessionStatus.signedOut);

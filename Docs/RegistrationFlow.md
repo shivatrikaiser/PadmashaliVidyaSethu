@@ -31,7 +31,7 @@ On submit, server field errors are shown on the matching fields and the wizard j
 
 ## Completion
 Shows "Registration Successful!", the **Student ID** (or **Registration ID** for non-students) `PVS-TT-NNNN`,
-"Welcome to Padmashali Vidya Setu. Your basic profile has been created." and **Continue to My Profile** → Home.
+"Welcome to Padmashali Vidya Sethu. Your basic profile has been created." and **Continue to My Profile** → Home.
 
 ## Family members
 Home → menu or Quick Links → **Add Family Member** runs the same wizard under the same mobile number (max 10).

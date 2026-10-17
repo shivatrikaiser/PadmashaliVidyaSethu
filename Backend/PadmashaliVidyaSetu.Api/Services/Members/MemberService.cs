@@ -54,6 +54,8 @@ public sealed class MemberService(
 
     public async Task<MemberProfileDto> GetProfileAsync(string registrationId, CancellationToken ct)
     {
+        // Administrators also see deactivated members.
+        var isAdmin = currentUser.IsInRole(RoleCodes.Admin) || currentUser.IsInRole(RoleCodes.SuperAdmin);
         var member = await db.Members.AsNoTracking()
             .Include(m => m.Gender).Include(m => m.Temple).Include(m => m.MemberStatus)
             .Include(m => m.Class).Include(m => m.HighestEducationLevel).Include(m => m.Organisation)
@@ -63,7 +65,7 @@ public sealed class MemberService(
             .Include(m => m.Addresses).ThenInclude(a => a.Country)
             .Include(m => m.Disabilities).ThenInclude(d => d.DisabilityType)
             .AsSplitQuery()
-            .SingleOrDefaultAsync(m => m.RegistrationId == registrationId && m.IsActive, ct);
+            .SingleOrDefaultAsync(m => m.RegistrationId == registrationId && (m.IsActive || isAdmin), ct);
 
         EnsureCanView(member);
         var canSeeSensitive = member!.AccountId == currentUser.AccountId || currentUser.IsInRole(RoleCodes.SuperAdmin);
@@ -80,7 +82,8 @@ public sealed class MemberService(
             Ref(member.MemberStatus.Id, member.MemberStatus.Name),
             member.MemberStatus.Code,
             member.Class is null ? null : Ref(member.Class.Id, member.Class.Name),
-            member.HighestEducationLevel is null ? null : Ref(member.HighestEducationLevel.Id, member.HighestEducationLevel.Name),
+            member.HighestEducationLevel is null ? null
+                : Ref(member.HighestEducationLevel.Id, WithOther(member.HighestEducationLevel.Name, member.HighestEducationLevelOtherText)),
             Ref(member.Organisation.Id, member.Organisation.Name),
             member.IsCurrentAddressSameAsPermanent,
             member.Addresses
@@ -91,7 +94,7 @@ public sealed class MemberService(
                 .ToList(),
             canSeeSensitive && member.IsDisabled,
             canSeeSensitive
-                ? member.Disabilities.Select(d => Ref(d.DisabilityType.Id, d.DisabilityType.Name)).ToList()
+                ? member.Disabilities.Select(d => Ref(d.DisabilityType.Id, WithOther(d.DisabilityType.Name, d.OtherText))).ToList()
                 : [],
             member.RegistrationCompletedDate);
     }
@@ -129,4 +132,7 @@ public sealed class MemberService(
     }
 
     private static LookupRefDto Ref(int id, string name) => new(id, name);
+
+    /// <summary>"Other" choices show what the member typed, e.g. "Other: Diploma in Yoga".</summary>
+    private static string WithOther(string name, string? otherText) => otherText is null ? name : $"{name}: {otherText}";
 }

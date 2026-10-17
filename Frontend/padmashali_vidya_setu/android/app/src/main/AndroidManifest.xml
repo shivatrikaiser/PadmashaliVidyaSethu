@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:label="Padmashali Vidya Setu"
+        android:label="Padmashali Vidya Sethu"
         android:allowBackup="false"
         android:usesCleartextTraffic="false"
         android:name="${applicationName}"

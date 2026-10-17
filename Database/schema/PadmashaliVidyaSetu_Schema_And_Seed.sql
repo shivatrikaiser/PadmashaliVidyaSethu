@@ -2295,3 +2295,346 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009101316_OtherTextColumns'
+)
+BEGIN
+    ALTER TABLE [PVS_Members] ADD [HighestEducationLevelOtherText] nvarchar(150) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009101316_OtherTextColumns'
+)
+BEGIN
+    ALTER TABLE [PVS_MemberDisabilities] ADD [OtherText] nvarchar(150) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009101316_OtherTextColumns'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261009101316_OtherTextColumns', N'10.0.12');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE TABLE [PVS_AcademicAchievements] (
+        [AcademicAchievementId] int NOT NULL IDENTITY,
+        [RegistrationId] char(11) NOT NULL,
+        [AchievementTypeId] int NOT NULL,
+        [AchievementTypeOtherText] nvarchar(150) NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_AcademicAchievements_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [ModifiedDate] datetime2(3) NULL,
+        [CreatedBy] nvarchar(100) NULL,
+        [ModifiedBy] nvarchar(100) NULL,
+        [IsActive] bit NOT NULL CONSTRAINT [PVS_DF_AcademicAchievements_IsActive] DEFAULT CAST(1 AS bit),
+        CONSTRAINT [PVS_PK_AcademicAchievements] PRIMARY KEY ([AcademicAchievementId]),
+        CONSTRAINT [PVS_FK_AcademicAchievements_AchievementTypes_AchievementTypeId] FOREIGN KEY ([AchievementTypeId]) REFERENCES [PVS_AchievementTypes] ([AchievementTypeId]) ON DELETE NO ACTION,
+        CONSTRAINT [PVS_FK_AcademicAchievements_Members_RegistrationId] FOREIGN KEY ([RegistrationId]) REFERENCES [PVS_Members] ([RegistrationId]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE TABLE [PVS_MemberCareerAspirations] (
+        [RegistrationId] char(11) NOT NULL,
+        [CareerOptionId] int NOT NULL,
+        [OtherText] nvarchar(150) NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_MemberCareerAspirations_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [CreatedBy] nvarchar(100) NULL,
+        CONSTRAINT [PVS_PK_MemberCareerAspirations] PRIMARY KEY ([RegistrationId], [CareerOptionId]),
+        CONSTRAINT [PVS_FK_MemberCareerAspirations_CareerOptions_CareerOptionId] FOREIGN KEY ([CareerOptionId]) REFERENCES [PVS_CareerOptions] ([CareerOptionId]) ON DELETE NO ACTION,
+        CONSTRAINT [PVS_FK_MemberCareerAspirations_Members_RegistrationId] FOREIGN KEY ([RegistrationId]) REFERENCES [PVS_Members] ([RegistrationId]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE TABLE [PVS_MemberCompetitiveExams] (
+        [RegistrationId] char(11) NOT NULL,
+        [CompetitiveExamId] int NOT NULL,
+        [OtherText] nvarchar(150) NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_MemberCompetitiveExams_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [CreatedBy] nvarchar(100) NULL,
+        CONSTRAINT [PVS_PK_MemberCompetitiveExams] PRIMARY KEY ([RegistrationId], [CompetitiveExamId]),
+        CONSTRAINT [PVS_FK_MemberCompetitiveExams_CompetitiveExams_CompetitiveExamId] FOREIGN KEY ([CompetitiveExamId]) REFERENCES [PVS_CompetitiveExams] ([CompetitiveExamId]) ON DELETE NO ACTION,
+        CONSTRAINT [PVS_FK_MemberCompetitiveExams_Members_RegistrationId] FOREIGN KEY ([RegistrationId]) REFERENCES [PVS_Members] ([RegistrationId]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE TABLE [PVS_MemberEducation] (
+        [MemberEducationId] int NOT NULL IDENTITY,
+        [RegistrationId] char(11) NOT NULL,
+        [EducationLevelId] int NOT NULL,
+        [EducationLevelOtherText] nvarchar(150) NULL,
+        [CourseId] int NULL,
+        [CourseOtherText] nvarchar(150) NULL,
+        [BranchId] int NULL,
+        [BranchOtherText] nvarchar(150) NULL,
+        [BoardId] int NULL,
+        [BoardOtherText] nvarchar(150) NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_MemberEducation_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [ModifiedDate] datetime2(3) NULL,
+        [CreatedBy] nvarchar(100) NULL,
+        [ModifiedBy] nvarchar(100) NULL,
+        [IsActive] bit NOT NULL CONSTRAINT [PVS_DF_MemberEducation_IsActive] DEFAULT CAST(1 AS bit),
+        CONSTRAINT [PVS_PK_MemberEducation] PRIMARY KEY ([MemberEducationId]),
+        CONSTRAINT [PVS_FK_MemberEducation_Boards_BoardId] FOREIGN KEY ([BoardId]) REFERENCES [PVS_Boards] ([BoardId]) ON DELETE NO ACTION,
+        CONSTRAINT [PVS_FK_MemberEducation_Branches_BranchId] FOREIGN KEY ([BranchId]) REFERENCES [PVS_Branches] ([BranchId]) ON DELETE NO ACTION,
+        CONSTRAINT [PVS_FK_MemberEducation_Courses_CourseId] FOREIGN KEY ([CourseId]) REFERENCES [PVS_Courses] ([CourseId]) ON DELETE NO ACTION,
+        CONSTRAINT [PVS_FK_MemberEducation_EducationLevels_EducationLevelId] FOREIGN KEY ([EducationLevelId]) REFERENCES [PVS_EducationLevels] ([EducationLevelId]) ON DELETE NO ACTION,
+        CONSTRAINT [PVS_FK_MemberEducation_Members_RegistrationId] FOREIGN KEY ([RegistrationId]) REFERENCES [PVS_Members] ([RegistrationId]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE TABLE [PVS_MemberHobbies] (
+        [RegistrationId] char(11) NOT NULL,
+        [HobbyId] int NOT NULL,
+        [OtherText] nvarchar(150) NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_MemberHobbies_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [CreatedBy] nvarchar(100) NULL,
+        CONSTRAINT [PVS_PK_MemberHobbies] PRIMARY KEY ([RegistrationId], [HobbyId]),
+        CONSTRAINT [PVS_FK_MemberHobbies_Hobbies_HobbyId] FOREIGN KEY ([HobbyId]) REFERENCES [PVS_Hobbies] ([HobbyId]) ON DELETE NO ACTION,
+        CONSTRAINT [PVS_FK_MemberHobbies_Members_RegistrationId] FOREIGN KEY ([RegistrationId]) REFERENCES [PVS_Members] ([RegistrationId]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE TABLE [PVS_MemberInterestAreas] (
+        [RegistrationId] char(11) NOT NULL,
+        [InterestAreaId] int NOT NULL,
+        [OtherText] nvarchar(150) NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_MemberInterestAreas_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [CreatedBy] nvarchar(100) NULL,
+        CONSTRAINT [PVS_PK_MemberInterestAreas] PRIMARY KEY ([RegistrationId], [InterestAreaId]),
+        CONSTRAINT [PVS_FK_MemberInterestAreas_InterestAreas_InterestAreaId] FOREIGN KEY ([InterestAreaId]) REFERENCES [PVS_InterestAreas] ([InterestAreaId]) ON DELETE NO ACTION,
+        CONSTRAINT [PVS_FK_MemberInterestAreas_Members_RegistrationId] FOREIGN KEY ([RegistrationId]) REFERENCES [PVS_Members] ([RegistrationId]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE TABLE [PVS_MemberSkills] (
+        [RegistrationId] char(11) NOT NULL,
+        [SkillId] int NOT NULL,
+        [OtherText] nvarchar(150) NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_MemberSkills_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [CreatedBy] nvarchar(100) NULL,
+        CONSTRAINT [PVS_PK_MemberSkills] PRIMARY KEY ([RegistrationId], [SkillId]),
+        CONSTRAINT [PVS_FK_MemberSkills_Members_RegistrationId] FOREIGN KEY ([RegistrationId]) REFERENCES [PVS_Members] ([RegistrationId]) ON DELETE CASCADE,
+        CONSTRAINT [PVS_FK_MemberSkills_Skills_SkillId] FOREIGN KEY ([SkillId]) REFERENCES [PVS_Skills] ([SkillId]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE TABLE [PVS_MemberSports] (
+        [RegistrationId] char(11) NOT NULL,
+        [SportId] int NOT NULL,
+        [OtherText] nvarchar(150) NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_MemberSports_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [CreatedBy] nvarchar(100) NULL,
+        CONSTRAINT [PVS_PK_MemberSports] PRIMARY KEY ([RegistrationId], [SportId]),
+        CONSTRAINT [PVS_FK_MemberSports_Members_RegistrationId] FOREIGN KEY ([RegistrationId]) REFERENCES [PVS_Members] ([RegistrationId]) ON DELETE CASCADE,
+        CONSTRAINT [PVS_FK_MemberSports_Sports_SportId] FOREIGN KEY ([SportId]) REFERENCES [PVS_Sports] ([SportId]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_AcademicAchievements_AchievementTypeId] ON [PVS_AcademicAchievements] ([AchievementTypeId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_AcademicAchievements_RegistrationId] ON [PVS_AcademicAchievements] ([RegistrationId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_MemberCareerAspirations_CareerOptionId] ON [PVS_MemberCareerAspirations] ([CareerOptionId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_MemberCompetitiveExams_CompetitiveExamId] ON [PVS_MemberCompetitiveExams] ([CompetitiveExamId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_MemberEducation_BoardId] ON [PVS_MemberEducation] ([BoardId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_MemberEducation_BranchId] ON [PVS_MemberEducation] ([BranchId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_MemberEducation_CourseId] ON [PVS_MemberEducation] ([CourseId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_MemberEducation_EducationLevelId] ON [PVS_MemberEducation] ([EducationLevelId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_MemberEducation_RegistrationId] ON [PVS_MemberEducation] ([RegistrationId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_MemberHobbies_HobbyId] ON [PVS_MemberHobbies] ([HobbyId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_MemberInterestAreas_InterestAreaId] ON [PVS_MemberInterestAreas] ([InterestAreaId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_MemberSkills_SkillId] ON [PVS_MemberSkills] ([SkillId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_MemberSports_SportId] ON [PVS_MemberSports] ([SportId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261009112325_MemberProfileListChoices'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261009112325_MemberProfileListChoices', N'10.0.12');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261010153650_AppBranding'
+)
+BEGIN
+    CREATE TABLE [PVS_AppBranding] (
+        [AppBrandingId] int NOT NULL,
+        [SponsorName] nvarchar(150) NULL,
+        [SponsorLogo] varbinary(max) NULL,
+        [SponsorLogoContentType] varchar(30) NULL,
+        [PoweredBy] nvarchar(150) NULL,
+        [ModifiedDate] datetime2(3) NULL,
+        [ModifiedBy] nvarchar(100) NULL,
+        CONSTRAINT [PVS_PK_AppBranding] PRIMARY KEY ([AppBrandingId]),
+        CONSTRAINT [PVS_CK_AppBranding_Singleton] CHECK ([AppBrandingId] = 1)
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261010153650_AppBranding'
+)
+BEGIN
+    IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'AppBrandingId', N'ModifiedBy', N'ModifiedDate', N'PoweredBy', N'SponsorLogo', N'SponsorLogoContentType', N'SponsorName') AND [object_id] = OBJECT_ID(N'[PVS_AppBranding]'))
+        SET IDENTITY_INSERT [PVS_AppBranding] ON;
+    EXEC(N'INSERT INTO [PVS_AppBranding] ([AppBrandingId], [ModifiedBy], [ModifiedDate], [PoweredBy], [SponsorLogo], [SponsorLogoContentType], [SponsorName])
+    VALUES (1, NULL, NULL, N''IQ Explore'', NULL, NULL, NULL)');
+    IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'AppBrandingId', N'ModifiedBy', N'ModifiedDate', N'PoweredBy', N'SponsorLogo', N'SponsorLogoContentType', N'SponsorName') AND [object_id] = OBJECT_ID(N'[PVS_AppBranding]'))
+        SET IDENTITY_INSERT [PVS_AppBranding] OFF;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261010153650_AppBranding'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261010153650_AppBranding', N'10.0.12');
+END;
+
+COMMIT;
+GO
+

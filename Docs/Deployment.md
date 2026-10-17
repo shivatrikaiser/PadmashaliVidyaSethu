@@ -18,7 +18,8 @@ Hosting has not been chosen yet. This is the recommended path on Azure (any SQL 
    | `PhoneVerification__CodeHashingKey` | ≥ 32 random bytes, different from the JWT key |
    | `SMS__APIKey` | SMS Gateway Hub API key (other `SMS` settings are in appsettings.json) |
    | `PhoneVerification__Sender` | `SmsGatewayHub` (default in appsettings.json) |
-   | `Cors__AllowedOrigins__0` | Only if a web client is deployed |
+   | `Cors__AllowedOrigins__0` | `https://pvs.vidyasethu.co.in` (admin portal) |
+   | `Cors__AllowedOrigins__1` | `https://app.vidyasethu.co.in` (member web app) |
 
 4. HTTPS only; HSTS is enabled automatically outside Development. If behind a proxy/Front Door, configure
    forwarded headers so rate limiting sees client IPs.
@@ -39,3 +40,27 @@ flutter build appbundle --release --dart-define-from-file=config/production.json
 ## Environments
 `Deployment/{development,staging,production}` hold environment notes. Configuration files:
 `appsettings.{Environment}.json` (non-secret only) and Flutter `config/{env}.json`.
+
+## Addresses
+
+| Address | What |
+|---|---|
+| `https://app.vidyasethu.co.in` | PVS member app, Flutter web build (Azure Static Web App, `web/staticwebapp.config.json`) |
+| `https://pvs.vidyasethu.co.in` | Admin portal (`Frontend/AdminWeb`) - see `Frontend/AdminWeb/README.md` "Deployment" |
+| `https://api.pvs.vidyasethu.co.in` | PVS API (custom domain on the API App Service: CNAME `api.pvs` + TXT `asuid.api.pvs`) |
+
+## Admin portal
+Azure App Service Web App (one zip, Windows or Linux) built with `npm run build` in `Frontend/AdminWeb`. Its
+production build calls `https://api.pvs.vidyasethu.co.in`, and the API must list `https://pvs.vidyasethu.co.in` in
+`Cors__AllowedOrigins__0`.
+
+## VidyaSethu public website
+Deployed separately as an Azure App Service Web App (one zip, Windows or Linux; static files, no database) - see
+`Frontend/VidyaSethuWeb/README.md`. Its "Open Padmashali Vidya Sethu" destination
+(`organizationLinks.pvs.application` in `src/environments/environment.ts`) is the member app
+`https://app.vidyasethu.co.in/`, not the admin portal.
+
+## Member web app
+`flutter build web --release --dart-define-from-file=config/production.json` → `build/web`, deployed to an Azure
+Static Web App (Free plan) with custom domain `app.vidyasethu.co.in`. `web/staticwebapp.config.json` is copied into
+the build (fallback to `index.html`, security headers, `.wasm` type).

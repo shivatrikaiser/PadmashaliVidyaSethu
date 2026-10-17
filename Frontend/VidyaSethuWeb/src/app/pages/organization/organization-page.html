@@ -1,0 +1,139 @@
+@let m = t().organization;
+@if (org(); as org) {
+  <section class="page-hero org-hero" [style.--org-accent]="brandColor()">
+    <div class="container">
+      <nav class="breadcrumb" [attr.aria-label]="m.breadcrumbLabel">
+        <a routerLink="/organizations">{{ m.breadcrumb }}</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{{ name() }}</span>
+      </nav>
+
+      <div class="identity">
+        @if (org.logo; as logo) {
+          <img
+            class="logo"
+            [src]="'/' + logo.src"
+            [alt]="i18n.text(logo.alt)"
+            [width]="logo.width"
+            [height]="logo.height"
+          />
+        }
+        <div>
+          <p class="eyebrow">{{ t().organizations.categories[org.category] }}</p>
+          <h1>{{ name() }}</h1>
+          @if (org.operatedBy; as by) {
+            <p class="by">{{ m.operatedBy(i18n.text(by)) }}</p>
+          }
+          <p class="lead">{{ i18n.text(org.description) }}</p>
+        </div>
+      </div>
+
+      <div class="portal" data-testid="portal">
+        @if (application(); as app) {
+          <a class="btn large open" [href]="app.href" data-testid="open-portal">
+            {{ m.open(name()) }}
+            <vs-icon name="external" [size]="20" />
+          </a>
+          <p class="portal-note">{{ m.openNote(name()) }}</p>
+          @if (app.development) {
+            <p class="notice warning dev" role="note" data-testid="dev-link">
+              <vs-icon name="info" [size]="20" />
+              <span>{{ m.developmentLink }}</span>
+            </p>
+          }
+          @if (deepLinks().length) {
+            <ul class="deep-links">
+              @for (d of deepLinks(); track d.kind) {
+                <li>
+                  <a [href]="d.link.href">{{ m.linkLabels[d.kind] }}</a>
+                </li>
+              }
+            </ul>
+          }
+        } @else {
+          <div class="notice info" role="status" data-testid="portal-unavailable">
+            <vs-icon name="info" [size]="22" />
+            <div>
+              <p>
+                <strong>{{ m.notAvailableTitle }}</strong>
+              </p>
+              <p>{{ m.notAvailable(name()) }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container layout">
+      <div>
+        <h2>{{ m.highlightsTitle }}</h2>
+        <ul class="highlights">
+          @for (h of org.highlights; track $index) {
+            <li class="card" [class.planned]="h.availability === 'planned'">
+              <div class="row">
+                <h3>{{ i18n.text(h.title) }}</h3>
+                <span class="tag" [class.available]="h.availability === 'available'">
+                  {{ m.highlightStatus[h.availability] }}
+                </span>
+              </div>
+              <p>{{ i18n.text(h.description) }}</p>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <aside class="side">
+        <div class="card">
+          <h2 class="h3">{{ m.aboutTitle }}</h2>
+          @for (p of org.about; track $index) {
+            <p>{{ i18n.text(p) }}</p>
+          }
+        </div>
+
+        <div class="card">
+          <h2 class="h3">{{ m.contactTitle }}</h2>
+          @if (org.publicContact; as c) {
+            <dl class="contact">
+              @if (c.email) {
+                <dt>{{ m.contactLabels.email }}</dt>
+                <dd>
+                  <a [href]="'mailto:' + c.email">{{ c.email }}</a>
+                </dd>
+              }
+              @if (c.phone) {
+                <dt>{{ m.contactLabels.phone }}</dt>
+                <dd>
+                  <a [href]="'tel:' + c.phone">{{ c.phone }}</a>
+                </dd>
+              }
+              @if (website(); as w) {
+                <dt>{{ m.contactLabels.website }}</dt>
+                <dd>
+                  <a [href]="w.href">{{ w.href }}</a>
+                </dd>
+              }
+              @if (c.address; as a) {
+                <dt>{{ m.contactLabels.address }}</dt>
+                <dd>{{ i18n.text(a) }}</dd>
+              }
+            </dl>
+          } @else {
+            <p>{{ m.contactNone(name()) }}</p>
+          }
+        </div>
+
+        <p class="independence">{{ m.independence(name()) }}</p>
+      </aside>
+    </div>
+  </section>
+} @else {
+  <section class="section">
+    <div class="container">
+      <h1>{{ m.notFoundTitle }}</h1>
+      <p>{{ m.notFoundText }}</p>
+      <a class="btn" routerLink="/organizations">{{ m.backToDirectory }}</a>
+    </div>
+  </section>
+}

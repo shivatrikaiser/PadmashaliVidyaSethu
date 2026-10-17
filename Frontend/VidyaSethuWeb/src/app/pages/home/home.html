@@ -1,0 +1,116 @@
+@let m = t().home;
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="container hero-inner">
+    <div class="hero-text">
+      <p class="eyebrow">{{ m.eyebrow }}</p>
+      <h1 id="hero-title">{{ m.title }}</h1>
+      <p class="lead">{{ m.lead }}</p>
+      <div class="actions">
+        <a class="btn large" routerLink="/organizations">{{ m.primaryCta }}</a>
+        <a class="btn large secondary" routerLink="/for-organizations">{{ m.secondaryCta }}</a>
+      </div>
+    </div>
+
+    <figure class="hero-art">
+      <img
+        src="/brand/vidyasethu-logo-480.png"
+        alt="VidyaSethu logo: two people raising their arms beneath a rising sun, above a bridge and an open book"
+        width="480"
+        height="480"
+        fetchpriority="high"
+      />
+      <figcaption class="product-of" data-testid="product-of">
+        <span class="label">{{ m.productOfLabel + " " }}</span>
+        <span class="company">{{ company.legalName }}</span>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="pillars-title">
+  <div class="container">
+    <div class="section-head center">
+      <h2 id="pillars-title">{{ m.pillarsTitle }}</h2>
+      <p>{{ m.pillarsLead }}</p>
+    </div>
+    <ul class="grid cols-4 plain">
+      @for (p of m.pillars; track p.title) {
+        <li class="card">
+          <span class="icon-tile"><vs-icon [name]="p.icon" /></span>
+          <h3>{{ p.title }}</h3>
+          <p>{{ p.text }}</p>
+        </li>
+      }
+    </ul>
+    <p class="note">
+      {{ m.pillarsNote }}
+      <a routerLink="/features">{{ m.pillarsNoteLink }}</a>
+    </p>
+  </div>
+</section>
+
+<section class="section muted" aria-labelledby="how-title">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="how-title">{{ m.howTitle }}</h2>
+    </div>
+    <ol class="steps">
+      @for (s of m.howSteps; track s.title) {
+        <li>
+          <h3>{{ s.title }}</h3>
+          <p>{{ s.text }}</p>
+        </li>
+      }
+    </ol>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="orgs-title">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="orgs-title">{{ m.orgsTitle }}</h2>
+      <p>{{ m.orgsLead }}</p>
+    </div>
+    @if (organizations.length) {
+      <div class="grid cols-2">
+        @for (org of organizations; track org.organizationId) {
+          <vs-organization-card [org]="org" />
+        }
+      </div>
+    } @else {
+      <p>{{ t().organizations.empty }}</p>
+    }
+    <p class="all">
+      <a routerLink="/organizations">{{ m.orgsAll }} <vs-icon name="arrowRight" [size]="18" /></a>
+    </p>
+  </div>
+</section>
+
+<section class="cta-band" aria-labelledby="join-title">
+  <div class="container inner">
+    <div>
+      <h2 id="join-title">{{ m.joinTitle }}</h2>
+      <p>{{ m.joinText }}</p>
+    </div>
+    <a class="btn light large" routerLink="/for-organizations" fragment="enquiry">{{
+      m.joinCta
+    }}</a>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="contact-title">
+  <div class="container contact">
+    <div>
+      <h2 id="contact-title">{{ m.contactTitle }}</h2>
+      <p>{{ m.contactText }}</p>
+      @if (company.email) {
+        <p>
+          <vs-icon name="mail" [size]="18" />
+          <a [href]="'mailto:' + company.email">{{ company.email }}</a>
+        </p>
+      }
+    </div>
+    <a class="btn secondary large" routerLink="/contact">{{ m.contactCta }}</a>
+  </div>
+</section>

@@ -1,11 +1,11 @@
 {
-    "name": "padmashali_vidya_setu",
-    "short_name": "padmashali_vidya_setu",
+    "name": "Padmashali Vidya Sethu",
+    "short_name": "PVS",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "Padmashali Vidya Setu - community education, skills and career platform",
+    "description": "Padmashali Vidya Sethu - community education, skills and career platform",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -1,0 +1,142 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 16px;
+  align-items: start;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+}
+
+h2 small {
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .logo {
+    max-height: 64px;
+    max-width: 180px;
+    padding: 6px;
+    border: 1px solid var(--pvs-border);
+    border-radius: 8px;
+    background: #fff;
+  }
+}
+
+label.file {
+  position: relative;
+  padding: 10px 16px;
+  border: 1px solid var(--pvs-primary);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--pvs-primary);
+
+  input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+}
+
+.small {
+  font-size: 0.85rem;
+  margin-top: 16px;
+}
+
+/* ---------------------------------------------------------------- Preview (mirrors the app's splash footer) */
+.preview-title {
+  margin: 0 0 6px;
+  font-weight: 600;
+  color: var(--pvs-text-muted);
+}
+
+.phone {
+  position: relative;
+  overflow: hidden;
+  padding: 18px 20px 72px;
+  border-radius: 16px;
+  border: 1px solid var(--pvs-border);
+  background: #f6ede2;
+  text-align: center;
+  color: #0b2d6b;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  border: 1.5px solid #f3cf7e;
+  background: linear-gradient(#fffaef, #fbeed2);
+  box-shadow: 0 4px 12px rgb(176 122 26 / 0.15);
+
+  .laurel {
+    color: #d49a2e;
+    font-size: 1.3rem;
+  }
+
+  .card-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .label {
+    font-weight: 600;
+  }
+
+  img {
+    max-height: 40px;
+    max-width: 100%;
+  }
+
+  strong {
+    font-size: 1.25rem;
+    overflow-wrap: anywhere;
+  }
+}
+
+.powered {
+  margin: 12px 0 0;
+}
+
+.waves {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 56px;
+  background:
+    radial-gradient(120% 140% at 0% 100%, #0b2d6b 45%, #d49a2e 46%, #f3cf7e 52%, transparent 53%),
+    radial-gradient(120% 140% at 100% 100%, #1c4f9c 45%, #f3cf7e 46%, #d49a2e 52%, transparent 53%);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

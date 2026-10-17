@@ -9,6 +9,8 @@ internal static class ConfigurationExtensions
     public const int NameLength = 150;
     public const int CodeLength = 60;
     public const int AuditUserLength = 100;
+    /// <summary>Free text entered when "Other" is chosen from a list.</summary>
+    public const int OtherTextLength = 150;
 
     public static void ConfigureAudit<T>(this EntityTypeBuilder<T> b) where T : AuditableEntity
     {

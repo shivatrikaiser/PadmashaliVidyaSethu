@@ -42,8 +42,9 @@ public class CompetitiveExam : MasterDataEntity;
 public class AchievementType : MasterDataEntity;
 
 /// <summary>
-/// Disability types. Members may add a new type via "Other - please specify";
-/// such rows are flagged <see cref="IsUserSubmitted"/> so administrators can review them.
+/// Disability types. "Other - please specify" links the member to the OTHER row and keeps the typed text in
+/// <c>MemberDisability.OtherText</c> for administrators to review and map. <see cref="IsUserSubmitted"/> marks rows
+/// created from such reviews.
 /// </summary>
 public class DisabilityType : MasterDataEntity
 {
@@ -85,7 +86,12 @@ public static class MasterCodes
     public const string StatusWorking = "WORKING";
     public const string StatusUnemployed = "UNEMPLOYED";
 
-    public const string DisabilityOther = "OTHER";
+    /// <summary>
+    /// The "Other" row every selectable list has. Choosing it requires free text, stored in a separate
+    /// <c>...OtherText</c> column next to the reference, so an administrator can create / map the proper row later.
+    /// </summary>
+    public const string Other = "OTHER";
+    public const string DisabilityOther = Other;
     public const string OrganisationNone = "NONE";
     public const string CountryIndia = "IN";
 }

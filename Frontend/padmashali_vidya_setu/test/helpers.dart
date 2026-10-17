@@ -6,6 +6,7 @@ import 'package:padmashali_vidya_setu/core/api/api_client.dart';
 import 'package:padmashali_vidya_setu/core/api/api_exception.dart';
 import 'package:padmashali_vidya_setu/core/storage/token_storage.dart';
 import 'package:padmashali_vidya_setu/l10n/generated/app_localizations.dart';
+import 'package:padmashali_vidya_setu/models/app_branding.dart';
 import 'package:padmashali_vidya_setu/models/location_models.dart';
 import 'package:padmashali_vidya_setu/models/master_data_item.dart';
 import 'package:padmashali_vidya_setu/providers/providers.dart';
@@ -27,7 +28,11 @@ final fakeLists = <String, List<MasterDataItem>>{
     item(3, 'Other / Prefer not to say', 'OTHER'),
   ],
   MasterDataTypes.classes: [item(1, 'LKG', 'LKG'), item(12, 'Class 10', 'CLASS_10'), item(13, 'PUC 1', 'PUC_1')],
-  MasterDataTypes.educationLevels: [item(2, 'Class 10 / SSLC', 'SSLC'), item(6, 'Undergraduate Degree', 'UG')],
+  MasterDataTypes.educationLevels: [
+    item(2, 'Class 10 / SSLC', 'SSLC'),
+    item(6, 'Undergraduate Degree', 'UG'),
+    item(14, 'Other', 'OTHER'),
+  ],
   MasterDataTypes.temples: [item(1, 'Temple 01', '01'), item(2, 'Temple 02', '02')],
   MasterDataTypes.organisations: [item(1, 'DK District', 'DK'), item(6, 'Not Linked to Any Organisation', 'NONE')],
   MasterDataTypes.disabilityTypes: [
@@ -39,6 +44,9 @@ final fakeLists = <String, List<MasterDataItem>>{
 };
 
 class FakeMasterDataRepository implements MasterDataRepository {
+  @override
+  Future<AppBranding> branding() async => const AppBranding(sponsorName: 'Test Sponsor', poweredBy: 'IQ Explore');
+
   int pinLookups = 0;
 
   @override
@@ -82,6 +90,7 @@ class FakeMasterDataRepository implements MasterDataRepository {
 
 /// Provider overrides that keep widget tests offline.
 List<Override> testOverrides({FakeMasterDataRepository? masterData}) => [
+  splashMinimumDisplayProvider.overrideWithValue(Duration.zero),
   tokenStorageProvider.overrideWithValue(MemoryTokenStorage()),
   apiClientProvider.overrideWithValue(
     ApiClient(baseUrl: 'http://test.invalid', tokenStorage: MemoryTokenStorage(), onSessionExpired: () {}),

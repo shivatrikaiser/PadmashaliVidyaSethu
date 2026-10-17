@@ -108,7 +108,11 @@ void main() {
     expect(find.text('Karnataka'), findsWidgets);
     expect(find.text('India'), findsWidgets);
     expect(find.text('Puttur'), findsWidgets, reason: 'taluk suggested from the PIN data');
-    await t.enterText(find.byKey(const Key('permanentAddress.cityVillageName')), 'Puttur');
+    // City / Village: one of the places India Post links to the PIN (first in the list).
+    final places = find.descendant(of: find.byKey(const Key('permanentAddress.cityId')), matching: find.byType(DropdownButtonFormField<int>));
+    await t.tapVisible(places);
+    await t.tap(find.byType(DropdownMenuItem<int>).first);
+    await t.pumpAndSettle();
     await shot(t, '08-address-pin-lookup');
     await t.tapVisible(find.byKey(const Key('sameAsPermanentCheckbox')));
     expect(find.text('Current Address'), findsNothing);

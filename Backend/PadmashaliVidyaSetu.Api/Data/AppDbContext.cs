@@ -6,6 +6,7 @@ using PadmashaliVidyaSetu.Api.Entities.Compliance;
 using PadmashaliVidyaSetu.Api.Entities.Locations;
 using PadmashaliVidyaSetu.Api.Entities.MasterData;
 using PadmashaliVidyaSetu.Api.Entities.Members;
+using PadmashaliVidyaSetu.Api.Entities.Settings;
 
 namespace PadmashaliVidyaSetu.Api.Data;
 
@@ -56,9 +57,22 @@ public class AppDbContext(
     public DbSet<MemberDisability> MemberDisabilities => Set<MemberDisability>();
     public DbSet<TempleRegistrationSequence> TempleRegistrationSequences => Set<TempleRegistrationSequence>();
 
+    // Member profile (list choices with "Other" text)
+    public DbSet<MemberEducation> MemberEducation => Set<MemberEducation>();
+    public DbSet<MemberSkill> MemberSkills => Set<MemberSkill>();
+    public DbSet<MemberInterestArea> MemberInterestAreas => Set<MemberInterestArea>();
+    public DbSet<MemberSport> MemberSports => Set<MemberSport>();
+    public DbSet<MemberHobby> MemberHobbies => Set<MemberHobby>();
+    public DbSet<MemberCareerAspiration> MemberCareerAspirations => Set<MemberCareerAspiration>();
+    public DbSet<MemberCompetitiveExam> MemberCompetitiveExams => Set<MemberCompetitiveExam>();
+    public DbSet<AcademicAchievement> AcademicAchievements => Set<AcademicAchievement>();
+
     // Compliance
     public DbSet<ConsentRecord> ConsentRecords => Set<ConsentRecord>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+
+    // Settings
+    public DbSet<AppBranding> AppBranding => Set<AppBranding>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,0 +1,27 @@
+<header class="topbar">
+  <div class="brand">
+    <img class="brand-mark" src="pvs-emblem.jpg" alt="" width="36" height="36" />
+    <span>Padmashali Vidya Sethu <small>Admin</small></span>
+  </div>
+  <div class="account">
+    <span>{{ auth.admin()?.maskedMobileNumber }}</span>
+    <button type="button" class="secondary" (click)="signOut()">Sign out</button>
+  </div>
+</header>
+
+<div class="body">
+  <nav aria-label="Main">
+    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    <a routerLink="/members" routerLinkActive="active">Members</a>
+    <a routerLink="/locations" routerLinkActive="active">Locations</a>
+    @if (auth.isSuperAdmin()) {
+      <a routerLink="/other-values" routerLinkActive="active">"Other" values</a>
+      <a routerLink="/lists" routerLinkActive="active">Master lists</a>
+      <a routerLink="/branding" routerLinkActive="active">Splash sponsor</a>
+      <a routerLink="/admin-users" routerLinkActive="active">Admin users</a>
+    }
+  </nav>
+  <main>
+    <router-outlet />
+  </main>
+</div>

@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/api/api_exception.dart';
-import '../../../models/location_models.dart';
 import '../../../models/master_data_item.dart';
 import '../../../models/registration_draft.dart';
 import '../../../providers/providers.dart';
@@ -14,7 +13,8 @@ import '../../../widgets/master_data_dropdown.dart';
 
 /// One address (permanent or current).
 ///
-/// PIN code → City/Village options, District, State, Country are filled automatically.
+/// PIN code → the places linked to it (India Post) are offered as City / Village choices, and District, State,
+/// Country are filled automatically. "My place is not listed" lets the member type the City / Village instead.
 /// Taluk is a dropdown filtered by district (pre-selected when the PIN data suggests one), with
 /// "My taluk is not listed" for anything missing. If the PIN lookup fails, State and District can be
 /// chosen manually — the user is never blocked by the PIN service.
@@ -96,13 +96,19 @@ class _AddressFormState extends ConsumerState<AddressForm> {
     }
   }
 
-  void _pickLocality(Locality locality) {
+  static const _placeNotListed = -1;
+
+  void _pickPlace(int? cityId) {
+    if (cityId == null) return;
     setState(() {
-      _a.cityId = locality.cityId;
-      _a.cityVillageName = locality.name;
-      _city.text = locality.name;
-      if (locality.talukId != null && !_a.talukNotListed) _a.talukId = locality.talukId;
+      if (cityId == _placeNotListed) {
+        _a.selectPlaceNotListed();
+      } else {
+        _a.selectLocality(_a.localities.firstWhere((l) => l.cityId == cityId));
+      }
+      _city.text = _a.cityVillageName;
     });
+    _changed('cityId');
     _changed('cityVillageName');
   }
 
@@ -174,31 +180,50 @@ class _AddressFormState extends ConsumerState<AddressForm> {
           InfoNote(text: _lookupMessage!, icon: Icons.travel_explore),
         ],
         const FieldGap(),
-        TextFormField(
-          key: _key('cityVillageName'),
-          controller: _city,
-          textCapitalization: TextCapitalization.words,
-          decoration: InputDecoration(
-            labelText: l10n.cityVillage,
-            helperText: _a.localities.length > 1 ? l10n.cityVillageHelp : null,
-            prefixIcon: const Icon(Icons.location_city_outlined),
-            errorText: _err('cityVillageName') ?? _err('cityId'),
-            suffixIcon: _a.localities.length > 1
-                ? PopupMenuButton<Locality>(
-                    key: _key('localityMenu'),
-                    icon: const Icon(Icons.arrow_drop_down_circle_outlined),
-                    tooltip: l10n.cityVillage,
-                    onSelected: _pickLocality,
-                    itemBuilder: (_) => [for (final l in _a.localities) PopupMenuItem(value: l, child: Text(l.name))],
-                  )
-                : null,
+        if (_a.localities.isNotEmpty)
+          KeyedSubtree(
+            key: _key('cityId'),
+            child: DropdownButtonFormField<int>(
+              // Re-created when a new PIN lookup changes the places or the selection.
+              key: ValueKey((_a.pinCode, _a.cityNotListed ? _placeNotListed : _a.cityId)),
+              initialValue: _a.cityNotListed ? _placeNotListed : _a.cityId,
+              isExpanded: true,
+              decoration: InputDecoration(
+                labelText: l10n.cityVillage,
+                helperText: l10n.cityVillageHelp,
+                prefixIcon: const Icon(Icons.location_city_outlined),
+                errorText: _a.cityNotListed ? null : _err('cityId') ?? _err('cityVillageName'),
+              ),
+              items: [
+                for (final l in _a.localities)
+                  DropdownMenuItem(
+                    value: l.cityId,
+                    child: Text(l.name, overflow: TextOverflow.ellipsis),
+                  ),
+                DropdownMenuItem(value: _placeNotListed, child: Text(l10n.cityNotListed)),
+              ],
+              validator: (v) => v == null ? l10n.validationSelect : null,
+              onChanged: _pickPlace,
+            ),
           ),
-          validator: (v) => Validators.requiredText(v)?.text(l10n),
-          onChanged: (v) {
-            _a.cityVillageName = v;
-            _changed('cityVillageName');
-          },
-        ),
+        if (_a.localities.isEmpty || _a.cityNotListed) ...[
+          if (_a.localities.isNotEmpty) const FieldGap(),
+          TextFormField(
+            key: _key('cityVillageName'),
+            controller: _city,
+            textCapitalization: TextCapitalization.words,
+            decoration: InputDecoration(
+              labelText: _a.cityNotListed ? l10n.pleaseSpecify : l10n.cityVillage,
+              prefixIcon: const Icon(Icons.location_city_outlined),
+              errorText: _err('cityVillageName'),
+            ),
+            validator: (v) => Validators.requiredText(v)?.text(l10n),
+            onChanged: (v) {
+              _a.cityVillageName = v;
+              _changed('cityVillageName');
+            },
+          ),
+        ],
         const FieldGap(),
         InputDecorator(
           decoration: InputDecoration(labelText: l10n.country, prefixIcon: const Icon(Icons.public), enabled: false),

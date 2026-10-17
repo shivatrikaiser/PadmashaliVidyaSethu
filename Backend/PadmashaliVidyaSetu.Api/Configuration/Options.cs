@@ -118,6 +118,12 @@ public class CorsSettings
 {
     public const string Section = "Cors";
     public string[] AllowedOrigins { get; set; } = [];
+
+    /// <summary>
+    /// Also allow any http://localhost:&lt;port&gt; origin - for development only (`flutter run -d chrome` and
+    /// `ng serve` use changing ports). Never enable outside Development.
+    /// </summary>
+    public bool AllowAnyLocalhostOrigin { get; set; }
 }
 
 public class DatabaseOptions

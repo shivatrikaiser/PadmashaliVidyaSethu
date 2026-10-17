@@ -1,0 +1,53 @@
+<h1>Locations review</h1>
+<p class="muted">
+  Districts and taluks added automatically from PIN-code lookups or typed by members ("My taluk is not listed").
+  Fix spelling, deactivate wrong entries, or merge a duplicate taluk into the correct one.
+</p>
+
+<div class="panel filters">
+  <label class="check">
+    <input type="checkbox" [(ngModel)]="includeSeed" (ngModelChange)="load()" /> Also show the original (seeded) locations
+  </label>
+</div>
+
+@if (error()) { <p class="alert">{{ error() }}</p> }
+@if (message()) { <p class="notice">{{ message() }}</p> }
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Type</th><th>Name</th><th>In</th><th>Source</th><th class="num">Addresses</th><th>Added</th><th>Merge into</th><th></th></tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.kind + row.id) {
+        <tr [class.inactive]="!row.isActive">
+          <td>{{ row.kind }}</td>
+          <td><input [(ngModel)]="row.editName" [name]="'name' + row.kind + row.id" /></td>
+          <td>{{ row.parentName }}</td>
+          <td>{{ row.source === 'UserSubmitted' ? 'Typed by member' : row.source === 'PinLookup' ? 'PIN lookup' : row.source }}</td>
+          <td class="num">{{ row.addressCount }}</td>
+          <td>{{ row.createdDate | date: 'dd MMM yyyy' }}</td>
+          <td>
+            @if (row.kind === 'Taluk' && row.isActive) {
+              <select [(ngModel)]="row.mergeTargetId" [name]="'merge' + row.id">
+                <option [ngValue]="null">-</option>
+                @for (t of mergeOptions(row); track t.id) { <option [ngValue]="t.id">{{ t.name }}</option> }
+              </select>
+            }
+          </td>
+          <td class="row-actions">
+            <button type="button" (click)="rename(row)" [disabled]="busy() || row.editName.trim() === row.name">Save</button>
+            @if (row.mergeTargetId) {
+              <button type="button" class="danger" (click)="merge(row)" [disabled]="busy()">Merge</button>
+            }
+            <button type="button" class="secondary" (click)="toggle(row)" [disabled]="busy()">
+              {{ row.isActive ? 'Deactivate' : 'Activate' }}
+            </button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="8" class="muted">Nothing to review.</td></tr>
+      }
+    </tbody>
+  </table>
+</div>

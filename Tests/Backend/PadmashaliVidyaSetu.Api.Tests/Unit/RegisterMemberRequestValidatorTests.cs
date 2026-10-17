@@ -16,7 +16,7 @@ public sealed class RegisterMemberRequestValidatorTests
         new("House 12, Temple Road", null, "574201", "Puttur", null, 3, null, 11, 11, 1);
 
     private static RegisterMemberRequest Valid() => new(
-        "Anu Suresh", "Suresh", "Lakshmi", new DateOnly(2012, 8, 15), 2, 1, 1, 13, null, 1,
+        "Anu Suresh", "Suresh", "Lakshmi", new DateOnly(2012, 8, 15), 2, 1, 1, 13, null, null, 1,
         ValidAddress, true, null, false, null, null, true, true);
 
     private IEnumerable<string> ErrorFields(RegisterMemberRequest request) =>
