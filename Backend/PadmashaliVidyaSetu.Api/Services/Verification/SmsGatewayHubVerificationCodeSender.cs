@@ -6,6 +6,9 @@ using PadmashaliVidyaSetu.Api.Configuration;
 
 namespace PadmashaliVidyaSetu.Api.Services.Verification;
 
+/// <summary>Provider's answer to one send. <see cref="ErrorCode"/> is null when the request itself failed.</summary>
+public sealed record SmsSendResult(bool Accepted, string? ErrorCode, string? ErrorMessage, string? JobId);
+
 /// <summary>
 /// Sends the Phone Number Verification Code through SMS Gateway Hub (India, DLT-registered template).
 /// API: GET {SMSURL}?APIKey&amp;senderid&amp;channel&amp;DCS&amp;flashsms&amp;number&amp;text&amp;route&amp;EntityId&amp;dlttemplateid,
@@ -24,6 +27,13 @@ public sealed class SmsGatewayHubVerificationCodeSender(
 
     public async Task SendAsync(string mobileNumberE164, string code, CancellationToken cancellationToken)
     {
+        var result = await TrySendAsync(mobileNumberE164, code, cancellationToken);
+        if (!result.Accepted) throw new ServiceUnavailableException(FailureMessage);
+    }
+
+    /// <summary>Sends and reports the provider's answer instead of throwing (also used by the SMS test endpoint).</summary>
+    public async Task<SmsSendResult> TrySendAsync(string mobileNumberE164, string code, CancellationToken cancellationToken)
+    {
         var o = options.Value;
         var masked = MobileNumber.Mask(mobileNumberE164);
         var url = BuildUrl(o, mobileNumberE164, code);
@@ -38,18 +48,20 @@ public sealed class SmsGatewayHubVerificationCodeSender(
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException && !cancellationToken.IsCancellationRequested)
         {
             // Log the exception type/message only: HttpRequestException messages never include the query string.
-            logger.LogError("SMS Gateway Hub request failed for {Mobile}: {Error}", masked, ex.GetType().Name + ": " + ex.Message);
-            throw new ServiceUnavailableException(FailureMessage);
+            var error = ex.GetType().Name + ": " + ex.Message;
+            logger.LogError("SMS Gateway Hub request failed for {Mobile}: {Error}", masked, error);
+            return new SmsSendResult(false, null, error, null);
         }
 
         if (result?.ErrorCode != SuccessCode)
         {
             logger.LogError("SMS Gateway Hub rejected message for {Mobile}: {ErrorCode} {ErrorMessage}",
                 masked, result?.ErrorCode, result?.ErrorMessage);
-            throw new ServiceUnavailableException(FailureMessage);
+            return new SmsSendResult(false, result?.ErrorCode, result?.ErrorMessage, result?.JobId);
         }
 
         logger.LogInformation("Verification code SMS accepted for {Mobile} (job {JobId})", masked, result.JobId);
+        return new SmsSendResult(true, result.ErrorCode, result.ErrorMessage, result.JobId);
     }
 
     /// <summary>Builds the provider URL. Public for tests.</summary>
@@ -63,7 +75,7 @@ public sealed class SmsGatewayHubVerificationCodeSender(
             ("DCS", "0"),
             ("flashsms", "0"),
             ("number", mobileNumberE164.TrimStart('+')), // 91XXXXXXXXXX
-            ("text", o.OTPTemplate.Replace(SmsOptions.CodePlaceholder, code, StringComparison.Ordinal)),
+            ("text", o.MessageText(code)),
             ("route", o.Route),
             ("EntityId", o.OTPEntityId),
             ("dlttemplateid", o.OTPTemplateId),

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace PadmashaliVidyaSetu.Api.Configuration;
 
@@ -62,7 +63,9 @@ public static class VerificationSenders
 public class SmsOptions
 {
     public const string Section = "SMS";
-    public const string CodePlaceholder = "{#numeric#}";
+
+    // The code goes into the template's DLT variable, whatever its name: {#var#}, {#num#}, {#numeric#}, ...
+    private static readonly Regex CodeVariable = new(@"\{#[A-Za-z]+#\}", RegexOptions.CultureInvariant);
 
     public string? APIKey { get; set; }
     public string SMSURL { get; set; } = "https://www.smsgatewayhub.com/api/mt/SendSMS";
@@ -70,8 +73,14 @@ public class SmsOptions
     public string OTPTemplateId { get; set; } = string.Empty;
     public string OTPEntityId { get; set; } = string.Empty;
 
-    /// <summary>DLT-approved text. <see cref="CodePlaceholder"/> is replaced by the code; the rest must match exactly.</summary>
+    /// <summary>
+    /// DLT-approved text, copied as registered (e.g. "... is {#var#} Valid for 10 minutes"). Its first {#...#}
+    /// variable is replaced by the code; the rest must match the registered template exactly.
+    /// </summary>
     public string OTPTemplate { get; set; } = string.Empty;
+
+    /// <summary>The SMS text for <paramref name="code"/>.</summary>
+    public string MessageText(string code) => CodeVariable.Replace(OTPTemplate, code, 1);
 
     /// <summary>Route id from the SMS Gateway Hub panel.</summary>
     public string Route { get; set; } = "1";
@@ -88,7 +97,7 @@ public class SmsOptions
         if (string.IsNullOrWhiteSpace(OTPSenderId)) yield return "SMS:OTPSenderId";
         if (string.IsNullOrWhiteSpace(OTPTemplateId)) yield return "SMS:OTPTemplateId";
         if (string.IsNullOrWhiteSpace(OTPEntityId)) yield return "SMS:OTPEntityId";
-        if (!OTPTemplate.Contains(CodePlaceholder, StringComparison.Ordinal)) yield return $"SMS:OTPTemplate (must contain {CodePlaceholder})";
+        if (!CodeVariable.IsMatch(OTPTemplate)) yield return "SMS:OTPTemplate (must contain a DLT variable such as {#var#})";
     }
 }
 
@@ -132,4 +141,20 @@ public class DatabaseOptions
 
     /// <summary>Apply EF migrations (incl. master-data seed) at startup. Development convenience only.</summary>
     public bool ApplyMigrationsOnStartup { get; set; }
+}
+
+public class SwaggerSettings
+{
+    public const string Section = "Swagger";
+    public const string UiPath = "/swagger";
+
+    /// <summary>
+    /// Serve the OpenAPI document (/openapi/v1.json) and Swagger UI (/swagger) for testing the API.
+    /// Not set = on in Development only. Elsewhere set Swagger__Enabled=true while testing and remove it afterwards:
+    /// it publishes the list of endpoints (calls still need a signed-in token).
+    /// </summary>
+    public bool? Enabled { get; set; }
+
+    public static bool IsEnabled(IConfiguration configuration, IHostEnvironment env) =>
+        configuration.GetSection(Section).Get<SwaggerSettings>()?.Enabled ?? env.IsDevelopment();
 }

@@ -40,12 +40,26 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
+// Swagger UI for testing (see SwaggerSettings). Served before authentication: the page itself is public, the API
+// calls it makes still need a token.
+var swaggerEnabled = SwaggerSettings.IsEnabled(app.Configuration, app.Environment);
+if (swaggerEnabled)
+{
+    app.UseSwaggerUI(o =>
+    {
+        o.RoutePrefix = SwaggerSettings.UiPath.TrimStart('/');
+        o.SwaggerEndpoint("/openapi/v1.json", "PVS API v1");
+        o.DocumentTitle = "PVS API";
+        o.EnablePersistAuthorization();
+    });
+}
+
 app.UseCors();
 app.UseAuthentication();
 app.UseRateLimiter();
 app.UseAuthorization();
 
-if (app.Environment.IsDevelopment())
+if (swaggerEnabled)
 {
     app.MapOpenApi().AllowAnonymous();
 }

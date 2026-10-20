@@ -17,8 +17,29 @@ public sealed class SmsGatewayHubSenderTests
         OTPSenderId = "IQXPLR",
         OTPTemplateId = "1107178125916994770",
         OTPEntityId = "1101698060000095750",
-        OTPTemplate = "Your Phone Number Verification Code for PVS is {#numeric#} Valid for 10 minutes.",
+        OTPTemplate = "Your Phone Number Verification Code for Vidya Sethu is {#var#} Valid for 10 minutes",
     };
+
+    [Theory]
+    [InlineData("Code {#var#} valid", "Code 0427 valid")]
+    [InlineData("Code {#num#} valid", "Code 0427 valid")]
+    [InlineData("Code {#numeric#} valid", "Code 0427 valid")]
+    [InlineData("Code {#var#} for {#var#}", "Code 0427 for {#var#}")] // only the first variable is the code
+    public void MessageText_PutsTheCodeInTheTemplatesVariable_WhateverItIsCalled(string template, string expected)
+    {
+        Assert.Equal(expected, new SmsOptions { OTPTemplate = template }.MessageText("0427"));
+    }
+
+    [Theory]
+    [InlineData("Your code is ready")]
+    [InlineData("Your code is {#}")]
+    public void MissingSettings_FlagsATemplateWithoutVariable(string template)
+    {
+        var o = Options();
+        o.OTPTemplate = template;
+
+        Assert.Contains(o.MissingSettings(), s => s.StartsWith("SMS:OTPTemplate"));
+    }
 
     [Fact]
     public void BuildUrl_UsesDltParameters_AndExactTemplateText()
@@ -36,7 +57,7 @@ public sealed class SmsGatewayHubSenderTests
         Assert.Equal("1", q["route"]);
         Assert.Equal("1101698060000095750", q["EntityId"]);
         Assert.Equal("1107178125916994770", q["dlttemplateid"]);
-        Assert.Equal("Your Phone Number Verification Code for PVS is 0427 Valid for 10 minutes.", q["text"]);
+        Assert.Equal("Your Phone Number Verification Code for Vidya Sethu is 0427 Valid for 10 minutes", q["text"]);
     }
 
     [Fact]
@@ -48,7 +69,7 @@ public sealed class SmsGatewayHubSenderTests
         await sender.SendAsync("+919876543210", "1234", CancellationToken.None);
 
         Assert.Equal(1, handler.Calls);
-        Assert.Contains("text=Your%20Phone%20Number%20Verification%20Code%20for%20PVS%20is%201234", handler.LastUri!.Query);
+        Assert.Contains("text=Your%20Phone%20Number%20Verification%20Code%20for%20Vidya%20Sethu%20is%201234", handler.LastUri!.Query);
     }
 
     [Theory]

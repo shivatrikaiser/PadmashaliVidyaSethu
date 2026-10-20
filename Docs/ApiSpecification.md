@@ -1,6 +1,15 @@
 # API Specification (v1)
 
-Base path `/api/v1`. JSON, camelCase. In Development the OpenAPI document is at `/openapi/v1.json`.
+Base path `/api/v1`. JSON, camelCase. The OpenAPI document is at `/openapi/v1.json` and
+Swagger UI at `/swagger` - on by default in Development; on Azure only while the app setting `Swagger__Enabled` is
+`true` (remove it after testing). To call protected endpoints in Swagger UI: `POST /api/v1/auth/verification-codes`,
+then `.../verify` with the SMS code, and paste the returned `accessToken` into **Authorize**.
+
+**SMS test** - `POST /api/v1/diagnostics/sms-test`, body `{ "mobileNumber": "9876543210" }`. Available whenever
+Swagger is (locally always; on Live while `Swagger__Enabled` is `true`), otherwise 404. Sends one real verification SMS
+with a generated 4-digit code in the template's `{#var#}`, without using the database, and returns SMS Gateway Hub's
+answer: `accepted`, `providerErrorCode` (`000` = accepted), `providerMessage`, `jobId`. Always sends through SMS
+Gateway Hub, whatever `PhoneVerification:Sender` is; 422 naming the missing `SMS:*` settings if they are incomplete. Rate-limited like verification codes; costs one SMS credit per call.
 Health check: `GET /health` (anonymous).
 
 ## Envelope

@@ -20,6 +20,7 @@ Hosting has not been chosen yet. This is the recommended path on Azure (any SQL 
    | `PhoneVerification__Sender` | `SmsGatewayHub` (default in appsettings.json) |
    | `Cors__AllowedOrigins__0` | `https://pvs.vidyasethu.co.in` (admin portal) |
    | `Cors__AllowedOrigins__1` | `https://app.vidyasethu.co.in` (member web app) |
+   | `Swagger__Enabled` | `true` only while testing - serves `/swagger`, `/openapi/v1.json` and the SMS test (`POST /api/v1/diagnostics/sms-test`); remove afterwards |
 
 4. HTTPS only; HSTS is enabled automatically outside Development. If behind a proxy/Front Door, configure
    forwarded headers so rate limiting sees client IPs.

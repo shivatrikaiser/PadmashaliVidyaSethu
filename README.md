@@ -57,7 +57,7 @@ In Development the database `PadmashaliVidyaSetu` is created on LocalDB, migrate
 Without user-secrets the API uses temporary keys (warning in the log) — fine for a quick try.
 
 **Phone Number Verification Code:** sent by SMS through **SMS Gateway Hub** (DLT template
-`Your Phone Number Verification Code for PVS is {#numeric#} Valid for 10 minutes.`, settings in the `SMS` section of
+`Your Phone Number Verification Code for Vidya Sethu is {#var#} Valid for 10 minutes`, settings in the `SMS` section of
 `appsettings.json`). The API key is a secret — never put it in a file in the repo:
 
 ```bash

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using PadmashaliVidyaSetu.Api.Authentication;
 using PadmashaliVidyaSetu.Api.Authorization;
 using PadmashaliVidyaSetu.Api.Common;
@@ -42,7 +43,7 @@ public static class ServiceCollectionExtensions
             .Validate<IOptions<PhoneVerificationOptions>>(
                 (sms, verification) => !IsSender(verification.Value, VerificationSenders.SmsGatewayHub) || !sms.MissingSettings().Any(),
                 "PhoneVerification:Sender is SmsGatewayHub but SMS settings are incomplete (SMS:APIKey, OTPSenderId, " +
-                "OTPTemplateId, OTPEntityId, OTPTemplate with {#numeric#}, https SMSURL).")
+                "OTPTemplateId, OTPEntityId, OTPTemplate with a {#...#} variable, https SMSURL).")
             .ValidateOnStart();
         services.AddOptions<RegistrationOptions>().Bind(configuration.GetSection(RegistrationOptions.Section)).ValidateDataAnnotations().ValidateOnStart();
         services.AddOptions<PinCodeLookupOptions>().Bind(configuration.GetSection(PinCodeLookupOptions.Section)).ValidateDataAnnotations().ValidateOnStart();
@@ -184,7 +185,24 @@ public static class ServiceCollectionExtensions
                 };
             });
 
-        services.AddOpenApi();
+        services.AddOpenApi(o => o.AddDocumentTransformer((document, _, _) =>
+        {
+            document.Info.Title = "Padmashali Vidya Sethu API";
+            // No server list: Swagger UI then calls the host it was opened from (https behind App Service too).
+            document.Servers = [];
+            // "Authorize" button in Swagger UI: paste the accessToken from verification-codes/verify.
+            document.Components ??= new OpenApiComponents();
+            document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
+            document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                Description = "Access token from POST /api/v1/auth/verification-codes/verify (without \"Bearer \").",
+            };
+            document.Security = [new OpenApiSecurityRequirement { [new OpenApiSecuritySchemeReference("Bearer", document)] = [] }];
+            return Task.CompletedTask;
+        }));
         services.AddHealthChecks().AddCheck<DatabaseHealthCheck>("database");
 
         services.AddCors();
