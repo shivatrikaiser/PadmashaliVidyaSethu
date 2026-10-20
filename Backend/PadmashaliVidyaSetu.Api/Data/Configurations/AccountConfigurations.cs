@@ -14,6 +14,10 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
         b.HasIndex(e => e.MobileNumber).IsUnique();
         b.Property(e => e.MobileVerifiedDate).HasColumnType("datetime2(3)");
         b.Property(e => e.LastLoginDate).HasColumnType("datetime2(3)");
+        b.Property(e => e.PasswordHash).HasMaxLength(200).IsUnicode(false);
+        b.Property(e => e.PasswordSetDate).HasColumnType("datetime2(3)");
+        b.Property(e => e.FailedPasswordAttempts).HasDefaultValue(0);
+        b.Property(e => e.PasswordLockedUntil).HasColumnType("datetime2(3)");
         b.ConfigureAudit();
     }
 }

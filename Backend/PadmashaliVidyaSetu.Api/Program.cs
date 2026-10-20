@@ -3,7 +3,32 @@ using Microsoft.Extensions.Options;
 using PadmashaliVidyaSetu.Api.Configuration;
 using PadmashaliVidyaSetu.Api.Data;
 using PadmashaliVidyaSetu.Api.Middleware;
+using PadmashaliVidyaSetu.Api.Authentication;
 using Serilog;
+
+// `dotnet run -- hash-password`: prints the hash of a password typed in (not shown), for
+// Database/seed/05_SetSuperAdminPassword.TEMPLATE.sql. Nothing is stored or sent anywhere.
+if (args is ["hash-password", ..])
+{
+    Console.Error.Write("Password: ");
+    var password = ReadHidden();
+    AdminPasswords.Validate(password);
+    Console.WriteLine(new AdminPasswords().Hash(password));
+    return;
+
+    static string ReadHidden()
+    {
+        if (Console.IsInputRedirected) return Console.ReadLine() ?? string.Empty;
+        var text = new System.Text.StringBuilder();
+        for (var key = Console.ReadKey(intercept: true); key.Key != ConsoleKey.Enter; key = Console.ReadKey(intercept: true))
+        {
+            if (key.Key == ConsoleKey.Backspace) { if (text.Length > 0) text.Length--; }
+            else if (!char.IsControl(key.KeyChar)) text.Append(key.KeyChar);
+        }
+        Console.Error.WriteLine();
+        return text.ToString();
+    }
+}
 
 var builder = WebApplication.CreateBuilder(args);
 

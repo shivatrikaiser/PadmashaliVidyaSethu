@@ -18,6 +18,7 @@ public interface IAuthService
 {
     Task<VerificationCodeIssuedResponse> RequestVerificationCodeAsync(string mobileNumber, CancellationToken ct);
     Task<AuthTokensResponse> VerifyCodeAsync(Guid challengeId, string code, CancellationToken ct);
+    Task<AuthTokensResponse> SignInWithPasswordAsync(string? mobileNumber, string? password, CancellationToken ct);
     Task<AuthTokensResponse> RefreshAsync(string refreshToken, CancellationToken ct);
     Task LogoutAsync(string refreshToken, CancellationToken ct);
 }
@@ -30,6 +31,7 @@ public sealed class AuthService(
     IAuditLogger audit,
     ICurrentUserService currentUser,
     IOptions<PhoneVerificationOptions> verificationOptions,
+    AdminPasswords passwords,
     TimeProvider clock,
     ILogger<AuthService> logger) : IAuthService
 {
@@ -112,6 +114,55 @@ public sealed class AuthService(
         audit.Add(AuditActions.VerificationSucceeded, "Account", account.AccountId.ToString(), accountId: account.AccountId);
         var response = await IssueTokensAsync(account, isNew, ct);
         logger.LogInformation("Account {AccountId} signed in via phone verification (new: {IsNew})", account.AccountId, isNew);
+        return response;
+    }
+
+    /// <summary>
+    /// Admin portal sign-in with the password a Super Admin set. Only for active accounts with an admin role. Every
+    /// failure gives the same message (it never reveals whether the number exists); 5 wrong passwords in a row lock
+    /// the password for 15 minutes.
+    /// </summary>
+    public async Task<AuthTokensResponse> SignInWithPasswordAsync(string? mobileNumber, string? password, CancellationToken ct)
+    {
+        const string Incorrect = "The mobile number or password is incorrect.";
+        if (!MobileNumber.TryNormalize(mobileNumber, out var mobile) || string.IsNullOrEmpty(password))
+            throw new UnauthorizedException(Incorrect);
+
+        var now = clock.GetUtcNow().UtcDateTime;
+        var account = await db.Accounts.SingleOrDefaultAsync(a => a.MobileNumber == mobile, ct);
+        var isAdmin = account is not null && await db.AccountRoles.AnyAsync(r => r.AccountId == account.AccountId
+            && r.Role.IsActive && (r.Role.Code == RoleCodes.Admin || r.Role.Code == RoleCodes.SuperAdmin), ct);
+        var hash = account is { IsActive: true } && isAdmin ? account.PasswordHash : null;
+
+        if (account?.PasswordLockedUntil > now)
+        {
+            var minutes = (int)Math.Ceiling((account.PasswordLockedUntil.Value - now).TotalMinutes);
+            throw new UnauthorizedException($"Too many incorrect attempts. Try again in {minutes} minute(s).");
+        }
+
+        // Always hash, so a missing account or password takes as long as a wrong password.
+        if (!passwords.Verify(hash, password))
+        {
+            if (hash is not null)
+            {
+                account!.FailedPasswordAttempts++;
+                if (account.FailedPasswordAttempts >= AdminPasswords.MaxFailedAttempts)
+                {
+                    account.PasswordLockedUntil = now + AdminPasswords.Lockout;
+                    account.FailedPasswordAttempts = 0;
+                }
+            }
+            audit.Add(AuditActions.PasswordSignInFailed, "Account", MobileNumber.Mask(mobile), accountId: account?.AccountId);
+            await db.SaveChangesAsync(ct);
+            throw new UnauthorizedException(Incorrect);
+        }
+
+        account!.FailedPasswordAttempts = 0;
+        account.PasswordLockedUntil = null;
+        account.LastLoginDate = now;
+        audit.Add(AuditActions.PasswordSignInSucceeded, "Account", account.AccountId.ToString(), accountId: account.AccountId);
+        var response = await IssueTokensAsync(account, isNewAccount: false, ct);
+        logger.LogInformation("Account {AccountId} signed in to the admin portal with a password", account.AccountId);
         return response;
     }
 

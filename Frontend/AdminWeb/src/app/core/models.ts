@@ -133,6 +133,9 @@ export interface AdminUser {
   mobileNumber: string;
   roles: string[];
   lastLoginDate: string | null;
+  /** A portal password is set (the password itself is never sent back). */
+  hasPassword: boolean;
+  passwordSetDate: string | null;
 }
 
 export interface AppBranding {

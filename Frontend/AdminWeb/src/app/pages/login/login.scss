@@ -63,14 +63,28 @@ label {
   }
 }
 
+.password {
+  position: relative;
+
+  input {
+    padding-right: 64px;
+  }
+
+  button.link {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    margin: 0;
+    transform: translateY(-50%);
+  }
+}
+
 button {
   margin-top: 8px;
 }
 
-.dev-note {
-  margin: 0;
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: var(--pvs-warning-bg);
-  font-size: 0.9rem;
+.hint {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  text-align: center;
 }

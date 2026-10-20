@@ -16,6 +16,17 @@ public class Account : AuditableEntity
     public DateTime? MobileVerifiedDate { get; set; }
     public DateTime? LastLoginDate { get; set; }
 
+    /// <summary>
+    /// Admin portal password (ASP.NET Core Identity PBKDF2 hash), set by a Super Admin on the Admin users page.
+    /// Only accounts with an admin role can sign in with it; null = no password sign-in.
+    /// </summary>
+    public string? PasswordHash { get; set; }
+    public DateTime? PasswordSetDate { get; set; }
+
+    /// <summary>Consecutive wrong passwords; reset by a successful sign-in or a new password.</summary>
+    public int FailedPasswordAttempts { get; set; }
+    public DateTime? PasswordLockedUntil { get; set; }
+
     public ICollection<AccountRole> AccountRoles { get; set; } = [];
 }
 

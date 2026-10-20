@@ -1,4 +1,8 @@
 <h1>Admin users</h1>
+<p class="muted">
+  Admins sign in to this portal with their mobile number and the password you set here. There is no "forgot
+  password": to change a password, set a new one below and share it with the person.
+</p>
 
 <form class="panel filters" (ngSubmit)="grant()">
   <label>Mobile number
@@ -10,8 +14,14 @@
       <option value="SUPER_ADMIN">Super Admin (also admin users and sensitive data)</option>
     </select>
   </label>
+  <label>Password <small class="muted">(optional now, at least {{ minLength }} characters)</small>
+    <span class="password-input">
+      <input name="newPassword" [(ngModel)]="newPassword" type="text" autocomplete="new-password" spellcheck="false" />
+      <button type="button" class="secondary" (click)="generateNew()" [disabled]="busy()">Generate</button>
+    </span>
+  </label>
   <div class="actions"><button type="submit" [disabled]="busy() || !mobileNumber.trim()">Grant access</button></div>
-  <p class="muted hint">The person signs in to the admin portal with this number. If they have never signed in, their account is created now.</p>
+  <p class="muted hint">If the person has never used the app or portal, their account is created now.</p>
 </form>
 
 @if (error()) { <p class="alert">{{ error() }}</p> }
@@ -19,7 +29,7 @@
 
 <div class="table-wrap">
   <table>
-    <thead><tr><th>Mobile number</th><th>Roles</th><th>Last sign-in</th></tr></thead>
+    <thead><tr><th>Mobile number</th><th>Roles</th><th>Password</th><th>Last sign-in</th></tr></thead>
     <tbody>
       @for (u of users(); track u.accountId) {
         <tr>
@@ -29,6 +39,28 @@
               <span class="chip">
                 {{ role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin' }}
                 <button type="button" class="chip-remove" title="Remove this role" (click)="revoke(u, role)" [disabled]="busy()">×</button>
+              </span>
+            }
+          </td>
+          <td>
+            @if (editing() === u.accountId) {
+              <form class="password-input" (ngSubmit)="savePassword(u)">
+                <input name="rowPassword" [(ngModel)]="rowPassword" type="text" autocomplete="new-password"
+                       spellcheck="false" [attr.aria-label]="'New password for ' + u.mobileNumber" />
+                <button type="button" class="secondary" (click)="generateRow()" [disabled]="busy()">Generate</button>
+                <button type="submit" [disabled]="busy() || rowPassword.length < minLength">Save</button>
+                <button type="button" class="link" (click)="cancelPassword()" [disabled]="busy()">Cancel</button>
+              </form>
+            } @else {
+              <span class="password-state">
+                @if (u.hasPassword) {
+                  Set {{ u.passwordSetDate | date: 'dd MMM yyyy' }}
+                } @else {
+                  <span class="warning">Not set</span>
+                }
+                <button type="button" class="link" (click)="startPassword(u)" [disabled]="busy()">
+                  {{ u.hasPassword ? 'Change' : 'Set password' }}
+                </button>
               </span>
             }
           </td>

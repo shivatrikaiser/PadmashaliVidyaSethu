@@ -13,8 +13,8 @@ Web admin portal for Padmashali Vidya Sethu - Angular 21 (standalone components,
    npx ng serve --open        # http://localhost:4200
    ```
 
-3. Sign in with a mobile number that has the **ADMIN** or **SUPER_ADMIN** role. In Development the verification
-   code is shown on screen. To grant the role, use `Database/seed/03_GrantAdminRole.TEMPLATE.sql`.
+3. Sign in with the mobile number and password of an **ADMIN** or **SUPER_ADMIN**. The first Super Admin's password is
+   set with `Database/seed/05_SetSuperAdminPassword.TEMPLATE.sql`; everyone else's on the Admin users page.
 
 > **npm note:** npm 10.9.x (bundled with Node 22.21) fails on this project with
 > `Cannot read properties of null (reading 'edgesOut')`. Use `npx -y npm@11 install` or upgrade Node/npm.
@@ -31,13 +31,16 @@ Web admin portal for Padmashali Vidya Sethu - Angular 21 (standalone components,
 
 ## How sign-in works
 
-* Same phone verification as the mobile app (`/api/v1/auth/...`).
+* Mobile number + password (`POST /api/v1/auth/admin/sign-in`) - no verification code. Passwords are set by a Super
+  Admin on the Admin users page; there is no self-service change or "forgot password". 5 wrong passwords in a row lock
+  the password for 15 minutes. Setting a new password signs that admin out everywhere.
 * After sign-in the portal calls `GET /api/v1/admin/me`; the API allows only Admin / Super Admin. Anyone else is
   signed out with "This mobile number does not have admin access".
 * Tokens are kept in `sessionStorage` (closing the browser signs out); an expired access token is refreshed once
   automatically (`core/auth.interceptor.ts`).
 * Roles are read when tokens are issued, so a newly granted role applies at the next sign-in. The first Super Admin
-  is set with `Database/seed/03_GrantAdminRole.TEMPLATE.sql`; after that, use the Admin users page.
+  and their password are set with `Database/seed/05_SetSuperAdminPassword.TEMPLATE.sql`; after that, use the Admin
+  users page.
 
 ## Pages
 

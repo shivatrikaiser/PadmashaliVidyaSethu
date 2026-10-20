@@ -31,11 +31,14 @@ describe('AuthService', () => {
 
   function verify(): { result: unknown; error: unknown } {
     const outcome: { result: unknown; error: unknown } = { result: null, error: null };
-    auth.verifyCode('challenge-1', '1234').subscribe({
+    auth.signIn('9876500011', 'Secret#2026').subscribe({
       next: (admin) => (outcome.result = admin),
       error: (e: unknown) => (outcome.error = e),
     });
-    http.expectOne(`${api}/auth/verification-codes/verify`).flush({ success: true, data: tokens });
+    const signIn = http.expectOne(`${api}/auth/admin/sign-in`);
+    expect(signIn.request.body).toEqual({ mobileNumber: '9876500011', password: 'Secret#2026' });
+    expect(signIn.request.headers.has('Authorization')).toBe(false);
+    signIn.flush({ success: true, data: tokens });
     return outcome;
   }
 
@@ -59,6 +62,17 @@ describe('AuthService', () => {
     expect((outcome.error as Error).message).toBe(NO_ADMIN_ACCESS);
     expect(auth.isSignedIn()).toBe(false);
     expect(sessionStorage.length).toBe(0);
+  });
+
+  it('reports a wrong password without trying to refresh', () => {
+    let error: unknown;
+    auth.signIn('9876500011', 'wrong').subscribe({ error: (e: unknown) => (error = e) });
+    http
+      .expectOne(`${api}/auth/admin/sign-in`)
+      .flush({ success: false, message: 'The mobile number or password is incorrect.' }, { status: 401, statusText: 'Unauthorized' });
+
+    expect(error).toBeTruthy();
+    expect(auth.isSignedIn()).toBe(false);
   });
 
   it('refreshes an expired access token once and retries the request', () => {

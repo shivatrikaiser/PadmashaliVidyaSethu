@@ -106,6 +106,8 @@ public sealed class PvsApiFactory : WebApplicationFactory<Program>, IAsyncLifeti
         return (client, mobile);
     }
 
+    public Task<(HttpClient Client, string Mobile)> CreateSuperAdminAsync() => CreateAdminClientAsync("SUPER_ADMIN");
+
     /// <summary>Registers a member with the given request body and returns the Registration ID.</summary>
     public static async Task<string> RegisterMemberAsync(HttpClient client, object request)
     {

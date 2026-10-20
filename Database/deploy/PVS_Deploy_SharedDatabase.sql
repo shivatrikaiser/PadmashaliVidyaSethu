@@ -2,8 +2,8 @@
 ================================================================================================================
   Padmashali Vidya Setu (PVS) - deployment into a SHARED database (e.g. IQExplore Live)
   Single self-contained deployment script. Must be updated whenever a new EF migration is added.
-  Generated: 2026-10-20 21:05    Migrations: 20261006135106_InitialSchema, 20261009101316_OtherTextColumns, 20261009112325_MemberProfileListChoices, 20261010153650_AppBranding,
-              20261020142456_SponsorOrganisationAddress, 20261020153210_AppVersions
+  Generated: 2026-10-20 21:35    Migrations: 20261006135106_InitialSchema, 20261009101316_OtherTextColumns, 20261009112325_MemberProfileListChoices, 20261010153650_AppBranding,
+              20261020142456_SponsorOrganisationAddress, 20261020153210_AppVersions, 20261020155916_AdminPasswords
 ================================================================================================================
   WHAT IT DOES
     * Creates 47 tables (incl. the migrations history) + their keys, indexes and constraints, and loads the
@@ -4013,6 +4013,72 @@ IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
 BEGIN
     INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
     VALUES (N'20261020153210_AppVersions', N'10.0.12');
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020155916_AdminPasswords'
+)
+BEGIN
+    ALTER TABLE [PVS_Accounts] ADD [FailedPasswordAttempts] int NOT NULL CONSTRAINT [PVS_DF_Accounts_FailedPasswordAttempts] DEFAULT 0;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020155916_AdminPasswords'
+)
+BEGIN
+    ALTER TABLE [PVS_Accounts] ADD [PasswordHash] varchar(200) NULL;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020155916_AdminPasswords'
+)
+BEGIN
+    ALTER TABLE [PVS_Accounts] ADD [PasswordLockedUntil] datetime2(3) NULL;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020155916_AdminPasswords'
+)
+BEGIN
+    ALTER TABLE [PVS_Accounts] ADD [PasswordSetDate] datetime2(3) NULL;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020155916_AdminPasswords'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261020155916_AdminPasswords', N'10.0.12');
 END;
 GO
 

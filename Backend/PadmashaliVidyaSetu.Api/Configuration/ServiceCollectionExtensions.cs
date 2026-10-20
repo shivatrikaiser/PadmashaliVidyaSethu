@@ -83,6 +83,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICurrentUserService, HttpCurrentUserService>();
         services.AddSingleton<SecurityKeys>();
         services.AddSingleton<ITokenService, TokenService>();
+        services.AddSingleton<AdminPasswords>();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
         services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)

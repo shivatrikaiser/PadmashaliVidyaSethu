@@ -47,6 +47,9 @@ public static class AuditActions
     public const string TokenRefreshed = "Auth.TokenRefreshed";
     public const string RefreshTokenReuseDetected = "Auth.RefreshTokenReuseDetected";
     public const string LoggedOut = "Auth.LoggedOut";
+    public const string PasswordSignInSucceeded = "Auth.PasswordSignInSucceeded";
+    public const string PasswordSignInFailed = "Auth.PasswordSignInFailed";
+    public const string PasswordSet = "Admin.PasswordSet";
     public const string MemberRegistered = "Member.Registered";
     public const string MemberActivated = "Admin.MemberActivated";
     public const string MemberDeactivated = "Admin.MemberDeactivated";

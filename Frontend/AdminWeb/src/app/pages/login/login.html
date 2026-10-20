@@ -5,35 +5,31 @@
       <h1 class="subtitle">Admin Portal</h1>
     </header>
 
-    @if (!challenge()) {
-      <form [formGroup]="phoneForm" (ngSubmit)="sendCode()" novalidate>
-        <label for="mobile">Mobile number</label>
-        <div class="phone">
-          <span class="prefix">+91</span>
-          <input id="mobile" formControlName="mobileNumber" inputmode="numeric" maxlength="10"
-                 autocomplete="tel-national" placeholder="10-digit mobile number" />
-        </div>
-        @if (phoneForm.controls.mobileNumber.touched && phoneForm.controls.mobileNumber.invalid) {
-          <p class="field-error">Enter a valid 10-digit Indian mobile number.</p>
-        }
-        <button type="submit" [disabled]="busy()">{{ busy() ? 'Sending…' : 'Send verification code' }}</button>
-      </form>
-    } @else {
-      <form [formGroup]="codeForm" (ngSubmit)="verify()" novalidate>
-        <p>Enter the code sent to <strong>{{ challenge()!.maskedMobileNumber }}</strong>.</p>
-        @if (challenge()!.developmentCode) {
-          <p class="dev-note">Development mode - code: <strong>{{ challenge()!.developmentCode }}</strong></p>
-        }
-        <label for="code">Verification code</label>
-        <input id="code" formControlName="code" inputmode="numeric" autocomplete="one-time-code"
-               [attr.maxlength]="challenge()!.codeLength" />
-        @if (codeForm.controls.code.touched && codeForm.controls.code.invalid) {
-          <p class="field-error">Enter the {{ challenge()!.codeLength }}-digit code.</p>
-        }
-        <button type="submit" [disabled]="busy()">{{ busy() ? 'Verifying…' : 'Sign in' }}</button>
-        <button type="button" class="link" (click)="changeNumber()" [disabled]="busy()">Change mobile number</button>
-      </form>
-    }
+    <form [formGroup]="form" (ngSubmit)="signIn()" novalidate>
+      <label for="mobile">Mobile number</label>
+      <div class="phone">
+        <span class="prefix">+91</span>
+        <input id="mobile" formControlName="mobileNumber" inputmode="numeric" maxlength="10"
+               autocomplete="username" placeholder="10-digit mobile number" />
+      </div>
+      @if (form.controls.mobileNumber.touched && form.controls.mobileNumber.invalid) {
+        <p class="field-error">Enter a valid 10-digit Indian mobile number.</p>
+      }
+
+      <label for="password">Password</label>
+      <div class="password">
+        <input id="password" formControlName="password" [type]="showPassword() ? 'text' : 'password'"
+               autocomplete="current-password" />
+        <button type="button" class="link" (click)="showPassword.set(!showPassword())"
+                [attr.aria-pressed]="showPassword()">{{ showPassword() ? 'Hide' : 'Show' }}</button>
+      </div>
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+        <p class="field-error">Enter your password.</p>
+      }
+
+      <button type="submit" [disabled]="busy()">{{ busy() ? 'Signing in…' : 'Sign in' }}</button>
+      <p class="muted hint">Forgot your password? Ask a Super Admin to set a new one.</p>
+    </form>
 
     @if (error()) {
       <p class="alert" role="alert">{{ error() }}</p>

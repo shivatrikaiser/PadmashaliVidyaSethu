@@ -39,6 +39,11 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasColumnType("datetime2(3)")
                         .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Accounts_CreatedDate");
 
+                    b.Property<int>("FailedPasswordAttempts")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0, "PVS_DF_Accounts_FailedPasswordAttempts");
+
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -61,6 +66,17 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasMaxLength(200)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTime?>("PasswordLockedUntil")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<DateTime?>("PasswordSetDate")
                         .HasColumnType("datetime2(3)");
 
                     b.HasKey("AccountId")

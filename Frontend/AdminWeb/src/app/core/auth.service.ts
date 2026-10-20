@@ -5,16 +5,6 @@ import { Observable, catchError, finalize, map, of, shareReplay, switchMap, tap,
 import { environment } from '../../environments/environment';
 import { ApiResponse } from './api';
 
-export interface CodeIssued {
-  challengeId: string;
-  maskedMobileNumber: string;
-  codeLength: number;
-  expiresInSeconds: number;
-  resendAfterSeconds: number;
-  /** Only returned by the API in Development. */
-  developmentCode: string | null;
-}
-
 export interface AdminProfile {
   maskedMobileNumber: string;
   roles: string[];
@@ -29,7 +19,8 @@ const SESSION_KEY = 'pvs-admin-session';
 export const NO_ADMIN_ACCESS = 'This mobile number does not have admin access. Ask a Super Admin to grant it.';
 
 /**
- * Phone-number sign-in (same API as the mobile app) plus a server-side admin check (GET /api/v1/admin/me).
+ * Mobile number + password sign-in (the password is set by a Super Admin on the Admin users page; there is no
+ * self-service change or reset) plus a server-side admin check (GET /api/v1/admin/me).
  * Tokens live in sessionStorage, so closing the browser signs the administrator out.
  */
 @Injectable({ providedIn: 'root' })
@@ -50,16 +41,10 @@ export class AuthService {
     return this.tokens()?.accessToken ?? null;
   }
 
-  requestCode(mobileNumber: string): Observable<CodeIssued> {
+  /** Signs in with the mobile number and the password a Super Admin set, then confirms admin access. */
+  signIn(mobileNumber: string, password: string): Observable<AdminProfile> {
     return this.http
-      .post<ApiResponse<CodeIssued>>(`${this.api}/auth/verification-codes`, { mobileNumber })
-      .pipe(map((r) => r.data!));
-  }
-
-  /** Verifies the code, then confirms the account is an administrator. */
-  verifyCode(challengeId: string, code: string): Observable<AdminProfile> {
-    return this.http
-      .post<ApiResponse<AuthTokens>>(`${this.api}/auth/verification-codes/verify`, { challengeId, code })
+      .post<ApiResponse<AuthTokens>>(`${this.api}/auth/admin/sign-in`, { mobileNumber, password })
       .pipe(
         tap((r) => this.store(r.data!)),
         switchMap(() => this.loadAdmin()),

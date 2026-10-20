@@ -85,9 +85,19 @@ public sealed record MapOtherValueResultDto(int UpdatedRows);
 
 // ---------------------------------------------------------------- Admin users
 
-public sealed record AdminUserDto(int AccountId, string MobileNumber, IReadOnlyList<string> Roles, DateTime? LastLoginDate);
+public sealed record AdminUserDto(
+    int AccountId,
+    string MobileNumber,
+    IReadOnlyList<string> Roles,
+    DateTime? LastLoginDate,
+    bool HasPassword,
+    DateTime? PasswordSetDate);
 
-public sealed record GrantRoleRequest(string? MobileNumber, string? RoleCode);
+/// <summary><c>Password</c> is optional: set it here or later with <see cref="SetPasswordRequest"/>.</summary>
+public sealed record GrantRoleRequest(string? MobileNumber, string? RoleCode, string? Password = null);
+
+/// <summary>A Super Admin sets (or replaces) an admin's portal password.</summary>
+public sealed record SetPasswordRequest(string? Password);
 
 // ---------------------------------------------------------------- Splash branding
 

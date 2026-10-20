@@ -2722,3 +2722,48 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020155916_AdminPasswords'
+)
+BEGIN
+    ALTER TABLE [PVS_Accounts] ADD [FailedPasswordAttempts] int NOT NULL CONSTRAINT [PVS_DF_Accounts_FailedPasswordAttempts] DEFAULT 0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020155916_AdminPasswords'
+)
+BEGIN
+    ALTER TABLE [PVS_Accounts] ADD [PasswordHash] varchar(200) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020155916_AdminPasswords'
+)
+BEGIN
+    ALTER TABLE [PVS_Accounts] ADD [PasswordLockedUntil] datetime2(3) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020155916_AdminPasswords'
+)
+BEGIN
+    ALTER TABLE [PVS_Accounts] ADD [PasswordSetDate] datetime2(3) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020155916_AdminPasswords'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261020155916_AdminPasswords', N'10.0.12');
+END;
+
+COMMIT;
+GO
+

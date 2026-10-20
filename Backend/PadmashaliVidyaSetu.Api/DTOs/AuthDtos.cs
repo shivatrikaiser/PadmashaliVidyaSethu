@@ -23,6 +23,9 @@ public sealed record AuthTokensResponse(
 
 public sealed record RefreshTokenRequest(string? RefreshToken);
 
+/// <summary>Admin portal sign-in with the password a Super Admin set.</summary>
+public sealed record PasswordSignInRequest(string? MobileNumber, string? Password);
+
 public sealed record AdminMeDto(string MaskedMobileNumber, IReadOnlyList<string> Roles);
 
 /// <summary>Result of POST /api/v1/diagnostics/sms-test: what SMS Gateway Hub answered ("000" = accepted).</summary>

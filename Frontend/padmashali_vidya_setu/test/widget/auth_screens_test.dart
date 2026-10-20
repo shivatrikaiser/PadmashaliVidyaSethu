@@ -24,6 +24,7 @@ void main() {
     expect(find.byKey(const Key('welcomeSponsor')), findsOneWidget);
     expect(find.text('Test Textiles Pvt Ltd'), findsOneWidget);
     expect(find.text('12, Car Street\nUdupi 576101'), findsOneWidget);
+    expect(find.byKey(const Key('welcomePoweredBy')), findsOneWidget);
     expect(find.byKey(const Key('footerSponsor')), findsOneWidget);
     expect(find.byKey(const Key('footerPoweredBy')), findsOneWidget);
     expect(

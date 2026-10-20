@@ -76,8 +76,17 @@ export class AdminApi {
   adminUsers(): Observable<AdminUser[]> {
     return this.get('/admin/users');
   }
-  grantRole(mobileNumber: string, roleCode: string): Observable<AdminUser> {
-    return this.http.post<ApiResponse<AdminUser>>(`${this.api}/admin/users`, { mobileNumber, roleCode }).pipe(map((r) => r.data!));
+  /** `password` is optional: it can also be set later with {@link setPassword}. */
+  grantRole(mobileNumber: string, roleCode: string, password?: string): Observable<AdminUser> {
+    return this.http
+      .post<ApiResponse<AdminUser>>(`${this.api}/admin/users`, { mobileNumber, roleCode, password: password || null })
+      .pipe(map((r) => r.data!));
+  }
+  /** Sets or replaces an admin's portal password; they are signed out everywhere (unless it is you). */
+  setPassword(accountId: number, password: string): Observable<AdminUser> {
+    return this.http
+      .put<ApiResponse<AdminUser>>(`${this.api}/admin/users/${accountId}/password`, { password })
+      .pipe(map((r) => r.data!));
   }
   revokeRole(accountId: number, roleCode: string): Observable<string> {
     return this.http

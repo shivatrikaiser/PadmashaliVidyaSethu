@@ -33,6 +33,16 @@ public sealed class AuthController(IAuthService auth) : ControllerBase
         return Ok(ApiResponse<AuthTokensResponse>.Ok(result, "Phone number verified."));
     }
 
+    /// <summary>Admin portal sign-in: mobile number + the password a Super Admin set (admins only).</summary>
+    [HttpPost("admin/sign-in")]
+    [AllowAnonymous]
+    [EnableRateLimiting(RateLimitPolicies.Auth)]
+    public async Task<ActionResult<ApiResponse<AuthTokensResponse>>> AdminSignIn(PasswordSignInRequest request, CancellationToken ct)
+    {
+        var result = await auth.SignInWithPasswordAsync(request.MobileNumber, request.Password, ct);
+        return Ok(ApiResponse<AuthTokensResponse>.Ok(result, "Signed in."));
+    }
+
     [HttpPost("token/refresh")]
     [AllowAnonymous]
     [EnableRateLimiting(RateLimitPolicies.Auth)]

@@ -6,7 +6,7 @@ import { catchError, switchMap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
-const ANONYMOUS = ['/api/v1/auth/verification-codes', '/api/v1/auth/token/refresh'];
+const ANONYMOUS = ['/api/v1/auth/admin/sign-in', '/api/v1/auth/token/refresh'];
 
 /** Adds the bearer token to API calls; on 401 refreshes once and retries, otherwise returns to sign-in. */
 export const authInterceptor: HttpInterceptorFn = (request, next) => {

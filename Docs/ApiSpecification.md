@@ -38,6 +38,7 @@ Health check: `GET /health` (anonymous).
 |---|---|---|
 | `POST /auth/verification-codes` | anon, rate-limited | `{ mobileNumber }` → `{ challengeId, maskedMobileNumber, codeLength: 4, expiresInSeconds, resendAfterSeconds, developmentCode? }` |
 | `POST /auth/verification-codes/verify` | anon, rate-limited | `{ challengeId, code }` (exactly 4 digits) → `{ accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt, isNewAccount, registeredMemberCount }` |
+| `POST /auth/admin/sign-in` | anon | `{ mobileNumber, password }` → tokens. Admin portal only: accounts with ADMIN / SUPER_ADMIN and a password set by a Super Admin. Same 401 message for every failure; 5 wrong passwords lock it for 15 minutes |
 | `POST /auth/token/refresh` | anon | `{ refreshToken }` → tokens (old refresh token revoked; reusing it within 2 minutes - a retry after a lost response - is allowed, later reuse revokes all sessions) |
 | `POST /auth/logout` | bearer | `{ refreshToken }` |
 
@@ -118,7 +119,7 @@ Used by `Frontend/AdminWeb`. Members get 403.
 | `PUT /admin/locations/{districts\|taluks}/{id}` `{ name?, isActive? }` | Rename / (de)activate |
 | `POST /admin/locations/taluks/{id}/merge` `{ targetTalukId }` | Move all addresses to another taluk of the same district |
 | `GET /admin/branding`, `PUT /admin/branding` `{ sponsorName, sponsorOrganisation, sponsorAddress, poweredBy }` (address: up to 4 lines, 300 chars), `POST /admin/branding/sponsor-logo` (multipart `file`, PNG/JPEG/WebP <= 300 KB), `DELETE /admin/branding/sponsor-logo` | App sponsor (splash, welcome screen, footer) - **Super Admin only** |
-| `GET /admin/users`, `POST /admin/users` `{ mobileNumber, roleCode }`, `DELETE /admin/users/{accountId}/roles/{roleCode}` | Admin users - **Super Admin only**; removing a role signs the person out |
+| `GET /admin/users`, `POST /admin/users` `{ mobileNumber, roleCode, password? }`, `PUT /admin/users/{accountId}/password` `{ password }`, `DELETE /admin/users/{accountId}/roles/{roleCode}` | Admin users and their portal passwords - **Super Admin only**; a new password or a removed role signs the person out (not when you set your own password) |
 
 Every change is written to `PVS_AuditLogs` (`Admin.*` actions).
 

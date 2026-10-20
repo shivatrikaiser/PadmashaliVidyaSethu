@@ -21,6 +21,11 @@ public sealed class AdminUsersController(IAdminUserService users) : ControllerBa
     public async Task<ActionResult<ApiResponse<AdminUserDto>>> Grant(GrantRoleRequest request, CancellationToken ct) =>
         Ok(ApiResponse<AdminUserDto>.Ok(await users.GrantAsync(request, ct), "Role granted. It applies at their next sign-in."));
 
+    /// <summary>Sets or replaces the admin's portal password. They are signed out everywhere (unless it is you).</summary>
+    [HttpPut("{accountId:int}/password")]
+    public async Task<ActionResult<ApiResponse<AdminUserDto>>> SetPassword(int accountId, SetPasswordRequest request, CancellationToken ct) =>
+        Ok(ApiResponse<AdminUserDto>.Ok(await users.SetPasswordAsync(accountId, request.Password, ct), "Password set."));
+
     [HttpDelete("{accountId:int}/roles/{roleCode}")]
     public async Task<ActionResult<ApiResponse<object>>> Revoke(int accountId, string roleCode, CancellationToken ct)
     {

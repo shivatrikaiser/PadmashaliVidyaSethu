@@ -1,0 +1,28 @@
+.password-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  input {
+    flex: 1;
+    min-width: 160px;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  }
+}
+
+.password-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.warning {
+  color: var(--pvs-error);
+  font-weight: 600;
+}
+
+small {
+  font-weight: 400;
+}

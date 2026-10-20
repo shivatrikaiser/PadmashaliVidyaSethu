@@ -9,9 +9,9 @@ import '../../utils/l10n.dart';
 import '../../widgets/brand.dart';
 import '../../widgets/common.dart';
 
-/// Logo, the sponsor's name, organisation and address (from the admin portal), a divider, then the welcome text -
-/// filling the full screen height above the app footer (which shows the sponsor and "Powered by" on every screen): the logo scales with the height and "Get Started" sits at the bottom (it scrolls instead on very
-/// small screens or with large text).
+/// Logo, the sponsor's name, organisation and address and "Powered by" (from the admin portal), a divider, then the
+/// welcome text - filling the full screen height above the app footer: the logo scales with the height and
+/// "Get Started" sits at the bottom (it scrolls instead on very small screens or with large text).
 class WelcomeScreen extends ConsumerWidget {
   const WelcomeScreen({super.key});
 
@@ -35,11 +35,11 @@ class WelcomeScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const Spacer(),
-                      // About a quarter of the available height, so everything below still fits without scrolling.
+                      // About a fifth of the available height, so everything below still fits without scrolling.
                       Center(
                         child: BrandLogo(
                           semanticLabel: l10n.appTitle,
-                          height: (constraints.maxHeight * 0.24).clamp(130.0, 360.0),
+                          height: (constraints.maxHeight * 0.2).clamp(120.0, 320.0),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -76,7 +76,7 @@ class WelcomeScreen extends ConsumerWidget {
   }
 }
 
-/// "Sponsored by:", then the sponsor's name (highlighted), organisation and address - each line only when set.
+/// "Sponsored by:", the sponsor's name (highlighted), organisation and address, then "Powered by:" - each only when set.
 class _Sponsor extends StatelessWidget {
   const _Sponsor({required this.branding});
   final AppBranding branding;
@@ -90,16 +90,20 @@ class _Sponsor extends StatelessWidget {
     final address = branding.sponsorAddressLines;
     final hasName = name != null && name.isNotEmpty;
     final hasOrganisation = organisation != null && organisation.isNotEmpty;
-    if (!hasName && !hasOrganisation && address.isEmpty) return const SizedBox(width: double.infinity);
+    final hasSponsor = hasName || hasOrganisation || address.isNotEmpty;
+    final poweredBy = branding.poweredBy;
+    final hasPoweredBy = poweredBy != null && poweredBy.isNotEmpty;
+    if (!hasSponsor && !hasPoweredBy) return const SizedBox(width: double.infinity);
 
     return Column(
       key: const Key('welcomeSponsor'),
       children: [
-        Text(
-          context.l10n.sponsoredBy,
-          textAlign: TextAlign.center,
-          style: theme.textTheme.bodySmall?.copyWith(color: muted),
-        ),
+        if (hasSponsor)
+          Text(
+            context.l10n.sponsoredBy,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(color: muted),
+          ),
         if (hasName)
           Text(
             name,
@@ -123,6 +127,20 @@ class _Sponsor extends StatelessWidget {
               style: theme.textTheme.bodySmall?.copyWith(color: muted),
             ),
           ),
+        if (hasPoweredBy) ...[
+          if (hasSponsor) const SizedBox(height: 8),
+          Text(
+            '${context.l10n.poweredBy}:',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(color: muted),
+          ),
+          Text(
+            poweredBy,
+            key: const Key('welcomePoweredBy'),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+          ),
+        ],
       ],
     );
   }
