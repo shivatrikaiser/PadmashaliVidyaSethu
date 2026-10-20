@@ -135,6 +135,65 @@ label.file {
     radial-gradient(120% 140% at 100% 100%, #1c4f9c 45%, #f3cf7e 46%, #d49a2e 52%, transparent 53%);
 }
 
+/* ---------------------------------------------------------------- Welcome block and footer previews */
+.phone + .preview-title,
+.welcome + .preview-title {
+  margin-top: 16px;
+}
+
+.welcome,
+.footer {
+  border-radius: 16px;
+  border: 1px solid var(--pvs-border);
+  background: #fff;
+  text-align: center;
+}
+
+.welcome {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 16px 20px;
+
+  .label {
+    font-size: 0.85rem;
+    color: var(--pvs-text-muted);
+  }
+
+  strong {
+    font-size: 1.25rem;
+    color: #0b2d6b;
+    overflow-wrap: anywhere;
+  }
+
+  .organisation {
+    font-weight: 600;
+  }
+
+  .address {
+    font-size: 0.85rem;
+    color: var(--pvs-text-muted);
+  }
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 16px;
+  font-size: 0.85rem;
+
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  b {
+    color: #0b2d6b;
+  }
+}
+
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);

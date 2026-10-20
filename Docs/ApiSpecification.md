@@ -38,7 +38,7 @@ Health check: `GET /health` (anonymous).
 |---|---|---|
 | `POST /auth/verification-codes` | anon, rate-limited | `{ mobileNumber }` → `{ challengeId, maskedMobileNumber, codeLength: 4, expiresInSeconds, resendAfterSeconds, developmentCode? }` |
 | `POST /auth/verification-codes/verify` | anon, rate-limited | `{ challengeId, code }` (exactly 4 digits) → `{ accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt, isNewAccount, registeredMemberCount }` |
-| `POST /auth/token/refresh` | anon | `{ refreshToken }` → tokens (old refresh token revoked; reuse revokes all sessions) |
+| `POST /auth/token/refresh` | anon | `{ refreshToken }` → tokens (old refresh token revoked; reusing it within 2 minutes - a retry after a lost response - is allowed, later reuse revokes all sessions) |
 | `POST /auth/logout` | bearer | `{ refreshToken }` |
 
 The code is sent by SMS (SMS Gateway Hub) and is valid for 10 minutes. `developmentCode` is only returned when the API runs in **Development** with
@@ -93,8 +93,9 @@ guardian consent required under 18; max 10 members per account; duplicate name +
 
 | Method & path | Purpose |
 |---|---|
-| `GET /app/branding` | Splash-screen sponsor name, "Powered by" text, whether a sponsor logo exists and its version |
+| `GET /app/branding` | Sponsor name, organisation and address, "Powered by" text, whether a sponsor logo exists and its version |
 | `GET /app/branding/sponsor-logo?v={version}` | The sponsor logo image (cacheable; the version changes with every edit) |
+| `GET /app/version?platform={android\|ios}` | Current app release `{ platform, latestVersion, isMandatory, storeUrl }` (table `PVS_AppVersions`, never cached). The app checks it on every screen; older apps show "Update required" (mandatory) or "Update available" |
 
 ## Admin portal (bearer, role ADMIN or SUPER_ADMIN)
 
@@ -116,7 +117,7 @@ Used by `Frontend/AdminWeb`. Members get 403.
 | `GET /admin/locations?includeSeed=` | Districts / taluks added by PIN lookups or members, with address counts |
 | `PUT /admin/locations/{districts\|taluks}/{id}` `{ name?, isActive? }` | Rename / (de)activate |
 | `POST /admin/locations/taluks/{id}/merge` `{ targetTalukId }` | Move all addresses to another taluk of the same district |
-| `GET /admin/branding`, `PUT /admin/branding` `{ sponsorName, poweredBy }`, `POST /admin/branding/sponsor-logo` (multipart `file`, PNG/JPEG/WebP <= 300 KB), `DELETE /admin/branding/sponsor-logo` | Splash sponsor - **Super Admin only** |
+| `GET /admin/branding`, `PUT /admin/branding` `{ sponsorName, sponsorOrganisation, sponsorAddress, poweredBy }` (address: up to 4 lines, 300 chars), `POST /admin/branding/sponsor-logo` (multipart `file`, PNG/JPEG/WebP <= 300 KB), `DELETE /admin/branding/sponsor-logo` | App sponsor (splash, welcome screen, footer) - **Super Admin only** |
 | `GET /admin/users`, `POST /admin/users` `{ mobileNumber, roleCode }`, `DELETE /admin/users/{accountId}/roles/{roleCode}` | Admin users - **Super Admin only**; removing a role signs the person out |
 
 Every change is written to `PVS_AuditLogs` (`Admin.*` actions).

@@ -173,5 +173,15 @@
   "errorNetwork": "Unable to reach the server. Please check your internet connection and try again.",
   "errorSessionExpired": "Your session has expired. Please sign in again.",
   "retry": "Retry",
-  "loading": "Loading…"
+  "loading": "Loading…",
+
+  "updateRequiredTitle": "Update required",
+  "updateRequiredBody": "A new version of Padmashali Vidya Sethu is available. Please update the app to continue.",
+  "updateAvailable": "A new version of the app is available.",
+  "updateVersions": "Your version: {installed}   Latest: {latest}",
+  "@updateVersions": { "placeholders": { "installed": { "type": "String" }, "latest": { "type": "String" } } },
+  "updateNow": "Update now",
+  "updateStoreHint": "Open the Play Store or App Store and update Padmashali Vidya Sethu.",
+  "updateCheckAgain": "Check again",
+  "dismiss": "Dismiss"
 }

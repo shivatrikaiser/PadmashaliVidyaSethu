@@ -496,4 +496,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loading => 'Loading…';
+
+  @override
+  String get updateRequiredTitle => 'Update required';
+
+  @override
+  String get updateRequiredBody =>
+      'A new version of Padmashali Vidya Sethu is available. Please update the app to continue.';
+
+  @override
+  String get updateAvailable => 'A new version of the app is available.';
+
+  @override
+  String updateVersions(String installed, String latest) {
+    return 'Your version: $installed   Latest: $latest';
+  }
+
+  @override
+  String get updateNow => 'Update now';
+
+  @override
+  String get updateStoreHint =>
+      'Open the Play Store or App Store and update Padmashali Vidya Sethu.';
+
+  @override
+  String get updateCheckAgain => 'Check again';
+
+  @override
+  String get dismiss => 'Dismiss';
 }

@@ -73,6 +73,7 @@ public class AppDbContext(
 
     // Settings
     public DbSet<AppBranding> AppBranding => Set<AppBranding>();
+    public DbSet<AppVersion> AppVersions => Set<AppVersion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

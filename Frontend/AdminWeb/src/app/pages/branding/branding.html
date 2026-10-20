@@ -1,7 +1,8 @@
-<h1>Splash sponsor</h1>
+<h1>App sponsor</h1>
 <p class="muted">
-  Shown at the bottom of the app's splash screen. Leave the sponsor empty (and remove the logo) to hide the sponsor
-  card; leave "Powered by" empty to hide that line.
+  The sponsor appears on the app's splash screen, on the welcome screen (with organisation and address) and, with
+  "Powered by", in the footer of every screen. Leave the sponsor empty (and remove the logo) to hide it; leave
+  "Powered by" empty to hide that line.
 </p>
 
 @if (error()) { <p class="alert">{{ error() }}</p> }
@@ -13,9 +14,18 @@
       <label>Sponsor name
         <input name="sponsor" [(ngModel)]="sponsorName" maxlength="150" placeholder="e.g. Sri Laxmi Silks" />
       </label>
+      <label>Sponsor organisation <small class="muted">(optional - welcome screen)</small>
+        <input name="organisation" [(ngModel)]="sponsorOrganisation" maxlength="150"
+          placeholder="e.g. Laxmi Textiles Pvt Ltd" />
+      </label>
+      <label>Sponsor address <small class="muted">(optional - welcome screen, up to 4 lines)</small>
+        <textarea name="address" [(ngModel)]="sponsorAddress" maxlength="300" rows="4"
+          placeholder="e.g. 12, Car Street&#10;Udupi 576101"></textarea>
+      </label>
       <label>Powered by
         <input name="poweredBy" [(ngModel)]="poweredBy" maxlength="150" placeholder="e.g. IQ Explore" />
       </label>
+      @if (addressLines().length > 4) { <p class="alert">The address can have at most 4 lines.</p> }
       <div><button type="submit" [disabled]="busy()">Save text</button></div>
     </form>
 
@@ -38,9 +48,9 @@
     }
   </section>
 
-  <!-- Preview of the splash footer (same layout as the app) -->
   <section class="preview" aria-label="Preview">
-    <p class="preview-title">Preview</p>
+    <!-- Splash footer (same layout as the app) -->
+    <p class="preview-title">Splash screen</p>
     <div class="phone">
       @if (sponsorName.trim() || logoUrl()) {
         <div class="card">
@@ -57,6 +67,27 @@
         <p class="powered">Powered by : <b>{{ poweredBy.trim() }}</b></p>
       }
       <div class="waves" aria-hidden="true"></div>
+    </div>
+
+    <!-- Welcome screen sponsor block -->
+    <p class="preview-title">Welcome screen</p>
+    <div class="welcome">
+      @if (sponsorName.trim() || sponsorOrganisation.trim() || addressLines().length) {
+        <span class="label">Sponsored by:</span>
+        @if (sponsorName.trim()) { <strong>{{ sponsorName.trim() }}</strong> }
+        @if (sponsorOrganisation.trim()) { <span class="organisation">{{ sponsorOrganisation.trim() }}</span> }
+        @for (line of addressLines(); track $index) { <span class="address">{{ line }}</span> }
+      } @else {
+        <span class="muted">No sponsor.</span>
+      }
+    </div>
+
+    <!-- Footer on every screen -->
+    <p class="preview-title">Footer (every screen)</p>
+    <div class="footer">
+      @if (sponsorName.trim()) { <span>Sponsored by: <b>{{ sponsorName.trim() }}</b></span> }
+      @if (poweredBy.trim()) { <span>Powered by: <b>{{ poweredBy.trim() }}</b></span> }
+      @if (!sponsorName.trim() && !poweredBy.trim()) { <span class="muted">No footer.</span> }
     </div>
   </section>
 </div>

@@ -1,7 +1,11 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
+using PadmashaliVidyaSetu.Api.DTOs;
+using PadmashaliVidyaSetu.Api.Services.Auth;
 using PadmashaliVidyaSetu.Api.Tests.Infrastructure;
 
 namespace PadmashaliVidyaSetu.Api.Tests.Integration;
@@ -154,15 +158,45 @@ public sealed class AuthApiTests(PvsApiFactory factory)
 
         var rotated = await client.PostAsJsonAsync("/api/v1/auth/token/refresh", new { refreshToken = tokens.RefreshToken });
         rotated.EnsureSuccessStatusCode();
-        var newTokens = (await rotated.Content.ReadFromJsonAsync<Envelope<TestTokens>>())!.Data!;
+        var newTokens = (await rotated.Content.ReadFromJsonAsync<Envelope<AuthTokensResponse>>())!.Data!;
         Assert.NotEqual(tokens.RefreshToken, newTokens.RefreshToken);
 
+        // Long-lived: members are effectively never signed out.
+        Assert.True(newTokens.RefreshTokenExpiresAt > DateTime.UtcNow.AddDays(3640));
+
+        // Reused after the retry grace period: treated as theft, every session ends.
+        await BackdateRevocationAsync(tokens.RefreshToken, AuthService.RefreshRetryGrace + TimeSpan.FromMinutes(1));
         var reuse = await client.PostAsJsonAsync("/api/v1/auth/token/refresh", new { refreshToken = tokens.RefreshToken });
         Assert.Equal(HttpStatusCode.Unauthorized, reuse.StatusCode);
 
         var afterTheft = await client.PostAsJsonAsync("/api/v1/auth/token/refresh", new { refreshToken = newTokens.RefreshToken });
         Assert.Equal(HttpStatusCode.Unauthorized, afterTheft.StatusCode);
     }
+
+    [Fact]
+    public async Task Refresh_RetriedAfterLostResponse_KeepsSession()
+    {
+        var client = factory.CreateClient();
+        var tokens = await PvsApiFactory.SignInAsync(client, PvsApiFactory.NewMobileNumber());
+
+        // The first refresh succeeds on the server but the app never receives the response...
+        (await client.PostAsJsonAsync("/api/v1/auth/token/refresh", new { refreshToken = tokens.RefreshToken })).EnsureSuccessStatusCode();
+
+        // ...so it retries with the same token: still signed in, with new tokens.
+        var retry = await client.PostAsJsonAsync("/api/v1/auth/token/refresh", new { refreshToken = tokens.RefreshToken });
+        Assert.Equal(HttpStatusCode.OK, retry.StatusCode);
+        var retried = (await retry.Content.ReadFromJsonAsync<Envelope<TestTokens>>())!.Data!;
+
+        var next = await client.PostAsJsonAsync("/api/v1/auth/token/refresh", new { refreshToken = retried.RefreshToken });
+        Assert.Equal(HttpStatusCode.OK, next.StatusCode);
+    }
+
+    private Task<int> BackdateRevocationAsync(string refreshToken, TimeSpan by) => factory.WithDbAsync(db =>
+    {
+        var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken)));
+        return db.RefreshTokens.Where(t => t.TokenHash == hash)
+            .ExecuteUpdateAsync(s => s.SetProperty(t => t.RevokedDate, t => t.RevokedDate!.Value.AddSeconds(-by.TotalSeconds)));
+    });
 
     [Fact]
     public async Task Logout_RevokesRefreshToken()

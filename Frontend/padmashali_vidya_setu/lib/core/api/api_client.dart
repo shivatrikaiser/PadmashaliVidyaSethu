@@ -59,11 +59,20 @@ class ApiClient {
     try {
       return _unwrap(await request(), parse);
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401 && e.requestOptions.path != _refreshPath && await _tryRefresh()) {
+      if (e.response?.statusCode == 401 && e.requestOptions.path != _refreshPath) {
+        final bool refreshed;
         try {
-          return _unwrap(await request(), parse);
-        } on DioException catch (retryError) {
-          throw _toApiException(retryError);
+          refreshed = await _tryRefresh();
+        } on DioException catch (refreshError) {
+          // Offline / server trouble while refreshing: report that, not the 401, so the session is kept.
+          throw _toApiException(refreshError);
+        }
+        if (refreshed) {
+          try {
+            return _unwrap(await request(), parse);
+          } on DioException catch (retryError) {
+            throw _toApiException(retryError);
+          }
         }
       }
       throw _toApiException(e);
@@ -75,6 +84,8 @@ class ApiClient {
     return _refreshInFlight ??= _refresh().whenComplete(() => _refreshInFlight = null);
   }
 
+  /// Ends the session only when the server rejects the refresh token (401). Network errors, timeouts and server
+  /// errors are rethrown and the tokens are kept, so a weak signal never signs the member out.
   Future<bool> _refresh() async {
     final current = await _tokens.read();
     if (current == null) return false;
@@ -85,7 +96,8 @@ class ApiClient {
         StoredTokens(accessToken: data['accessToken']! as String, refreshToken: data['refreshToken']! as String),
       );
       return true;
-    } on DioException {
+    } on DioException catch (e) {
+      if (e.response?.statusCode != 401) rethrow;
       await _tokens.clear();
       _onSessionExpired();
       return false;

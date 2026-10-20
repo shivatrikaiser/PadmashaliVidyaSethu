@@ -5,7 +5,7 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ApiResponse } from './api';
 import {
-  AdminUser, AppBranding, ListItem, ListType, LocationItem, LookupItem, MemberDetail, MemberFilters, MemberRow, OtherValue,
+  AdminUser, AppBranding, BrandingText, ListItem, ListType, LocationItem, LookupItem, MemberDetail, MemberFilters, MemberRow, OtherValue,
   PagedResult, Summary,
 } from './models';
 
@@ -89,9 +89,9 @@ export class AdminApi {
   branding(): Observable<AppBranding> {
     return this.get('/admin/branding');
   }
-  saveBranding(sponsorName: string, poweredBy: string): Observable<AppBranding> {
+  saveBranding(text: BrandingText): Observable<AppBranding> {
     return this.http
-      .put<ApiResponse<AppBranding>>(`${this.api}/admin/branding`, { sponsorName, poweredBy })
+      .put<ApiResponse<AppBranding>>(`${this.api}/admin/branding`, text)
       .pipe(map((r) => r.data!));
   }
   uploadSponsorLogo(file: File): Observable<AppBranding> {

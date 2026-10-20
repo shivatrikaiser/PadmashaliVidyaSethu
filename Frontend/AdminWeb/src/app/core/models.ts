@@ -137,10 +137,21 @@ export interface AdminUser {
 
 export interface AppBranding {
   sponsorName: string | null;
+  sponsorOrganisation: string | null;
+  /** Up to four lines separated by a line feed. */
+  sponsorAddress: string | null;
   poweredBy: string | null;
   hasSponsorLogo: boolean;
   sponsorLogoVersion: string | null;
   modifiedDate: string | null;
+}
+
+/** The editable text of [AppBranding]. */
+export interface BrandingText {
+  sponsorName: string;
+  sponsorOrganisation: string;
+  sponsorAddress: string;
+  poweredBy: string;
 }
 
 export interface LocationItem {

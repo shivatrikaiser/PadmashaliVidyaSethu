@@ -49,7 +49,7 @@ export const routes: Routes = [
         path: 'branding',
         canActivate: [superAdminGuard],
         loadComponent: () => import('./pages/branding/branding').then((m) => m.Branding),
-        title: 'Splash sponsor | PVS Admin',
+        title: 'App sponsor | PVS Admin',
       },
       {
         path: 'admin-users',

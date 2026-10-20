@@ -18,7 +18,7 @@ public interface IBrandingService
     Task<AppBrandingDto> RemoveSponsorLogoAsync(CancellationToken ct);
 }
 
-/// <summary>Sponsor / "Powered by" for the splash screen (single settings row).</summary>
+/// <summary>Sponsor (name, organisation, address) / "Powered by" for the app (single settings row).</summary>
 public sealed class BrandingService(
     AppDbContext db,
     ICurrentUserService currentUser,
@@ -27,12 +27,15 @@ public sealed class BrandingService(
 {
     public const int MaxLogoBytes = 300 * 1024;
     public const int MaxTextLength = 150;
+    public const int MaxAddressLength = 300;
+    public const int MaxAddressLines = 4;
 
     public async Task<AppBrandingDto> GetAsync(CancellationToken ct) =>
         ToDto(await db.AppBranding.AsNoTracking()
             .Select(b => new AppBranding
             {
-                SponsorName = b.SponsorName, PoweredBy = b.PoweredBy, ModifiedDate = b.ModifiedDate,
+                SponsorName = b.SponsorName, SponsorOrganisation = b.SponsorOrganisation, SponsorAddress = b.SponsorAddress,
+                PoweredBy = b.PoweredBy, ModifiedDate = b.ModifiedDate,
                 SponsorLogoContentType = b.SponsorLogoContentType,
             })
             .SingleAsync(ct));
@@ -50,11 +53,15 @@ public sealed class BrandingService(
     public async Task<AppBrandingDto> UpdateTextAsync(UpdateBrandingRequest request, CancellationToken ct)
     {
         var sponsor = ValidText(request.SponsorName, "sponsorName");
+        var organisation = ValidText(request.SponsorOrganisation, "sponsorOrganisation");
+        var address = ValidAddress(request.SponsorAddress);
         var poweredBy = ValidText(request.PoweredBy, "poweredBy");
         var branding = await db.AppBranding.SingleAsync(ct);
         branding.SponsorName = sponsor;
+        branding.SponsorOrganisation = organisation;
+        branding.SponsorAddress = address;
         branding.PoweredBy = poweredBy;
-        return await SaveAsync(branding, $"sponsor '{sponsor}', powered by '{poweredBy}'", ct);
+        return await SaveAsync(branding, $"sponsor '{sponsor}', organisation '{organisation}', powered by '{poweredBy}'", ct);
     }
 
     public async Task<AppBrandingDto> SetSponsorLogoAsync(byte[] bytes, CancellationToken ct)
@@ -87,7 +94,7 @@ public sealed class BrandingService(
     }
 
     private static AppBrandingDto ToDto(AppBranding b) => new(
-        b.SponsorName, b.PoweredBy, b.SponsorLogoContentType is not null,
+        b.SponsorName, b.SponsorOrganisation, b.SponsorAddress, b.PoweredBy, b.SponsorLogoContentType is not null,
         b.SponsorLogoContentType is null ? null : Version(b.ModifiedDate), b.ModifiedDate);
 
     /// <summary>Changes whenever the settings change, so apps can cache the logo URL safely.</summary>
@@ -99,6 +106,18 @@ public sealed class BrandingService(
         if (text.Length > MaxTextLength)
             throw new RequestValidationException([new ApiError(field, $"At most {MaxTextLength} characters.")]);
         return text.Length == 0 ? null : text;
+    }
+
+    /// <summary>Each line tidied, blank lines dropped; at most <see cref="MaxAddressLines"/> lines.</summary>
+    private static string? ValidAddress(string? value)
+    {
+        var lines = (value ?? string.Empty).Split('\n').Select(l => l.Tidy()).Where(l => l.Length > 0).ToList();
+        var address = string.Join('\n', lines);
+        if (lines.Count > MaxAddressLines)
+            throw new RequestValidationException([new ApiError("sponsorAddress", $"At most {MaxAddressLines} lines.")]);
+        if (address.Length > MaxAddressLength)
+            throw new RequestValidationException([new ApiError("sponsorAddress", $"At most {MaxAddressLength} characters.")]);
+        return address.Length == 0 ? null : address;
     }
 
     /// <summary>Recognises the file by its first bytes (never trusts the uploaded file name or type).</summary>

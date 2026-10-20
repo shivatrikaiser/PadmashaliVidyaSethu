@@ -6,7 +6,7 @@ The platform holds information about children. These controls are implemented in
 * ✔ 4-digit Phone Number Verification Code, cryptographically random, 10-minute expiry (matches the DLT SMS text), **single use** (atomic update).
 * ✔ Stored as HMAC-SHA256 with a server secret — never stored or logged in plain text.
 * ✔ Brute force: 5 wrong attempts per code; per-number limits (1 / 30 s, 5 / hour); per-IP rate limits.
-* ✔ JWT access tokens (30 min, HS256, no personal data inside) + random refresh tokens (30 days) stored as SHA-256,
+* ✔ JWT access tokens (30 min, HS256, no personal data inside) + random refresh tokens (3650 days, renewed on every use - members stay signed in) stored as SHA-256,
   **rotated on every use; reuse of a rotated token revokes every session** of the account.
 * ✔ Development code exposure only in the Development environment — startup fails otherwise. No hard-coded codes.
 * ✔ Delivered by SMS Gateway Hub using the DLT-registered sender/template. The request URL (API key + code) is never

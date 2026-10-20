@@ -7,6 +7,8 @@ import 'package:padmashali_vidya_setu/core/api/api_exception.dart';
 import 'package:padmashali_vidya_setu/core/storage/token_storage.dart';
 import 'package:padmashali_vidya_setu/l10n/generated/app_localizations.dart';
 import 'package:padmashali_vidya_setu/models/app_branding.dart';
+import 'package:padmashali_vidya_setu/models/app_version.dart';
+import 'package:padmashali_vidya_setu/providers/app_update.dart';
 import 'package:padmashali_vidya_setu/models/location_models.dart';
 import 'package:padmashali_vidya_setu/models/master_data_item.dart';
 import 'package:padmashali_vidya_setu/providers/providers.dart';
@@ -45,9 +47,26 @@ final fakeLists = <String, List<MasterDataItem>>{
 
 class FakeMasterDataRepository implements MasterDataRepository {
   @override
-  Future<AppBranding> branding() async => const AppBranding(sponsorName: 'Test Sponsor', poweredBy: 'IQ Explore');
+  Future<AppBranding> branding() async => const AppBranding(
+    sponsorName: 'Test Sponsor',
+    sponsorOrganisation: 'Test Textiles Pvt Ltd',
+    sponsorAddress: '12, Car Street\nUdupi 576101',
+    poweredBy: 'IQ Explore',
+  );
 
   int pinLookups = 0;
+
+  /// What `GET /app/version` returns; [versionError] makes it fail (offline).
+  AppVersionInfo version = const AppVersionInfo(latestVersion: '1.0.0', isMandatory: true);
+  Object? versionError;
+  int versionChecks = 0;
+
+  @override
+  Future<AppVersionInfo> appVersion(String platform) async {
+    versionChecks++;
+    if (versionError != null) throw versionError!;
+    return version;
+  }
 
   @override
   Future<List<MasterDataItem>> list(String type) async => fakeLists[type] ?? const [];
@@ -96,6 +115,8 @@ List<Override> testOverrides({FakeMasterDataRepository? masterData}) => [
     ApiClient(baseUrl: 'http://test.invalid', tokenStorage: MemoryTokenStorage(), onSessionExpired: () {}),
   ),
   masterDataRepositoryProvider.overrideWithValue(masterData ?? FakeMasterDataRepository()),
+  // No version check unless a test opts in (see app_update_test.dart).
+  appPlatformProvider.overrideWithValue(null),
 ];
 
 /// Pumps [child] inside a localized, themed MaterialApp with test providers.

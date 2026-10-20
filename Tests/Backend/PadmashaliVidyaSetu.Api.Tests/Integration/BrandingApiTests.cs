@@ -29,11 +29,23 @@ public sealed class BrandingApiTests(PvsApiFactory factory)
 
         try
         {
-            var saved = await superAdmin.PutAsJsonAsync("/api/v1/admin/branding", new { sponsorName = "  Sri Laxmi Silks ", poweredBy = "IQ Explore" });
+            var saved = await superAdmin.PutAsJsonAsync("/api/v1/admin/branding", new
+            {
+                sponsorName = "  Sri Laxmi Silks ",
+                sponsorOrganisation = " Laxmi  Textiles Pvt Ltd ",
+                // Lines kept (each tidied, blank ones dropped), Windows line endings accepted.
+                sponsorAddress = " 12, Car Street \r\n\r\n Udupi  576101 ",
+                poweredBy = "IQ Explore",
+            });
             Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
             var publicView = (await anonymous.GetFromJsonAsync<Envelope<AppBrandingDto>>("/api/v1/app/branding"))!.Data!;
             Assert.Equal("Sri Laxmi Silks", publicView.SponsorName);
+            Assert.Equal("Laxmi Textiles Pvt Ltd", publicView.SponsorOrganisation);
+            Assert.Equal("12, Car Street\nUdupi 576101", publicView.SponsorAddress);
             Assert.Equal("IQ Explore", publicView.PoweredBy);
+
+            var tooManyLines = await superAdmin.PutAsJsonAsync("/api/v1/admin/branding", new { sponsorAddress = "1\n2\n3\n4\n5" });
+            Assert.Equal(HttpStatusCode.BadRequest, tooManyLines.StatusCode);
 
             // Logo: real images only; served publicly with its content type.
             var notImage = await UploadAsync(superAdmin, "not an image"u8.ToArray(), "logo.png");

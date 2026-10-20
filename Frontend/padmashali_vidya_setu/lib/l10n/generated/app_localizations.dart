@@ -981,6 +981,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading…'**
   String get loading;
+
+  /// No description provided for @updateRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update required'**
+  String get updateRequiredTitle;
+
+  /// No description provided for @updateRequiredBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A new version of Padmashali Vidya Sethu is available. Please update the app to continue.'**
+  String get updateRequiredBody;
+
+  /// No description provided for @updateAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'A new version of the app is available.'**
+  String get updateAvailable;
+
+  /// No description provided for @updateVersions.
+  ///
+  /// In en, this message translates to:
+  /// **'Your version: {installed}   Latest: {latest}'**
+  String updateVersions(String installed, String latest);
+
+  /// No description provided for @updateNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Update now'**
+  String get updateNow;
+
+  /// No description provided for @updateStoreHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the Play Store or App Store and update Padmashali Vidya Sethu.'**
+  String get updateStoreHint;
+
+  /// No description provided for @updateCheckAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get updateCheckAgain;
+
+  /// No description provided for @dismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get dismiss;
 }
 
 class _AppLocalizationsDelegate

@@ -9,7 +9,7 @@ import { AppBranding } from '../../core/models';
 
 const MAX_LOGO_KB = 300;
 
-/** Sponsor and "Powered by" shown on the app's splash screen (Super Admin only). */
+/** Sponsor (name, organisation, address) and "Powered by" shown in the app (Super Admin only). */
 @Component({
   selector: 'app-branding',
   imports: [FormsModule, DatePipe],
@@ -29,7 +29,14 @@ export class Branding {
   protected readonly busy = signal(false);
 
   protected sponsorName = '';
+  protected sponsorOrganisation = '';
+  protected sponsorAddress = '';
   protected poweredBy = '';
+
+  /** Address lines as the app shows them (blank lines dropped). */
+  protected addressLines(): string[] {
+    return this.sponsorAddress.split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
+  }
 
   constructor() {
     this.api.branding().subscribe({
@@ -39,7 +46,13 @@ export class Branding {
   }
 
   protected save(): void {
-    this.run(this.api.saveBranding(this.sponsorName, this.poweredBy), 'Saved. The app shows it at the next start.');
+    const text = {
+      sponsorName: this.sponsorName,
+      sponsorOrganisation: this.sponsorOrganisation,
+      sponsorAddress: this.sponsorAddress,
+      poweredBy: this.poweredBy,
+    };
+    this.run(this.api.saveBranding(text), 'Saved. The app shows it at the next start.');
   }
 
   protected upload(input: HTMLInputElement): void {
@@ -78,6 +91,8 @@ export class Branding {
   private apply(b: AppBranding): void {
     this.branding.set(b);
     this.sponsorName = b.sponsorName ?? '';
+    this.sponsorOrganisation = b.sponsorOrganisation ?? '';
+    this.sponsorAddress = b.sponsorAddress ?? '';
     this.poweredBy = b.poweredBy ?? '';
   }
 }

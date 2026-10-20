@@ -1,5 +1,6 @@
 import '../core/api/api_client.dart';
 import '../models/app_branding.dart';
+import '../models/app_version.dart';
 import '../models/auth_models.dart';
 import '../models/location_models.dart';
 import '../models/master_data_item.dart';
@@ -41,6 +42,10 @@ class MasterDataRepository {
 
   /// Splash-screen sponsor / "Powered by" (public, works before sign-in).
   Future<AppBranding> branding() => _api.get('/api/v1/app/branding', AppBranding.fromJson);
+
+  /// The current app release for [platform] (android | ios) - public, checked on every screen.
+  Future<AppVersionInfo> appVersion(String platform) =>
+      _api.get('/api/v1/app/version', AppVersionInfo.fromJson, query: {'platform': platform});
 }
 
 class MemberRepository {

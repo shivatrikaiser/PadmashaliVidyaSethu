@@ -2,10 +2,11 @@
 ================================================================================================================
   Padmashali Vidya Setu (PVS) - deployment into a SHARED database (e.g. IQExplore Live)
   Single self-contained deployment script. Must be updated whenever a new EF migration is added.
-  Generated: 2026-10-10 21:07    Migrations: 20261006135106_InitialSchema, 20261009101316_OtherTextColumns, 20261009112325_MemberProfileListChoices, 20261010153650_AppBranding
+  Generated: 2026-10-20 21:05    Migrations: 20261006135106_InitialSchema, 20261009101316_OtherTextColumns, 20261009112325_MemberProfileListChoices, 20261010153650_AppBranding,
+              20261020142456_SponsorOrganisationAddress, 20261020153210_AppVersions
 ================================================================================================================
   WHAT IT DOES
-    * Creates 46 tables (incl. the migrations history) + their keys, indexes and constraints, and loads the
+    * Creates 47 tables (incl. the migrations history) + their keys, indexes and constraints, and loads the
       PVS master data (temples, genders, classes, locations, ...). Every object name starts with PVS_.
     * Creates objects ONLY - never alters, drops or writes to any existing non-PVS table / object.
     * Safe to run again: already-applied migrations are skipped; new ones (after regeneration) are applied.
@@ -3900,6 +3901,121 @@ BEGIN
 END;
 GO
 
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020142456_SponsorOrganisationAddress'
+)
+BEGIN
+    ALTER TABLE [PVS_AppBranding] ADD [SponsorAddress] nvarchar(300) NULL;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020142456_SponsorOrganisationAddress'
+)
+BEGIN
+    ALTER TABLE [PVS_AppBranding] ADD [SponsorOrganisation] nvarchar(150) NULL;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020142456_SponsorOrganisationAddress'
+)
+BEGIN
+    EXEC(N'UPDATE [PVS_AppBranding] SET [SponsorAddress] = NULL, [SponsorOrganisation] = NULL
+    WHERE [AppBrandingId] = 1;
+    SELECT @@ROWCOUNT');
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020142456_SponsorOrganisationAddress'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261020142456_SponsorOrganisationAddress', N'10.0.12');
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020153210_AppVersions'
+)
+BEGIN
+    CREATE TABLE [PVS_AppVersions] (
+        [Platform] varchar(20) NOT NULL,
+        [LatestVersion] varchar(20) NOT NULL,
+        [IsMandatory] bit NOT NULL,
+        [StoreUrl] nvarchar(500) NULL,
+        [ModifiedDate] datetime2(3) NULL,
+        [ModifiedBy] nvarchar(100) NULL,
+        CONSTRAINT [PVS_PK_AppVersions] PRIMARY KEY ([Platform]),
+        CONSTRAINT [PVS_CK_AppVersions_LatestVersion] CHECK ([LatestVersion] LIKE '[0-9]%.[0-9]%.[0-9]%' AND [LatestVersion] NOT LIKE '%[^0-9.]%'),
+        CONSTRAINT [PVS_CK_AppVersions_Platform] CHECK ([Platform] IN ('android', 'ios'))
+    );
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020153210_AppVersions'
+)
+BEGIN
+    IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'Platform', N'IsMandatory', N'LatestVersion', N'ModifiedBy', N'ModifiedDate', N'StoreUrl') AND [object_id] = OBJECT_ID(N'[PVS_AppVersions]'))
+        SET IDENTITY_INSERT [PVS_AppVersions] ON;
+    EXEC(N'INSERT INTO [PVS_AppVersions] ([Platform], [IsMandatory], [LatestVersion], [ModifiedBy], [ModifiedDate], [StoreUrl])
+    VALUES (''android'', CAST(1 AS bit), ''1.0.0'', NULL, NULL, N''https://play.google.com/store/apps/details?id=org.padmashalividyasetu.padmashali_vidya_setu''),
+    (''ios'', CAST(1 AS bit), ''1.0.0'', NULL, NULL, NULL)');
+    IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'Platform', N'IsMandatory', N'LatestVersion', N'ModifiedBy', N'ModifiedDate', N'StoreUrl') AND [object_id] = OBJECT_ID(N'[PVS_AppVersions]'))
+        SET IDENTITY_INSERT [PVS_AppVersions] OFF;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020153210_AppVersions'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261020153210_AppVersions', N'10.0.12');
+END;
+GO
+
 -------------------------------------------------------------------------------- 3. Post-flight checks, then COMMIT
 IF @@TRANCOUNT = 0
 BEGIN
@@ -3913,6 +4029,7 @@ INSERT INTO @expected (TableName) VALUES
     (N'PVS_Accounts'),
     (N'PVS_AchievementTypes'),
     (N'PVS_AppBranding'),
+    (N'PVS_AppVersions'),
     (N'PVS_AuditLogs'),
     (N'PVS_Boards'),
     (N'PVS_Branches'),

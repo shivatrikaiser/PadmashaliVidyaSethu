@@ -35,6 +35,9 @@ public sealed class AuthService(
 {
     private readonly PhoneVerificationOptions _options = verificationOptions.Value;
 
+    /// <summary>How long a just-rotated refresh token may be presented again (a retry after a lost response).</summary>
+    public static readonly TimeSpan RefreshRetryGrace = TimeSpan.FromMinutes(2);
+
     private const string InvalidCodeMessage = "The verification code has expired or is no longer valid. Please request a new code.";
 
     public async Task<VerificationCodeIssuedResponse> RequestVerificationCodeAsync(string mobileNumber, CancellationToken ct)
@@ -120,6 +123,20 @@ public sealed class AuthService(
 
         if (stored is null)
             throw new UnauthorizedException("Your session has expired. Please sign in again.");
+
+        if (stored.RevokedDate is not null && stored.ReplacedByTokenHash is not null
+            && now - stored.RevokedDate.Value <= RefreshRetryGrace)
+        {
+            // The app retried a refresh whose response it never received (weak network): its replacement was
+            // never used. Replace that unused token instead of treating the retry as theft.
+            var unused = await db.RefreshTokens.SingleOrDefaultAsync(
+                t => t.TokenHash == stored.ReplacedByTokenHash && t.RevokedDate == null, ct);
+            if (unused is not null)
+            {
+                unused.RevokedDate = now;
+                return await IssueTokensAsync(stored.Account, isNewAccount: false, ct, replaced: stored);
+            }
+        }
 
         if (stored.RevokedDate is not null)
         {

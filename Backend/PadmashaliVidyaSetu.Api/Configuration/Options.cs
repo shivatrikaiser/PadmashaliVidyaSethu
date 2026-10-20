@@ -17,7 +17,11 @@ public class JwtOptions
     public string? SigningKey { get; set; }
 
     [Range(5, 240)] public int AccessTokenMinutes { get; set; } = 30;
-    [Range(1, 180)] public int RefreshTokenDays { get; set; } = 30;
+    /// <summary>
+    /// Refresh token lifetime. Every refresh issues a new token with a fresh lifetime, so members stay signed in
+    /// for as long as they open the app at least once in this period (3650 days: effectively never signed out).
+    /// </summary>
+    [Range(1, 3650)] public int RefreshTokenDays { get; set; } = 3650;
 }
 
 public class PhoneVerificationOptions

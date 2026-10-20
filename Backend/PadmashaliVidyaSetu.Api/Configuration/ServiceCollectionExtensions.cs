@@ -140,6 +140,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAdminUserService, AdminUserService>();
         services.AddScoped<ILocationReviewService, LocationReviewService>();
         services.AddScoped<IBrandingService, BrandingService>();
+        services.AddScoped<IAppVersionService, AppVersionService>();
 
         services.AddHttpClient<IPinCodeProvider, IndiaPostPinCodeProvider>((sp, client) =>
         {

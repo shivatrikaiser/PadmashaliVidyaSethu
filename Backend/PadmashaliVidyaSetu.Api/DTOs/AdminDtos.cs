@@ -91,16 +91,24 @@ public sealed record GrantRoleRequest(string? MobileNumber, string? RoleCode);
 
 // ---------------------------------------------------------------- Splash branding
 
-/// <summary>Sponsor / "Powered by" for the app's splash screen. The logo is served separately (see AppController).</summary>
+/// <summary>Sponsor (name, organisation, address) / "Powered by" for the app's splash, welcome screen and footer. The logo is served separately (see AppController).</summary>
 public sealed record AppBrandingDto(
     string? SponsorName,
+    string? SponsorOrganisation,
+    /// <summary>Up to four lines separated by a line feed.</summary>
+    string? SponsorAddress,
     string? PoweredBy,
     bool HasSponsorLogo,
     /// <summary>Changes with every edit; appended to the logo URL so caches refresh.</summary>
     string? SponsorLogoVersion,
     DateTime? ModifiedDate);
 
-public sealed record UpdateBrandingRequest(string? SponsorName, string? PoweredBy);
+public sealed record UpdateBrandingRequest(string? SponsorName, string? PoweredBy, string? SponsorOrganisation = null, string? SponsorAddress = null);
+
+// ---------------------------------------------------------------- App version
+
+/// <summary>The current release for a platform. Apps older than <c>LatestVersion</c> ask the member to update.</summary>
+public sealed record AppVersionDto(string Platform, string LatestVersion, bool IsMandatory, string? StoreUrl);
 
 // ---------------------------------------------------------------- Locations review
 

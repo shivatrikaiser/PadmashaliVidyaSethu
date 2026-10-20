@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:padmashali_vidya_setu/app.dart';
 import 'package:padmashali_vidya_setu/screens/auth/phone_screen.dart';
+import 'package:padmashali_vidya_setu/widgets/app_footer.dart';
 import 'package:padmashali_vidya_setu/widgets/brand.dart';
 import 'package:padmashali_vidya_setu/widgets/code_input.dart';
 
@@ -17,13 +18,17 @@ void main() {
     await tester.pumpWidget(ProviderScope(overrides: testOverrides(), child: const PvsApp()));
     await tester.pumpAndSettle();
 
-    // Logo, then sponsor and "Powered by" from the admin portal, then the welcome text - all on one screen.
+    // Logo, then the sponsor's name, organisation and address from the admin portal, then the welcome text - all
+    // on one screen, above the footer with the sponsor and "Powered by".
     expect(find.byType(BrandLogo), findsOneWidget);
     expect(find.byKey(const Key('welcomeSponsor')), findsOneWidget);
-    expect(find.byKey(const Key('welcomePoweredBy')), findsOneWidget);
+    expect(find.text('Test Textiles Pvt Ltd'), findsOneWidget);
+    expect(find.text('12, Car Street\nUdupi 576101'), findsOneWidget);
+    expect(find.byKey(const Key('footerSponsor')), findsOneWidget);
+    expect(find.byKey(const Key('footerPoweredBy')), findsOneWidget);
     expect(
       tester.getBottomLeft(find.byKey(const Key('getStartedButton'))).dy,
-      lessThan(tester.view.physicalSize.height / tester.view.devicePixelRatio),
+      lessThan(tester.getTopLeft(find.byType(AppFooter)).dy),
     );
     expect(find.byKey(const Key('getStartedButton')), findsOneWidget);
 

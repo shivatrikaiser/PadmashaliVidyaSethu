@@ -5,18 +5,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'routing/app_router.dart';
 import 'theme/app_theme.dart';
+import 'widgets/app_footer.dart';
 
 class PvsApp extends ConsumerWidget {
   const PvsApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
     return MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      routerConfig: ref.watch(routerProvider),
+      routerConfig: router,
       // English now; Kannada (kn) and Hindi (hi) are added by dropping app_kn.arb / app_hi.arb into lib/l10n.
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -31,7 +33,8 @@ class PvsApp extends ConsumerWidget {
         final media = MediaQuery.of(context);
         return MediaQuery(
           data: media.copyWith(textScaler: media.textScaler.clamp(maxScaleFactor: 1.6)),
-          child: child!,
+          // Sponsor / "Powered by" footer under every screen.
+          child: AppFrame(router: router, child: child!),
         );
       },
     );

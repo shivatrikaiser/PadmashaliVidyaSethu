@@ -6714,6 +6714,10 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.Property<string>("SponsorAddress")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
                     b.Property<byte[]>("SponsorLogo")
                         .HasColumnType("varbinary(max)");
 
@@ -6723,6 +6727,10 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasColumnType("varchar(30)");
 
                     b.Property<string>("SponsorName")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("SponsorOrganisation")
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
@@ -6740,6 +6748,61 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         {
                             AppBrandingId = 1,
                             PoweredBy = "IQ Explore"
+                        });
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Settings.AppVersion", b =>
+                {
+                    b.Property<string>("Platform")
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<bool>("IsMandatory")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LatestVersion")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<string>("StoreUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Platform")
+                        .HasName("PVS_PK_AppVersions");
+
+                    b.ToTable("PVS_AppVersions", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_AppVersions_LatestVersion", "[LatestVersion] LIKE '[0-9]%.[0-9]%.[0-9]%' AND [LatestVersion] NOT LIKE '%[^0-9.]%'")
+                                .HasName("PVS_CK_AppVersions_LatestVersion");
+
+                            t.HasCheckConstraint("CK_AppVersions_Platform", "[Platform] IN ('android', 'ios')")
+                                .HasName("PVS_CK_AppVersions_Platform");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Platform = "android",
+                            IsMandatory = true,
+                            LatestVersion = "1.0.0",
+                            StoreUrl = "https://play.google.com/store/apps/details?id=org.padmashalividyasetu.padmashali_vidya_setu"
+                        },
+                        new
+                        {
+                            Platform = "ios",
+                            IsMandatory = true,
+                            LatestVersion = "1.0.0"
                         });
                 });
 
