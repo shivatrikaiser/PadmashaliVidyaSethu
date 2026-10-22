@@ -35,7 +35,7 @@ flutter build appbundle --release --dart-define-from-file=config/production.json
 * Set the real API URL in `config/production.json`.
 * Create an upload keystore (kept outside the repo) and `android/key.properties`; configure release signing in
   `android/app/build.gradle.kts` (currently uses the debug key — **must change before Play Store**).
-* Confirm the application id (`org.padmashalividyasetu.padmashali_vidya_setu`) and app icon before first release —
+* Confirm the application id (`com.vidyasethu.pvs`) and app icon before first release —
   they cannot change after publishing.
 
 ## Environments

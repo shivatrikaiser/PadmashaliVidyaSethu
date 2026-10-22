@@ -43,7 +43,7 @@ public class AppVersionConfiguration : IEntityTypeConfiguration<AppVersion>
             new AppVersion
             {
                 Platform = AppVersion.Android, LatestVersion = "1.0.0", IsMandatory = true,
-                StoreUrl = "https://play.google.com/store/apps/details?id=org.padmashalividyasetu.padmashali_vidya_setu",
+                StoreUrl = "https://play.google.com/store/apps/details?id=com.vidyasethu.pvs",
             },
             new AppVersion { Platform = AppVersion.Ios, LatestVersion = "1.0.0", IsMandatory = true });
     }

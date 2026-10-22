@@ -1,4 +1,4 @@
-package org.padmashalividyasetu.padmashali_vidya_setu
+package com.vidyasethu.pvs
 
 import io.flutter.embedding.android.FlutterActivity
 

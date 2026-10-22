@@ -6,13 +6,13 @@ plugins {
 }
 
 // Push notifications need app/google-services.json from the Firebase console (Android app
-// org.padmashalividyasetu.padmashali_vidya_setu). Without it the app builds and runs, just without push.
+// com.vidyasethu.pvs). Without it the app builds and runs, just without push.
 if (file("google-services.json").exists()) {
     apply(plugin = "com.google.gms.google-services")
 }
 
 android {
-    namespace = "org.padmashalividyasetu.padmashali_vidya_setu"
+    namespace = "com.vidyasethu.pvs"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -29,7 +29,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "org.padmashalividyasetu.padmashali_vidya_setu"
+        applicationId = "com.vidyasethu.pvs"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

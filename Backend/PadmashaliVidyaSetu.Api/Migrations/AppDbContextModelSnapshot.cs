@@ -6831,7 +6831,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                             Platform = "android",
                             IsMandatory = true,
                             LatestVersion = "1.0.0",
-                            StoreUrl = "https://play.google.com/store/apps/details?id=org.padmashalividyasetu.padmashali_vidya_setu"
+                            StoreUrl = "https://play.google.com/store/apps/details?id=com.vidyasethu.pvs"
                         },
                         new
                         {

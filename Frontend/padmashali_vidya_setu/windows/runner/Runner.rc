@@ -89,11 +89,11 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "org.padmashalividyasetu" "\0"
+            VALUE "CompanyName", "com.vidyasethu" "\0"
             VALUE "FileDescription", "padmashali_vidya_setu" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "padmashali_vidya_setu" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 org.padmashalividyasetu. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.vidyasethu. All rights reserved." "\0"
             VALUE "OriginalFilename", "padmashali_vidya_setu.exe" "\0"
             VALUE "ProductName", "padmashali_vidya_setu" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"

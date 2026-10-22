@@ -19,7 +19,7 @@ No device list is needed: every install that opened the app once (and allowed no
 
 1. **Project**: create one (or use the IQ Explore project) - e.g. "Padmashali Vidya Sethu".
 2. **Android app**: Project settings → *Add app* → Android, package name
-   `org.padmashalividyasetu.padmashali_vidya_setu`. Download **google-services.json** and put it in
+   `com.vidyasethu.pvs`. Download **google-services.json** and put it in
    `Frontend/padmashali_vidya_setu/android/app/`. (It is not a secret; it may be committed.) Rebuild the app - without
    this file the app builds and runs, just without push.
 3. **Server key**: Project settings → *Service accounts* → *Generate new private key*. This JSON **is a secret** -

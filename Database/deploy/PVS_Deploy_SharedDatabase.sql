@@ -2,8 +2,8 @@
 ================================================================================================================
   Padmashali Vidya Setu (PVS) - deployment into a SHARED database (e.g. IQExplore Live)
   Single self-contained deployment script. Must be updated whenever a new EF migration is added.
-  Generated: 2026-10-22 10:25    Migrations: 20261006135106_InitialSchema, 20261009101316_OtherTextColumns, 20261009112325_MemberProfileListChoices, 20261010153650_AppBranding,
-              20261020142456_SponsorOrganisationAddress, 20261020153210_AppVersions, 20261020155916_AdminPasswords, 20261022042837_MemberMobileNumber, 20261022044620_PushNotifications
+  Generated: 2026-10-22 10:41    Migrations: 20261006135106_InitialSchema, 20261009101316_OtherTextColumns, 20261009112325_MemberProfileListChoices, 20261010153650_AppBranding,
+              20261020142456_SponsorOrganisationAddress, 20261020153210_AppVersions, 20261020155916_AdminPasswords, 20261022042837_MemberMobileNumber, 20261022044620_PushNotifications, 20261022051124_AndroidPackageName
 ================================================================================================================
   WHAT IT DOES
     * Creates 48 tables (incl. the migrations history) + their keys, indexes and constraints, and loads the
@@ -4194,6 +4194,33 @@ IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
 BEGIN
     INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
     VALUES (N'20261022044620_PushNotifications', N'10.0.12');
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022051124_AndroidPackageName'
+)
+BEGIN
+    UPDATE [PVS_AppVersions] SET [StoreUrl] = N'https://play.google.com/store/apps/details?id=com.vidyasethu.pvs' WHERE [Platform] = 'android' AND [StoreUrl] = N'https://play.google.com/store/apps/details?id=org.padmashalividyasetu.padmashali_vidya_setu';
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022051124_AndroidPackageName'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022051124_AndroidPackageName', N'10.0.12');
 END;
 GO
 

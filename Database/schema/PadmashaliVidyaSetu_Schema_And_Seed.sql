@@ -2850,3 +2850,24 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022051124_AndroidPackageName'
+)
+BEGIN
+    UPDATE [PVS_AppVersions] SET [StoreUrl] = N'https://play.google.com/store/apps/details?id=com.vidyasethu.pvs' WHERE [Platform] = 'android' AND [StoreUrl] = N'https://play.google.com/store/apps/details?id=org.padmashalividyasetu.padmashali_vidya_setu';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022051124_AndroidPackageName'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022051124_AndroidPackageName', N'10.0.12');
+END;
+
+COMMIT;
+GO
+
