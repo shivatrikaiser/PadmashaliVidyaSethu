@@ -14,6 +14,14 @@ class AppConfig {
 
   bool get isDevelopment => environment == 'development';
 
+  /// The push-notification topic this build listens to. Must match the API's Firebase:AllUsersTopic for the same
+  /// environment, so notifications sent while testing never reach members' phones.
+  String get pushTopic => switch (environment) {
+    'production' => 'all',
+    'staging' => 'all-staging',
+    _ => 'all-dev',
+  };
+
   static const _environment = String.fromEnvironment('APP_ENV', defaultValue: 'development');
   static const _apiBaseUrl = String.fromEnvironment('API_BASE_URL');
 

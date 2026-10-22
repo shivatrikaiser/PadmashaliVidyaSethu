@@ -1,0 +1,73 @@
+<h1>Notifications</h1>
+<p class="muted">
+  Send a push notification to everyone who has the Padmashali Vidya Sethu app. It appears on their phone even when the
+  app is closed. It cannot be recalled once sent.
+</p>
+
+@if (overview(); as o) {
+  @if (!o.isConfigured) {
+    <p class="alert">
+      Sending is not set up yet: the Firebase service-account key is missing on the API server
+      (setting <code>Firebase__CredentialsJson</code>).
+    </p>
+  }
+}
+@if (error()) { <p class="alert">{{ error() }}</p> }
+@if (message()) { <p class="notice">{{ message() }}</p> }
+
+<div class="layout">
+  <section class="panel">
+    <form class="fields" (ngSubmit)="send()">
+      <label>Title
+        <input name="title" [(ngModel)]="title" [attr.maxlength]="overview()?.maxTitleLength ?? 65"
+               placeholder="e.g. Scholarship applications open" />
+        <small class="muted count">{{ title.length }} / {{ overview()?.maxTitleLength ?? 65 }}</small>
+      </label>
+      <label>Message
+        <textarea name="body" [(ngModel)]="body" rows="4" [attr.maxlength]="overview()?.maxBodyLength ?? 240"
+                  placeholder="e.g. Students of class 10 and PUC can apply until 30 November. Open the app for details."></textarea>
+        <small class="muted count">{{ body.length }} / {{ overview()?.maxBodyLength ?? 240 }}</small>
+      </label>
+      <div>
+        <button type="submit" [disabled]="busy() || !title.trim() || !body.trim() || !overview()?.isConfigured">
+          {{ busy() ? 'Sending…' : 'Send to all app users' }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section aria-label="Preview">
+    <p class="preview-title">Preview (Android)</p>
+    <div class="phone">
+      <div class="notification">
+        <div class="app-row">
+          <span class="bell" aria-hidden="true">🔔</span>
+          <span>Padmashali Vidya Sethu · now</span>
+        </div>
+        <strong>{{ title.trim() || 'Title' }}</strong>
+        <p>{{ body.trim() || 'Your message appears here.' }}</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<h2>Sent</h2>
+@if (overview()?.history?.length) {
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Sent</th><th>Title</th><th>Message</th><th>By</th></tr></thead>
+      <tbody>
+        @for (n of overview()!.history; track n.id) {
+          <tr>
+            <td class="nowrap">{{ n.sentDate | date: 'dd MMM yyyy, HH:mm' }}</td>
+            <td>{{ n.title }}</td>
+            <td>{{ n.body }}</td>
+            <td>{{ n.sentBy }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <p class="muted">Nothing sent yet.</p>
+}

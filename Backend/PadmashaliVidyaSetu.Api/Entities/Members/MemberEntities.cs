@@ -18,6 +18,14 @@ public class Member : AuditableEntity
     public Account Account { get; set; } = null!;
 
     public string FullName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The member's own mobile number (E.164), when different people of one family share an account. Optional;
+    /// only stored after it was verified with a code (or it is the account's own, already verified, number).
+    /// </summary>
+    public string? MobileNumber { get; set; }
+    public DateTime? MobileVerifiedDate { get; set; }
+
     public string FatherName { get; set; } = string.Empty;
     public string MotherName { get; set; } = string.Empty;
 

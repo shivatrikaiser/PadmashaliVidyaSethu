@@ -92,6 +92,17 @@ class RegistrationDraft {
   String fullName = '';
   String fatherName = '';
   String motherName = '';
+
+  /// The member's own mobile number (10 digits, optional). Sent only when it was verified with a code:
+  /// [verifiedMobileNumber] is the number that code proved, [mobileVerificationId] the verified challenge.
+  String mobileNumber = '';
+  String? verifiedMobileNumber;
+  String? mobileVerificationId;
+
+  String get mobileDigits => mobileNumber.replaceAll(RegExp(r'\D'), '');
+  bool get hasMobileNumber => mobileDigits.isNotEmpty;
+  bool get mobileIsVerified => hasMobileNumber && verifiedMobileNumber == mobileDigits && mobileVerificationId != null;
+
   DateTime? dateOfBirth;
   int? genderId;
 
@@ -153,6 +164,8 @@ class RegistrationDraft {
     'fullName': Validators.tidy(fullName),
     'fatherName': Validators.tidy(fatherName),
     'motherName': Validators.tidy(motherName),
+    'mobileNumber': hasMobileNumber ? mobileDigits : null,
+    'mobileVerificationId': mobileIsVerified ? mobileVerificationId : null,
     'dateOfBirth': dateOfBirth == null ? null : isoDate(dateOfBirth!),
     'genderId': genderId,
     'templeId': templeId,

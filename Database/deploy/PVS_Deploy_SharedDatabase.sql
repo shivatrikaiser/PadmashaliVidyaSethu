@@ -2,11 +2,11 @@
 ================================================================================================================
   Padmashali Vidya Setu (PVS) - deployment into a SHARED database (e.g. IQExplore Live)
   Single self-contained deployment script. Must be updated whenever a new EF migration is added.
-  Generated: 2026-10-20 21:35    Migrations: 20261006135106_InitialSchema, 20261009101316_OtherTextColumns, 20261009112325_MemberProfileListChoices, 20261010153650_AppBranding,
-              20261020142456_SponsorOrganisationAddress, 20261020153210_AppVersions, 20261020155916_AdminPasswords
+  Generated: 2026-10-22 10:25    Migrations: 20261006135106_InitialSchema, 20261009101316_OtherTextColumns, 20261009112325_MemberProfileListChoices, 20261010153650_AppBranding,
+              20261020142456_SponsorOrganisationAddress, 20261020153210_AppVersions, 20261020155916_AdminPasswords, 20261022042837_MemberMobileNumber, 20261022044620_PushNotifications
 ================================================================================================================
   WHAT IT DOES
-    * Creates 47 tables (incl. the migrations history) + their keys, indexes and constraints, and loads the
+    * Creates 48 tables (incl. the migrations history) + their keys, indexes and constraints, and loads the
       PVS master data (temples, genders, classes, locations, ...). Every object name starts with PVS_.
     * Creates objects ONLY - never alters, drops or writes to any existing non-PVS table / object.
     * Safe to run again: already-applied migrations are skipped; new ones (after regeneration) are applied.
@@ -4082,6 +4082,121 @@ BEGIN
 END;
 GO
 
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    ALTER TABLE [PVS_PhoneVerificationChallenges] ADD [AccountId] int NULL;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    ALTER TABLE [PVS_PhoneVerificationChallenges] ADD [Purpose] varchar(20) NOT NULL CONSTRAINT [PVS_DF_PhoneVerificationChallenges_Purpose] DEFAULT 'SIGN_IN';
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    ALTER TABLE [PVS_Members] ADD [MobileNumber] varchar(16) NULL;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    ALTER TABLE [PVS_Members] ADD [MobileVerifiedDate] datetime2(3) NULL;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022042837_MemberMobileNumber', N'10.0.12');
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022044620_PushNotifications'
+)
+BEGIN
+    CREATE TABLE [PVS_PushNotifications] (
+        [PushNotificationId] int NOT NULL IDENTITY,
+        [Title] nvarchar(65) NOT NULL,
+        [Body] nvarchar(240) NOT NULL,
+        [Topic] varchar(100) NOT NULL,
+        [FcmMessageId] varchar(200) NULL,
+        [SentDate] datetime2(3) NOT NULL,
+        [SentBy] nvarchar(100) NULL,
+        CONSTRAINT [PVS_PK_PushNotifications] PRIMARY KEY ([PushNotificationId])
+    );
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022044620_PushNotifications'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_PushNotifications_SentDate] ON [PVS_PushNotifications] ([SentDate]);
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022044620_PushNotifications'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022044620_PushNotifications', N'10.0.12');
+END;
+GO
+
 -------------------------------------------------------------------------------- 3. Post-flight checks, then COMMIT
 IF @@TRANCOUNT = 0
 BEGIN
@@ -4128,6 +4243,7 @@ INSERT INTO @expected (TableName) VALUES
     (N'PVS_Members'),
     (N'PVS_Organisations'),
     (N'PVS_PhoneVerificationChallenges'),
+    (N'PVS_PushNotifications'),
     (N'PVS_RefreshTokens'),
     (N'PVS_Roles'),
     (N'PVS_Skills'),

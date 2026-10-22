@@ -67,6 +67,12 @@ public class PhoneVerificationChallenge
     public Guid ChallengeId { get; set; }
     public string MobileNumber { get; set; } = string.Empty;
 
+    /// <summary><see cref="VerificationPurposes.SignIn"/> or <see cref="VerificationPurposes.MemberMobile"/>.</summary>
+    public string Purpose { get; set; } = VerificationPurposes.SignIn;
+
+    /// <summary>The signed-in account that asked for a <see cref="VerificationPurposes.MemberMobile"/> code; null for sign-in.</summary>
+    public int? AccountId { get; set; }
+
     /// <summary>HMAC-SHA256 of the code keyed with a server secret. The code itself is never stored or logged.</summary>
     public string CodeHash { get; set; } = string.Empty;
 
@@ -75,6 +81,18 @@ public class PhoneVerificationChallenge
     public int FailedAttemptCount { get; set; }
     public DateTime? VerifiedDate { get; set; }
     public string? RequestIp { get; set; }
+}
+
+public static class VerificationPurposes
+{
+    /// <summary>Signs in (creating the account on first use).</summary>
+    public const string SignIn = "SIGN_IN";
+
+    /// <summary>Proves a family member's own mobile number at registration; never signs in.</summary>
+    public const string MemberMobile = "MEMBER_MOBILE";
+
+    /// <summary>How long a verified member-number code may be used to register that number.</summary>
+    public static readonly TimeSpan MemberMobileProofLifetime = TimeSpan.FromHours(1);
 }
 
 public static class RoleCodes

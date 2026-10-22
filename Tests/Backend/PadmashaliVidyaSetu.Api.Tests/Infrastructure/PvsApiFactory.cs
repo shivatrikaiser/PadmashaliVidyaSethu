@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using PadmashaliVidyaSetu.Api.Data;
 using PadmashaliVidyaSetu.Api.Entities.Accounts;
+using PadmashaliVidyaSetu.Api.Services.Notifications;
 using PadmashaliVidyaSetu.Api.Services.Locations;
 
 namespace PadmashaliVidyaSetu.Api.Tests.Infrastructure;
@@ -41,14 +42,20 @@ public sealed class PvsApiFactory : WebApplicationFactory<Program>, IAsyncLifeti
             ["RateLimiting:LookupPermitLimit"] = "10000",
             ["RateLimiting:GlobalPermitLimit"] = "100000",
             ["Serilog:MinimumLevel:Default"] = "Warning",
+            ["Firebase:AllUsersTopic"] = "all-test",
         }));
 
         builder.ConfigureServices(services =>
         {
             services.RemoveAll<IPinCodeProvider>();
             services.AddSingleton<IPinCodeProvider, FakePinCodeProvider>();
+            // Never call Firebase from tests: record what would have been sent.
+            services.RemoveAll<IPushSender>();
+            services.AddSingleton<IPushSender>(PushSender);
         });
     }
+
+    public FakePushSender PushSender { get; } = new();
 
     public Task InitializeAsync() => Task.CompletedTask;
 
@@ -139,6 +146,21 @@ public sealed record Envelope<T>(bool Success, string Message, T? Data, List<Err
 public sealed record ErrorItem(string? Field, string Message);
 public sealed record ChallengeData(Guid ChallengeId, string MaskedMobileNumber, int CodeLength, string? DevelopmentCode);
 public sealed record TestTokens(string AccessToken, string RefreshToken, bool IsNewAccount, int RegisteredMemberCount);
+
+/// <summary>Records push notifications instead of sending them to Firebase.</summary>
+public sealed class FakePushSender : IPushSender
+{
+    public sealed record SentPush(string Topic, string Title, string Body);
+
+    public System.Collections.Concurrent.ConcurrentQueue<SentPush> Sent { get; } = new();
+    public bool IsConfigured => true;
+
+    public Task<string> SendToTopicAsync(string topic, string title, string body, CancellationToken ct)
+    {
+        Sent.Enqueue(new SentPush(topic, title, body));
+        return Task.FromResult("projects/test/messages/" + Sent.Count);
+    }
+}
 
 /// <summary>Deterministic PIN data mirroring the shape of India Post responses.</summary>
 public sealed class FakePinCodeProvider : IPinCodeProvider

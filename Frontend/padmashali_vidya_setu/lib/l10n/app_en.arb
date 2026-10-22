@@ -183,5 +183,13 @@
   "updateNow": "Update now",
   "updateStoreHint": "Open the Play Store or App Store and update Padmashali Vidya Sethu.",
   "updateCheckAgain": "Check again",
-  "dismiss": "Dismiss"
+  "dismiss": "Dismiss",
+
+  "memberMobileLabel": "Mobile number (optional)",
+  "memberMobileHelp": "If this person has their own mobile number, add it. We will send a verification code to it.",
+  "memberMobileVerify": "Verify",
+  "memberMobileCodeSent": "Enter the 4-digit code sent to {number}.",
+  "@memberMobileCodeSent": { "placeholders": { "number": { "type": "String" } } },
+  "memberMobileVerified": "Verified",
+  "memberMobileNeedsVerification": "Verify this mobile number, or leave it empty."
 }

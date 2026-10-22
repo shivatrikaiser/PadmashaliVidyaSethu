@@ -52,6 +52,12 @@ export const routes: Routes = [
         title: 'App sponsor | PVS Admin',
       },
       {
+        path: 'notifications',
+        canActivate: [superAdminGuard],
+        loadComponent: () => import('./pages/notifications/notifications').then((m) => m.Notifications),
+        title: 'Notifications | PVS Admin',
+      },
+      {
         path: 'admin-users',
         canActivate: [superAdminGuard],
         loadComponent: () => import('./pages/admin-users/admin-users').then((m) => m.AdminUsers),

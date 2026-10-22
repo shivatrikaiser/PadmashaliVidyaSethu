@@ -82,10 +82,13 @@ export interface MemberProfile {
   isDisabled: boolean;
   disabilityTypes: LookupRef[];
   registrationCompletedDate: string;
+  /** The member's own verified mobile number, if one was added at registration. */
+  mobileNumber: string | null;
 }
 
 export interface MemberDetail {
   profile: MemberProfile;
+  /** The account (sign-in) number the member is registered under. */
   mobileNumber: string;
   isActive: boolean;
   canSeeSensitiveData: boolean;

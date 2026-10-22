@@ -120,6 +120,20 @@ public sealed record UpdateBrandingRequest(string? SponsorName, string? PoweredB
 /// <summary>The current release for a platform. Apps older than <c>LatestVersion</c> ask the member to update.</summary>
 public sealed record AppVersionDto(string Platform, string LatestVersion, bool IsMandatory, string? StoreUrl);
 
+// ---------------------------------------------------------------- Push notifications
+
+public sealed record SendNotificationRequest(string? Title, string? Body);
+
+public sealed record PushNotificationDto(int Id, string Title, string Body, string Topic, DateTime SentDate, string? SentBy);
+
+/// <summary><c>IsConfigured</c> false: the Firebase key is not set on the server, so nothing can be sent yet.</summary>
+public sealed record NotificationOverviewDto(
+    bool IsConfigured,
+    string Topic,
+    int MaxTitleLength,
+    int MaxBodyLength,
+    IReadOnlyList<PushNotificationDto> History);
+
 // ---------------------------------------------------------------- Locations review
 
 public sealed record LocationReviewItemDto(

@@ -27,6 +27,9 @@ public static class Policies
     /// <summary>Splash-screen sponsor and "Powered by". Super Admin only.</summary>
     public const string ManageBranding = nameof(ManageBranding);
 
+    /// <summary>Push notifications to all app users. Super Admin only.</summary>
+    public const string SendNotifications = nameof(SendNotifications);
+
     public static void AddPvsPolicies(this AuthorizationOptions options)
     {
         options.AddPolicy(Member, p => p.RequireAuthenticatedUser());
@@ -35,6 +38,7 @@ public static class Policies
         options.AddPolicy(ManageAdmins, p => p.RequireRole(RoleCodes.SuperAdmin));
         options.AddPolicy(ManageMasterData, p => p.RequireRole(RoleCodes.SuperAdmin));
         options.AddPolicy(ManageBranding, p => p.RequireRole(RoleCodes.SuperAdmin));
+        options.AddPolicy(SendNotifications, p => p.RequireRole(RoleCodes.SuperAdmin));
         options.FallbackPolicy = options.GetPolicy(Member);
     }
 }

@@ -32,7 +32,11 @@ public sealed record RegisterMemberRequest(
     IReadOnlyList<int>? DisabilityTypeIds,
     string? OtherDisabilityDescription,
     bool AcceptPrivacyPolicy,
-    bool GuardianConsent);
+    bool GuardianConsent,
+    /// <summary>Optional: the member's own mobile number. Unless it is the signed-in number, it must be verified first
+    /// (POST members/mobile-verifications, then .../verify) and <c>MobileVerificationId</c> set to that challenge.</summary>
+    string? MobileNumber = null,
+    Guid? MobileVerificationId = null);
 
 public sealed record RegistrationResultDto(string RegistrationId, string FullName, string TempleName);
 
@@ -67,7 +71,9 @@ public sealed record MemberProfileDto(
     IReadOnlyList<AddressDto> Addresses,
     bool IsDisabled,
     IReadOnlyList<LookupRefDto> DisabilityTypes,
-    DateTime RegistrationCompletedDate);
+    DateTime RegistrationCompletedDate,
+    /// <summary>The member's own verified mobile number, if any.</summary>
+    string? MobileNumber = null);
 
 public sealed record MemberSummaryDto(
     string RegistrationId,

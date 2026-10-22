@@ -54,6 +54,17 @@ class MemberRepository {
 
   Future<MyAccount> myAccount() => _api.get('/api/v1/me', MyAccount.fromJson);
 
+  /// Sends a verification code to a member's own (optional) mobile number while registering them.
+  Future<VerificationChallenge> requestMemberMobileCode(String mobileNumber) =>
+      _api.post('/api/v1/members/mobile-verifications', {'mobileNumber': mobileNumber}, VerificationChallenge.fromJson);
+
+  /// Checks that code; the returned challenge id goes into the registration as `mobileVerificationId`.
+  Future<String> verifyMemberMobileCode(String challengeId, String code) => _api.post(
+    '/api/v1/members/mobile-verifications/verify',
+    {'challengeId': challengeId, 'code': code},
+    (d) => (d! as Map<String, Object?>)['challengeId']! as String,
+  );
+
   Future<RegistrationResult> register(Map<String, Object?> request) =>
       _api.post('/api/v1/members', request, RegistrationResult.fromJson);
 

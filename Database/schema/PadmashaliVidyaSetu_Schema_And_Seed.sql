@@ -2767,3 +2767,86 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    ALTER TABLE [PVS_PhoneVerificationChallenges] ADD [AccountId] int NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    ALTER TABLE [PVS_PhoneVerificationChallenges] ADD [Purpose] varchar(20) NOT NULL CONSTRAINT [PVS_DF_PhoneVerificationChallenges_Purpose] DEFAULT 'SIGN_IN';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    ALTER TABLE [PVS_Members] ADD [MobileNumber] varchar(16) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    ALTER TABLE [PVS_Members] ADD [MobileVerifiedDate] datetime2(3) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022042837_MemberMobileNumber', N'10.0.12');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022044620_PushNotifications'
+)
+BEGIN
+    CREATE TABLE [PVS_PushNotifications] (
+        [PushNotificationId] int NOT NULL IDENTITY,
+        [Title] nvarchar(65) NOT NULL,
+        [Body] nvarchar(240) NOT NULL,
+        [Topic] varchar(100) NOT NULL,
+        [FcmMessageId] varchar(200) NULL,
+        [SentDate] datetime2(3) NOT NULL,
+        [SentBy] nvarchar(100) NULL,
+        CONSTRAINT [PVS_PK_PushNotifications] PRIMARY KEY ([PushNotificationId])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022044620_PushNotifications'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_PushNotifications_SentDate] ON [PVS_PushNotifications] ([SentDate]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022044620_PushNotifications'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022044620_PushNotifications', N'10.0.12');
+END;
+
+COMMIT;
+GO
+

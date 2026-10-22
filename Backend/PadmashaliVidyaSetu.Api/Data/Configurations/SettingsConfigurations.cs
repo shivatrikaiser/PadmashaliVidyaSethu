@@ -48,3 +48,19 @@ public class AppVersionConfiguration : IEntityTypeConfiguration<AppVersion>
             new AppVersion { Platform = AppVersion.Ios, LatestVersion = "1.0.0", IsMandatory = true });
     }
 }
+
+public class PushNotificationConfiguration : IEntityTypeConfiguration<PushNotification>
+{
+    public void Configure(EntityTypeBuilder<PushNotification> b)
+    {
+        b.ToTable("PushNotifications");
+        b.HasKey(e => e.PushNotificationId);
+        b.Property(e => e.Title).HasMaxLength(PushNotification.MaxTitleLength).IsRequired();
+        b.Property(e => e.Body).HasMaxLength(PushNotification.MaxBodyLength).IsRequired();
+        b.Property(e => e.Topic).HasMaxLength(100).IsUnicode(false).IsRequired();
+        b.Property(e => e.FcmMessageId).HasMaxLength(200).IsUnicode(false);
+        b.Property(e => e.SentDate).HasColumnType("datetime2(3)");
+        b.Property(e => e.SentBy).HasMaxLength(ConfigurationExtensions.AuditUserLength);
+        b.HasIndex(e => e.SentDate);
+    }
+}

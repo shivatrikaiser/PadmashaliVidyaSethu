@@ -50,7 +50,9 @@ The code is sent by SMS (SMS Gateway Hub) and is valid for 10 minutes. `developm
 | Method & path | Description |
 |---|---|
 | `GET /me` | Masked mobile number, members on this account (id, name, age, temple, status, completion %), member limit |
-| `POST /members` | Register a member → `201 { registrationId, fullName, templeName }` |
+| `POST /members/mobile-verifications` | `{ mobileNumber }` → sends a code to a member's own (optional) number while registering; same limits as sign-in codes. The code proves the number only - it can never sign in |
+| `POST /members/mobile-verifications/verify` | `{ challengeId, code }` → `{ challengeId, maskedMobileNumber }`; pass `challengeId` as `mobileVerificationId` when registering (valid for 1 hour, this account and this number only) |
+| `POST /members` | Register a member → `201 { registrationId, fullName, templeName }`. Optional `mobileNumber` + `mobileVerificationId` (the account's own number needs no code) |
 | `GET /members/{registrationId}` | Basic profile (owner only; disability details only to owner / Super Admin) |
 | `GET /members/{registrationId}/dashboard` | Profile completion by section |
 
@@ -61,6 +63,7 @@ The code is sent by SMS (SMS Gateway Hub) and is valid for 10 minutes. `developm
 ```json
 {
   "fullName": "Anu Suresh", "fatherName": "Suresh", "motherName": "Lakshmi",
+  "mobileNumber": "9876543210", "mobileVerificationId": "<challengeId from .../verify>",
   "dateOfBirth": "2014-08-15", "genderId": 2, "templeId": 1,
   "memberStatusId": 1, "classId": 13, "highestEducationLevelId": null,
   "organisationId": 1,
@@ -120,6 +123,7 @@ Used by `Frontend/AdminWeb`. Members get 403.
 | `POST /admin/locations/taluks/{id}/merge` `{ targetTalukId }` | Move all addresses to another taluk of the same district |
 | `GET /admin/branding`, `PUT /admin/branding` `{ sponsorName, sponsorOrganisation, sponsorAddress, poweredBy }` (address: up to 4 lines, 300 chars), `POST /admin/branding/sponsor-logo` (multipart `file`, PNG/JPEG/WebP <= 300 KB), `DELETE /admin/branding/sponsor-logo` | App sponsor (splash, welcome screen, footer) - **Super Admin only** |
 | `GET /admin/users`, `POST /admin/users` `{ mobileNumber, roleCode, password? }`, `PUT /admin/users/{accountId}/password` `{ password }`, `DELETE /admin/users/{accountId}/roles/{roleCode}` | Admin users and their portal passwords - **Super Admin only**; a new password or a removed role signs the person out (not when you set your own password) |
+| `GET /admin/notifications`, `POST /admin/notifications` `{ title, body }` | Push notification to all app users (Firebase topic per environment) and the last 50 sent - **Super Admin only**; 503 when the Firebase key is not configured. See `Docs/PushNotifications.md` |
 
 Every change is written to `PVS_AuditLogs` (`Admin.*` actions).
 

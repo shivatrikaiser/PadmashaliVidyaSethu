@@ -96,7 +96,8 @@ public sealed class MemberService(
             canSeeSensitive
                 ? member.Disabilities.Select(d => Ref(d.DisabilityType.Id, WithOther(d.DisabilityType.Name, d.OtherText))).ToList()
                 : [],
-            member.RegistrationCompletedDate);
+            member.RegistrationCompletedDate,
+            member.MobileNumber);
     }
 
     public async Task<MemberDashboardDto> GetDashboardAsync(string registrationId, CancellationToken ct)

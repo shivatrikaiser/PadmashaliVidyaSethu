@@ -23,6 +23,9 @@ public sealed record AuthTokensResponse(
 
 public sealed record RefreshTokenRequest(string? RefreshToken);
 
+/// <summary>A member's own mobile number is verified; pass <c>ChallengeId</c> as <c>MobileVerificationId</c> when registering.</summary>
+public sealed record MemberMobileVerifiedResponse(Guid ChallengeId, string MaskedMobileNumber);
+
 /// <summary>Admin portal sign-in with the password a Super Admin set.</summary>
 public sealed record PasswordSignInRequest(string? MobileNumber, string? Password);
 

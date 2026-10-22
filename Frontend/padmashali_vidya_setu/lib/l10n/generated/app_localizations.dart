@@ -1029,6 +1029,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dismiss'**
   String get dismiss;
+
+  /// No description provided for @memberMobileLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile number (optional)'**
+  String get memberMobileLabel;
+
+  /// No description provided for @memberMobileHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'If this person has their own mobile number, add it. We will send a verification code to it.'**
+  String get memberMobileHelp;
+
+  /// No description provided for @memberMobileVerify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get memberMobileVerify;
+
+  /// No description provided for @memberMobileCodeSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 4-digit code sent to {number}.'**
+  String memberMobileCodeSent(String number);
+
+  /// No description provided for @memberMobileVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get memberMobileVerified;
+
+  /// No description provided for @memberMobileNeedsVerification.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify this mobile number, or leave it empty.'**
+  String get memberMobileNeedsVerification;
 }
 
 class _AppLocalizationsDelegate

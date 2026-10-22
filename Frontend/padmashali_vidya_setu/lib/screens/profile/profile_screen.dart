@@ -74,6 +74,7 @@ class _ProfileBody extends StatelessWidget {
                 title: l10n.personalInformation,
                 icon: Icons.person_outline,
                 children: [
+                  if (p.mobileNumber != null) _Row(l10n.phoneLabel, p.mobileNumber!),
                   _Row(l10n.fatherName, p.fatherName),
                   _Row(l10n.motherName, p.motherName),
                   _Row(l10n.dateOfBirth, date.format(p.dateOfBirth)),

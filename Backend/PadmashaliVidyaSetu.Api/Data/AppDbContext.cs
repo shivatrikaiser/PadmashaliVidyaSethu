@@ -74,6 +74,7 @@ public class AppDbContext(
     // Settings
     public DbSet<AppBranding> AppBranding => Set<AppBranding>();
     public DbSet<AppVersion> AppVersions => Set<AppVersion>();
+    public DbSet<PushNotification> PushNotifications => Set<PushNotification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

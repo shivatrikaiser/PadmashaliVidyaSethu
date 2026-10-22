@@ -50,6 +50,8 @@ public static class AuditActions
     public const string PasswordSignInSucceeded = "Auth.PasswordSignInSucceeded";
     public const string PasswordSignInFailed = "Auth.PasswordSignInFailed";
     public const string PasswordSet = "Admin.PasswordSet";
+    public const string MemberMobileVerified = "Member.MobileVerified";
+    public const string NotificationSent = "Admin.NotificationSent";
     public const string MemberRegistered = "Member.Registered";
     public const string MemberActivated = "Admin.MemberActivated";
     public const string MemberDeactivated = "Admin.MemberDeactivated";

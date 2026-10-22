@@ -524,4 +524,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dismiss => 'Dismiss';
+
+  @override
+  String get memberMobileLabel => 'Mobile number (optional)';
+
+  @override
+  String get memberMobileHelp =>
+      'If this person has their own mobile number, add it. We will send a verification code to it.';
+
+  @override
+  String get memberMobileVerify => 'Verify';
+
+  @override
+  String memberMobileCodeSent(String number) {
+    return 'Enter the 4-digit code sent to $number.';
+  }
+
+  @override
+  String get memberMobileVerified => 'Verified';
+
+  @override
+  String get memberMobileNeedsVerification =>
+      'Verify this mobile number, or leave it empty.';
 }

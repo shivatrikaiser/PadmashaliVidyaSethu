@@ -62,6 +62,7 @@ public class PhoneVerificationChallengeConfiguration : IEntityTypeConfiguration<
         b.Property(e => e.MobileNumber).HasMaxLength(16).IsUnicode(false).IsRequired();
         b.Property(e => e.CodeHash).HasMaxLength(64).IsFixedLength().IsUnicode(false).IsRequired();
         b.Property(e => e.RequestIp).HasMaxLength(45).IsUnicode(false);
+        b.Property(e => e.Purpose).HasMaxLength(20).IsUnicode(false).HasDefaultValue(VerificationPurposes.SignIn);
         b.Property(e => e.CreatedDate).HasColumnType("datetime2(3)");
         b.Property(e => e.ExpiresDate).HasColumnType("datetime2(3)");
         b.Property(e => e.VerifiedDate).HasColumnType("datetime2(3)");

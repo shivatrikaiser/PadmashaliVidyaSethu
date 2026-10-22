@@ -9,6 +9,7 @@ import '../../../utils/l10n.dart';
 import '../../../utils/validators.dart';
 import '../../../widgets/common.dart';
 import '../../../widgets/master_data_choice.dart';
+import '../widgets/member_mobile_field.dart';
 import 'step_base.dart';
 
 class PersonalDetailsStep extends RegistrationStep {
@@ -103,6 +104,12 @@ class _PersonalDetailsStepState extends State<PersonalDetailsStep> {
         _nameField('fatherName', l10n.fatherName, _fatherName, (v) => draft.fatherName = v, Icons.man_outlined),
         const FieldGap(),
         _nameField('motherName', l10n.motherName, _motherName, (v) => draft.motherName = v, Icons.woman_outlined),
+        const FieldGap(),
+        MemberMobileField(
+          draft: draft,
+          serverError: widget.serverErrors['mobileNumber'],
+          onChanged: () => widget.onFieldChanged('mobileNumber'),
+        ),
         const FieldGap(),
         TextFormField(
           key: const Key('dateOfBirthField'),

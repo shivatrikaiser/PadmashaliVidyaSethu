@@ -4,6 +4,8 @@ using PadmashaliVidyaSetu.Api.Authentication;
 using PadmashaliVidyaSetu.Api.Common;
 using PadmashaliVidyaSetu.Api.Configuration;
 using PadmashaliVidyaSetu.Api.Data;
+using PadmashaliVidyaSetu.Api.Entities.Accounts;
+using PadmashaliVidyaSetu.Api.Entities.Accounts;
 using PadmashaliVidyaSetu.Api.DTOs;
 using PadmashaliVidyaSetu.Api.Entities.Common;
 using PadmashaliVidyaSetu.Api.Entities.Compliance;
@@ -100,6 +102,8 @@ public sealed class RegistrationService(
             ? await ResolveDisabilitiesAsync(r.DisabilityTypeIds ?? [], r.OtherDisabilityDescription, errors, ct)
             : [];
 
+        var memberMobile = await ResolveMemberMobileAsync(r, accountId, now, errors, ct);
+
         if (errors.Count > 0) throw new RequestValidationException(errors);
 
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
@@ -109,6 +113,8 @@ public sealed class RegistrationService(
             RegistrationId = await registrationIds.NextAsync(temple!.Id, temple.Code, ct),
             AccountId = accountId,
             FullName = r.FullName.Tidy(),
+            MobileNumber = memberMobile,
+            MobileVerifiedDate = memberMobile is null ? null : now,
             FatherName = r.FatherName.Tidy(),
             MotherName = r.MotherName.Tidy(),
             DateOfBirth = r.DateOfBirth.Value,
@@ -145,6 +151,33 @@ public sealed class RegistrationService(
 
         logger.LogInformation("Member {RegistrationId} registered by account {AccountId}", member.RegistrationId, accountId);
         return new RegistrationResultDto(member.RegistrationId, member.FullName, temple.Name);
+    }
+
+    /// <summary>
+    /// The member's own mobile number: optional. The account's number is already verified (sign-in); any other
+    /// number needs a <see cref="VerificationPurposes.MemberMobile"/> code that this account verified for exactly
+    /// that number within the last hour.
+    /// </summary>
+    private async Task<string?> ResolveMemberMobileAsync(RegisterMemberRequest r, int accountId, DateTime now,
+        List<ApiError> errors, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(r.MobileNumber)) return null;
+        if (!MobileNumber.TryNormalize(r.MobileNumber, out var mobile))
+        {
+            errors.Add(new("mobileNumber", "Please enter a valid 10-digit mobile number, or leave it empty."));
+            return null;
+        }
+
+        var accountMobile = await db.Accounts.Where(a => a.AccountId == accountId).Select(a => a.MobileNumber).SingleAsync(ct);
+        if (mobile == accountMobile) return mobile;
+
+        var since = now - VerificationPurposes.MemberMobileProofLifetime;
+        var verified = r.MobileVerificationId is { } challengeId && await db.PhoneVerificationChallenges.AnyAsync(c =>
+            c.ChallengeId == challengeId && c.Purpose == VerificationPurposes.MemberMobile && c.AccountId == accountId
+            && c.MobileNumber == mobile && c.VerifiedDate != null && c.VerifiedDate >= since, ct);
+        if (!verified)
+            errors.Add(new("mobileNumber", "Please verify this mobile number with the code sent to it, or leave it empty."));
+        return mobile;
     }
 
     private async Task EnsureAccountCanAddMemberAsync(int accountId, RegisterMemberRequest r, CancellationToken ct)

@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PadmashaliVidyaSetu.Api.Authorization;
 using PadmashaliVidyaSetu.Api.Common;
+using PadmashaliVidyaSetu.Api.Configuration;
 using PadmashaliVidyaSetu.Api.DTOs;
+using PadmashaliVidyaSetu.Api.Services.Auth;
 using PadmashaliVidyaSetu.Api.Services.Members;
 
 namespace PadmashaliVidyaSetu.Api.Controllers;
@@ -10,7 +13,7 @@ namespace PadmashaliVidyaSetu.Api.Controllers;
 [ApiController]
 [Authorize(Policy = Policies.Member)]
 [Route("api/v1")]
-public sealed class MembersController(IRegistrationService registration, IMemberService members) : ControllerBase
+public sealed class MembersController(IRegistrationService registration, IMemberService members, IAuthService auth) : ControllerBase
 {
     private const string RegistrationIdRoute = "{registrationId:regex(^PVS-\\d{{2}}-\\d{{4}}$)}";
 
@@ -18,6 +21,22 @@ public sealed class MembersController(IRegistrationService registration, IMember
     [HttpGet("me")]
     public async Task<ActionResult<ApiResponse<MyAccountDto>>> Me(CancellationToken ct) =>
         Ok(ApiResponse<MyAccountDto>.Ok(await members.GetMyAccountAsync(ct)));
+
+    /// <summary>Sends a verification code to a member's own (optional) mobile number while registering them.</summary>
+    [HttpPost("members/mobile-verifications")]
+    [EnableRateLimiting(RateLimitPolicies.Verification)]
+    public async Task<ActionResult<ApiResponse<VerificationCodeIssuedResponse>>> RequestMobileCode(
+        RequestVerificationCodeRequest request, CancellationToken ct) =>
+        Ok(ApiResponse<VerificationCodeIssuedResponse>.Ok(await auth.RequestMemberMobileCodeAsync(request.MobileNumber!, ct),
+            "Verification code sent."));
+
+    /// <summary>Verifies that code; pass the returned challenge id as <c>mobileVerificationId</c> when registering.</summary>
+    [HttpPost("members/mobile-verifications/verify")]
+    [EnableRateLimiting(RateLimitPolicies.Verification)]
+    public async Task<ActionResult<ApiResponse<MemberMobileVerifiedResponse>>> VerifyMobileCode(
+        VerifyCodeRequest request, CancellationToken ct) =>
+        Ok(ApiResponse<MemberMobileVerifiedResponse>.Ok(await auth.VerifyMemberMobileCodeAsync(request.ChallengeId, request.Code!, ct),
+            "Mobile number verified."));
 
     /// <summary>Registers a member (basic profile) under the signed-in mobile number.</summary>
     [HttpPost("members")]

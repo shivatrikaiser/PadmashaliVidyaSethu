@@ -12,6 +12,7 @@ using PadmashaliVidyaSetu.Api.Common;
 using PadmashaliVidyaSetu.Api.Data;
 using PadmashaliVidyaSetu.Api.Logging;
 using PadmashaliVidyaSetu.Api.Middleware;
+using PadmashaliVidyaSetu.Api.Services.Notifications;
 using PadmashaliVidyaSetu.Api.Services.Admin;
 using PadmashaliVidyaSetu.Api.Services.Auth;
 using PadmashaliVidyaSetu.Api.Services.Locations;
@@ -50,6 +51,7 @@ public static class ServiceCollectionExtensions
         services.AddOptions<RateLimitingOptions>().Bind(configuration.GetSection(RateLimitingOptions.Section));
         services.AddOptions<DatabaseOptions>().Bind(configuration.GetSection(DatabaseOptions.Section));
         services.AddOptions<CorsSettings>().Bind(configuration.GetSection(CorsSettings.Section));
+        services.AddOptions<FirebaseOptions>().Bind(configuration.GetSection(FirebaseOptions.Section)).ValidateDataAnnotations().ValidateOnStart();
         return services;
     }
 
@@ -142,6 +144,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILocationReviewService, LocationReviewService>();
         services.AddScoped<IBrandingService, BrandingService>();
         services.AddScoped<IAppVersionService, AppVersionService>();
+        services.AddSingleton<IPushSender, FirebasePushSender>();
+        services.AddScoped<INotificationService, NotificationService>();
 
         services.AddHttpClient<IPinCodeProvider, IndiaPostPinCodeProvider>((sp, client) =>
         {

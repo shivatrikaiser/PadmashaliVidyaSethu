@@ -18,6 +18,8 @@ public interface IAuthService
 {
     Task<VerificationCodeIssuedResponse> RequestVerificationCodeAsync(string mobileNumber, CancellationToken ct);
     Task<AuthTokensResponse> VerifyCodeAsync(Guid challengeId, string code, CancellationToken ct);
+    Task<VerificationCodeIssuedResponse> RequestMemberMobileCodeAsync(string mobileNumber, CancellationToken ct);
+    Task<MemberMobileVerifiedResponse> VerifyMemberMobileCodeAsync(Guid challengeId, string code, CancellationToken ct);
     Task<AuthTokensResponse> SignInWithPasswordAsync(string? mobileNumber, string? password, CancellationToken ct);
     Task<AuthTokensResponse> RefreshAsync(string refreshToken, CancellationToken ct);
     Task LogoutAsync(string refreshToken, CancellationToken ct);
@@ -42,7 +44,48 @@ public sealed class AuthService(
 
     private const string InvalidCodeMessage = "The verification code has expired or is no longer valid. Please request a new code.";
 
-    public async Task<VerificationCodeIssuedResponse> RequestVerificationCodeAsync(string mobileNumber, CancellationToken ct)
+    public Task<VerificationCodeIssuedResponse> RequestVerificationCodeAsync(string mobileNumber, CancellationToken ct) =>
+        IssueCodeAsync(mobileNumber, VerificationPurposes.SignIn, accountId: null, ct);
+
+    public async Task<AuthTokensResponse> VerifyCodeAsync(Guid challengeId, string code, CancellationToken ct)
+    {
+        var now = clock.GetUtcNow().UtcDateTime;
+        var challenge = await CheckCodeAsync(challengeId, code, VerificationPurposes.SignIn, accountId: null, now, ct);
+
+        var (account, isNew) = await GetOrCreateAccountAsync(challenge.MobileNumber, now, ct);
+        account.LastLoginDate = now;
+        account.MobileVerifiedDate = now;
+
+        audit.Add(AuditActions.VerificationSucceeded, "Account", account.AccountId.ToString(), accountId: account.AccountId);
+        var response = await IssueTokensAsync(account, isNew, ct);
+        logger.LogInformation("Account {AccountId} signed in via phone verification (new: {IsNew})", account.AccountId, isNew);
+        return response;
+    }
+
+    /// <summary>
+    /// Sends a code to a family member's own mobile number during registration (signed-in account). The code only
+    /// proves the number - it can never be used to sign in.
+    /// </summary>
+    public Task<VerificationCodeIssuedResponse> RequestMemberMobileCodeAsync(string mobileNumber, CancellationToken ct) =>
+        IssueCodeAsync(mobileNumber, VerificationPurposes.MemberMobile, currentUser.RequireAccountId(), ct);
+
+    /// <summary>
+    /// Checks the code for a member's mobile number. The challenge then counts as proof for registering that number
+    /// (see <c>RegistrationService</c>) for <see cref="VerificationPurposes.MemberMobileProofLifetime"/>.
+    /// </summary>
+    public async Task<MemberMobileVerifiedResponse> VerifyMemberMobileCodeAsync(Guid challengeId, string code, CancellationToken ct)
+    {
+        var now = clock.GetUtcNow().UtcDateTime;
+        var challenge = await CheckCodeAsync(challengeId, code, VerificationPurposes.MemberMobile,
+            currentUser.RequireAccountId(), now, ct);
+        audit.Add(AuditActions.MemberMobileVerified, "PhoneVerificationChallenge", challengeId.ToString("N"),
+            MobileNumber.Mask(challenge.MobileNumber));
+        await db.SaveChangesAsync(ct);
+        return new MemberMobileVerifiedResponse(challengeId, MobileNumber.Mask(challenge.MobileNumber));
+    }
+
+    private async Task<VerificationCodeIssuedResponse> IssueCodeAsync(string mobileNumber, string purpose, int? accountId,
+        CancellationToken ct)
     {
         if (!MobileNumber.TryNormalize(mobileNumber, out var mobile))
             throw new RequestValidationException("mobileNumber", "Please enter a valid 10-digit mobile number.");
@@ -54,6 +97,8 @@ public sealed class AuthService(
         {
             ChallengeId = Guid.NewGuid(),
             MobileNumber = mobile,
+            Purpose = purpose,
+            AccountId = accountId,
             CreatedDate = now,
             ExpiresDate = now.AddSeconds(_options.CodeLifetimeSeconds),
             RequestIp = currentUser.IpAddress,
@@ -77,13 +122,18 @@ public sealed class AuthService(
             _options.ExposeCodeInResponse ? code : null);
     }
 
-    public async Task<AuthTokensResponse> VerifyCodeAsync(Guid challengeId, string code, CancellationToken ct)
+    /// <summary>
+    /// Checks <paramref name="code"/> and marks the challenge verified (single use). A challenge issued for another
+    /// purpose or another account is treated exactly like an unknown one.
+    /// </summary>
+    private async Task<PhoneVerificationChallenge> CheckCodeAsync(Guid challengeId, string code, string purpose, int? accountId,
+        DateTime now, CancellationToken ct)
     {
-        var now = clock.GetUtcNow().UtcDateTime;
         var challenge = await db.PhoneVerificationChallenges.AsNoTracking()
             .SingleOrDefaultAsync(c => c.ChallengeId == challengeId, ct);
 
-        if (challenge is null || challenge.VerifiedDate is not null || challenge.ExpiresDate <= now)
+        if (challenge is null || challenge.Purpose != purpose || challenge.AccountId != accountId
+            || challenge.VerifiedDate is not null || challenge.ExpiresDate <= now)
             throw new RequestValidationException("code", InvalidCodeMessage);
 
         if (challenge.FailedAttemptCount >= _options.MaxFailedAttemptsPerCode)
@@ -103,18 +153,10 @@ public sealed class AuthService(
         // Single use, enforced atomically: only one concurrent request can mark the challenge verified.
         var claimed = await db.PhoneVerificationChallenges
             .Where(c => c.ChallengeId == challengeId && c.VerifiedDate == null)
-            .ExecuteUpdateAsync(s => s.SetProperty(c => c.VerifiedDate, now), ct);
+            .ExecuteUpdateAsync(x => x.SetProperty(c => c.VerifiedDate, now), ct);
         if (claimed == 0)
             throw new RequestValidationException("code", InvalidCodeMessage);
-
-        var (account, isNew) = await GetOrCreateAccountAsync(challenge.MobileNumber, now, ct);
-        account.LastLoginDate = now;
-        account.MobileVerifiedDate = now;
-
-        audit.Add(AuditActions.VerificationSucceeded, "Account", account.AccountId.ToString(), accountId: account.AccountId);
-        var response = await IssueTokensAsync(account, isNew, ct);
-        logger.LogInformation("Account {AccountId} signed in via phone verification (new: {IsNew})", account.AccountId, isNew);
-        return response;
+        return challenge;
     }
 
     /// <summary>

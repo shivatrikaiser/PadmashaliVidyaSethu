@@ -207,6 +207,7 @@ class MemberProfile {
     required this.isDisabled,
     required this.disabilityTypes,
     required this.registrationCompletedDate,
+    this.mobileNumber,
   });
 
   final String registrationId;
@@ -226,6 +227,9 @@ class MemberProfile {
   final bool isDisabled;
   final List<String> disabilityTypes;
   final DateTime registrationCompletedDate;
+
+  /// The member's own verified mobile number (E.164), if one was added at registration.
+  final String? mobileNumber;
 
   bool get isStudent => memberStatusCode == MasterCodes.statusStudent;
 
@@ -251,6 +255,7 @@ class MemberProfile {
           .map((d) => LookupRef.fromJson(d)!.name)
           .toList(growable: false),
       registrationCompletedDate: DateTime.parse(m['registrationCompletedDate']! as String),
+      mobileNumber: m['mobileNumber'] as String?,
     );
   }
 }

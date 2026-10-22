@@ -27,7 +27,10 @@
       <dt>Mother's name</dt><dd>{{ d.profile.motherName }}</dd>
       <dt>Date of birth</dt><dd>{{ d.profile.dateOfBirth | date: 'dd MMM yyyy' }} (age {{ d.profile.age }})</dd>
       <dt>Gender</dt><dd>{{ d.profile.gender.name }}</dd>
-      <dt>Mobile number</dt><dd>{{ d.mobileNumber }}</dd>
+      <dt>Registered by (mobile)</dt><dd>{{ d.mobileNumber }}</dd>
+      @if (d.profile.mobileNumber) {
+        <dt>Member's own mobile</dt><dd>{{ d.profile.mobileNumber }} <span class="muted">(verified)</span></dd>
+      }
       <dt>Temple</dt><dd>{{ d.profile.temple.name }}</dd>
       <dt>Organisation</dt><dd>{{ d.profile.organisation.name }}</dd>
       <dt>Current status</dt><dd>{{ d.profile.memberStatus.name }}</dd>

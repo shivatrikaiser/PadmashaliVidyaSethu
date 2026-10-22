@@ -123,6 +123,9 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("AccountId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CodeHash")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -144,6 +147,14 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(16)
                         .IsUnicode(false)
                         .HasColumnType("varchar(16)");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)")
+                        .HasDefaultValue("SIGN_IN", "PVS_DF_PhoneVerificationChallenges_Purpose");
 
                     b.Property<string>("RequestIp")
                         .HasMaxLength(45)
@@ -6178,6 +6189,14 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<int>("MemberStatusId")
                         .HasColumnType("int");
 
+                    b.Property<string>("MobileNumber")
+                        .HasMaxLength(16)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(16)");
+
+                    b.Property<DateTime?>("MobileVerifiedDate")
+                        .HasColumnType("datetime2(3)");
+
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -6820,6 +6839,51 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                             IsMandatory = true,
                             LatestVersion = "1.0.0"
                         });
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Settings.PushNotification", b =>
+                {
+                    b.Property<int>("PushNotificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PushNotificationId"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(240)
+                        .HasColumnType("nvarchar(240)");
+
+                    b.Property<string>("FcmMessageId")
+                        .HasMaxLength(200)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("SentBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("SentDate")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(65)
+                        .HasColumnType("nvarchar(65)");
+
+                    b.Property<string>("Topic")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("PushNotificationId")
+                        .HasName("PVS_PK_PushNotifications");
+
+                    b.HasIndex("SentDate")
+                        .HasDatabaseName("PVS_IX_PushNotifications_SentDate");
+
+                    b.ToTable("PVS_PushNotifications", (string)null);
                 });
 
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Accounts.AccountRole", b =>

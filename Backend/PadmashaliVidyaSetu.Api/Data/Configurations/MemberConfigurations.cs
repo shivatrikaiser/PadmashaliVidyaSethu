@@ -23,6 +23,8 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
         b.Property(e => e.RegistrationId).HasMaxLength(11).IsFixedLength().IsUnicode(false);
 
         b.Property(e => e.FullName).HasMaxLength(150).IsRequired();
+        b.Property(e => e.MobileNumber).HasMaxLength(16).IsUnicode(false);
+        b.Property(e => e.MobileVerifiedDate).HasColumnType("datetime2(3)");
         b.Property(e => e.FatherName).HasMaxLength(150).IsRequired();
         b.Property(e => e.MotherName).HasMaxLength(150).IsRequired();
         b.Property(e => e.DateOfBirth).HasColumnType("date");
