@@ -5,7 +5,7 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ApiResponse } from './api';
 import {
-  AdminUser, AppBranding, BrandingText, ListItem, ListType, LocationItem, LookupItem, MemberDetail, MemberFilters, MemberRow, OtherValue,
+  AdminUser, AppBranding, BrandingText, FooterSponsor, FooterSponsorInput, ListItem, ListType, LocationItem, LookupItem, MemberDetail, MemberFilters, MemberRow, OtherValue,
   PagedResult, Summary,
 } from './models';
 
@@ -110,6 +110,19 @@ export class AdminApi {
   }
   removeSponsorLogo(): Observable<AppBranding> {
     return this.http.delete<ApiResponse<AppBranding>>(`${this.api}/admin/branding/sponsor-logo`).pipe(map((r) => r.data!));
+  }
+  footerSponsors(): Observable<FooterSponsor[]> {
+    return this.get('/admin/branding/footer-sponsors');
+  }
+  saveFooterSponsor(id: number | null, sponsor: FooterSponsorInput): Observable<FooterSponsor> {
+    const url = `${this.api}/admin/branding/footer-sponsors`;
+    const request = id === null
+      ? this.http.post<ApiResponse<FooterSponsor>>(url, sponsor)
+      : this.http.put<ApiResponse<FooterSponsor>>(`${url}/${id}`, sponsor);
+    return request.pipe(map((r) => r.data!));
+  }
+  deleteFooterSponsor(id: number): Observable<unknown> {
+    return this.http.delete(`${this.api}/admin/branding/footer-sponsors/${id}`);
   }
   sponsorLogoUrl(branding: AppBranding): string | null {
     return branding.hasSponsorLogo ? `${this.api}/app/branding/sponsor-logo?v=${branding.sponsorLogoVersion}` : null;

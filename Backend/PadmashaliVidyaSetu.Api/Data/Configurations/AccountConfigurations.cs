@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PadmashaliVidyaSetu.Api.Common;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PadmashaliVidyaSetu.Api.Entities.Accounts;
 
@@ -14,6 +15,8 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
         b.HasIndex(e => e.MobileNumber).IsUnique();
         b.Property(e => e.MobileVerifiedDate).HasColumnType("datetime2(3)");
         b.Property(e => e.LastLoginDate).HasColumnType("datetime2(3)");
+        b.Property(e => e.DeletedDate).HasColumnType("datetime2(3)");
+        b.Ignore(e => e.IsDeleted);
         b.Property(e => e.PasswordHash).HasMaxLength(200).IsUnicode(false);
         b.Property(e => e.PasswordSetDate).HasColumnType("datetime2(3)");
         b.Property(e => e.FailedPasswordAttempts).HasDefaultValue(0);
@@ -57,9 +60,11 @@ public class PhoneVerificationChallengeConfiguration : IEntityTypeConfiguration<
 {
     public void Configure(EntityTypeBuilder<PhoneVerificationChallenge> b)
     {
-        b.ToTable("PhoneVerificationChallenges");
+        b.ToTable("PhoneVerificationChallenges", t => t.HasCheckConstraint("CK_PhoneVerificationChallenges_Target",
+            "([MobileNumber] IS NOT NULL AND [Email] IS NULL) OR ([MobileNumber] IS NULL AND [Email] IS NOT NULL)"));
         b.HasKey(e => e.ChallengeId);
-        b.Property(e => e.MobileNumber).HasMaxLength(16).IsUnicode(false).IsRequired();
+        b.Property(e => e.MobileNumber).HasMaxLength(16).IsUnicode(false);
+        b.Property(e => e.Email).HasMaxLength(EmailAddress.MaxLength).IsUnicode(false);
         b.Property(e => e.CodeHash).HasMaxLength(64).IsFixedLength().IsUnicode(false).IsRequired();
         b.Property(e => e.RequestIp).HasMaxLength(45).IsUnicode(false);
         b.Property(e => e.Purpose).HasMaxLength(20).IsUnicode(false).HasDefaultValue(VerificationPurposes.SignIn);
@@ -68,5 +73,6 @@ public class PhoneVerificationChallengeConfiguration : IEntityTypeConfiguration<
         b.Property(e => e.VerifiedDate).HasColumnType("datetime2(3)");
         // Supports the per-number send-rate check.
         b.HasIndex(e => new { e.MobileNumber, e.CreatedDate });
+        b.HasIndex(e => new { e.Email, e.CreatedDate });
     }
 }

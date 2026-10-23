@@ -18,6 +18,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get poweredBy => 'Powered by';
 
   @override
+  String get technologyPoweredBy => 'Technology Powered by';
+
+  @override
   String get appTagline =>
       'Connecting Our Young Padmashalis for a Brighter Future';
 
@@ -69,6 +72,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get phoneInvalid => 'Please enter a valid 10-digit mobile number.';
+
+  @override
+  String get phoneInvalidInternational =>
+      'Please enter a valid mobile number for the selected country code.';
+
+  @override
+  String get phoneHintInternational => 'Mobile number';
+
+  @override
+  String get codeViaWhatsApp =>
+      'Outside India, the verification code is sent to this number on WhatsApp.';
+
+  @override
+  String get emailInvalid => 'Please enter a valid email address.';
+
+  @override
+  String get memberEmailLabel => 'Email address (optional)';
+
+  @override
+  String get memberEmailHelp =>
+      'If you add an email address, we will send a separate code to it to confirm it.';
+
+  @override
+  String memberEmailCodeSent(String email) {
+    return 'Enter the 4-digit code sent to $email.';
+  }
+
+  @override
+  String get memberEmailNeedsVerification =>
+      'Verify this email address, or leave it empty.';
 
   @override
   String get verifyTitle => 'Phone Number Verification';
@@ -264,6 +297,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get country => 'Country';
 
   @override
+  String get countryHelp =>
+      'Select the country first. For India, the PIN code fills in the rest.';
+
+  @override
+  String get cityTown => 'City / Town';
+
+  @override
+  String get stateProvince => 'State / Province / Region';
+
+  @override
+  String get stateNotListed => 'My state / province is not listed';
+
+  @override
+  String get postalCode => 'Postal Code (optional)';
+
+  @override
   String get isDisabled => 'Is Disabled?';
 
   @override
@@ -289,17 +338,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get consentHeading => 'Consent';
 
   @override
-  String get privacyAgree => 'I have read and agree to the Privacy Policy.';
-
-  @override
-  String get viewPrivacyPolicy => 'View Privacy Policy';
+  String get privacyAgree =>
+      'I have read and agree to the Privacy Policy and the Terms and Conditions.';
 
   @override
   String get privacyPolicy => 'Privacy Policy';
 
   @override
-  String get privacyPolicyBody =>
-      'This is a placeholder. The D. K. Jilla Padmashali Vidyavardhaka Sangha (R), Udupi will publish the final privacy policy here.\n\nSummary of current practice:\n• We collect only the information needed for education, career and support programs.\n• Information is never shown in any public directory.\n• Disability information is visible only to you and specifically authorised Sangha staff.\n• You can ask the Sangha to correct or delete your information.\n• Communication from the Sangha will be sent only on the channels and topics you choose.';
+  String get termsAndConditions => 'Terms and Conditions';
+
+  @override
+  String get agreeByContinuing =>
+      'By continuing, you agree to our Terms and Conditions and Privacy Policy.';
+
+  @override
+  String legalLastUpdated(String date) {
+    return 'Last updated: $date';
+  }
+
+  @override
+  String get legalDraftNote =>
+      'Draft - this text is being reviewed and may change before the app is published.';
 
   @override
   String get guardianConsent =>
@@ -384,6 +443,54 @@ class AppLocalizationsEn extends AppLocalizations {
       'Sign out of Padmashali Vidya Sethu on this device?';
 
   @override
+  String get deleteAccountTitle => 'Delete Account';
+
+  @override
+  String get deleteAccountIntro =>
+      'You can delete your Padmashali Vidya Sethu account. Please read what this means:';
+
+  @override
+  String deleteAccountPointMembers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Your account and the $count members registered with it are closed.',
+      one: 'Your account and the 1 member registered with it are closed.',
+      zero: 'Your account is closed.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deleteAccountPointNumber =>
+      'This mobile number cannot sign in or register again.';
+
+  @override
+  String get deleteAccountPointRecords =>
+      'The information you gave is kept in the Sangha\'s records, marked as deleted. It is no longer shown in the app.';
+
+  @override
+  String get deleteAccountPointSignOut => 'You are signed out on this device.';
+
+  @override
+  String get deleteAccountUnderstood =>
+      'I understand that this cannot be undone.';
+
+  @override
+  String get deleteAccountButton => 'Delete My Account';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Delete your account?';
+
+  @override
+  String get deleteAccountConfirmBody =>
+      'Your account will be deleted and this mobile number cannot be used to register again.';
+
+  @override
+  String get accountDeletedNote => 'Your account has been deleted.';
+
+  @override
   String get notifications => 'Notifications';
 
   @override
@@ -456,6 +563,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get validationPinInvalid => 'PIN code must be exactly 6 digits.';
+
+  @override
+  String get validationPostalCodeInvalid => 'Please check the postal code.';
 
   @override
   String get validationDobRequired => 'Please select the date of birth.';

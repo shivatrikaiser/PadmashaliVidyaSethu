@@ -93,6 +93,32 @@ void main() {
     expect(json['mobileVerificationId'], 'challenge-1');
   });
 
+  testWidgets('number outside India is verified and sent with its country code', (tester) async {
+    await pump(tester);
+    await tester.tap(find.byKey(const Key('memberMobileCountryCode')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('+971  United Arab Emirates').last);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('memberMobileField')), '501234567');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('memberMobileVerifyButton')));
+    await tester.pumpAndSettle();
+    expect(repo.sentTo, ['+971501234567']);
+    await tester.enterText(find.byType(EditableText).last, '4321');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Verified'), findsOneWidget);
+    expect(draft.toJson(otherDisabilityTypeId: null)['mobileNumber'], '+971501234567');
+
+    // The same digits under another country code are a different number.
+    await tester.tap(find.byKey(const Key('memberMobileCountryCode')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('+968  Oman').last);
+    await tester.pumpAndSettle();
+    expect(draft.mobileIsVerified, isFalse);
+  });
+
   testWidgets('changing a verified number needs a new verification', (tester) async {
     await pump(tester);
     await tester.enterText(find.byKey(const Key('memberMobileField')), '9876543210');

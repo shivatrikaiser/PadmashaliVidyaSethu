@@ -31,6 +31,9 @@ class MasterDataItem {
 /// Codes the app relies on. Everything else about master data comes from the server.
 abstract final class MasterCodes {
   static const statusStudent = 'STUDENT';
+
+  /// ISO code of India: Indian addresses use the PIN-code flow (District, Taluk); others are typed.
+  static const countryIndia = 'IN';
   static const disabilityOther = other;
 
   /// Every selectable list has an "Other" row; choosing it asks for the value as free text.

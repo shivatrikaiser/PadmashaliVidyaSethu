@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../models/app_branding.dart';
 import '../../providers/providers.dart';
 import '../../routing/routes.dart';
+import '../legal/legal_document_screen.dart';
 import '../../utils/l10n.dart';
 import '../../widgets/brand.dart';
 import '../../widgets/common.dart';
@@ -20,6 +21,7 @@ class WelcomeScreen extends ConsumerWidget {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final expired = ref.watch(sessionProvider.select((s) => s.expired));
+    final accountDeleted = ref.watch(sessionProvider.select((s) => s.accountDeleted));
     final branding = ref.watch(appBrandingProvider).valueOrNull;
 
     return Scaffold(
@@ -50,6 +52,14 @@ class WelcomeScreen extends ConsumerWidget {
                       const Spacer(),
                       const Divider(height: 28),
                       if (expired) ...[ErrorBanner(message: l10n.errorSessionExpired), const SizedBox(height: 12)],
+                      if (accountDeleted) ...[
+                        InfoNote(
+                          key: const Key('accountDeletedNote'),
+                          text: l10n.accountDeletedNote,
+                          icon: Icons.check_circle_outline,
+                        ),
+                        const SizedBox(height: 12),
+                      ],
                       Text(l10n.welcomeHeading, style: theme.textTheme.titleLarge),
                       const SizedBox(height: 6),
                       Text(l10n.welcomeBody, style: theme.textTheme.bodyMedium),
@@ -63,6 +73,10 @@ class WelcomeScreen extends ConsumerWidget {
                         key: const Key('getStartedButton'),
                         label: l10n.getStarted,
                         onPressed: () => context.push(Routes.phone),
+                      ),
+                      LegalLinks(
+                        onPrivacy: () => context.push(Routes.privacy),
+                        onTerms: () => context.push(Routes.terms),
                       ),
                     ],
                   ),

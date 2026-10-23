@@ -173,3 +173,12 @@
     width: 100%;
   }
 }
+
+.app-policies {
+  margin: 0;
+  padding-left: 20px;
+
+  li + li {
+    margin-top: 6px;
+  }
+}

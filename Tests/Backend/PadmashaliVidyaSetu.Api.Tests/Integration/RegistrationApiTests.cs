@@ -270,6 +270,46 @@ public sealed class RegistrationApiTests(PvsApiFactory factory)
     }
 
     [Fact]
+    public async Task AddressOutsideIndia_IsSaved_AndTypedStateIsAddedToCountry()
+    {
+        var client = await factory.CreateSignedInClientAsync();
+        var state = "Emirate " + new string(Guid.NewGuid().ToString("N").Where(char.IsLetter).Take(5).ToArray());
+        var request = Student();
+        request["permanentAddress"] = AddressOutsideIndia(newStateName: state);
+
+        var id = await RegisterAsync(client, request);
+
+        var profile = await client.GetFromJsonAsync<Envelope<MemberProfileDto>>($"/api/v1/members/{id}");
+        var permanent = profile!.Data!.Addresses.Single(a => a.AddressType == "Permanent");
+        Assert.Equal("United Arab Emirates", permanent.Country.Name);
+        Assert.Equal(state, permanent.State.Name);
+        Assert.Null(permanent.District);
+        Assert.Null(permanent.Taluk);
+        Assert.Null(permanent.PinCode);
+
+        // The typed state is now in the country's list, and the next member can choose it.
+        var states = await client.GetFromJsonAsync<Envelope<List<MasterDataItemDto>>>($"/api/v1/locations/countries/{CountryUae}/states");
+        var added = Assert.Single(states!.Data!, s => s.Name == state);
+        var next = Student("Kiran Suresh");
+        next["permanentAddress"] = AddressOutsideIndia(stateId: added.Id, newStateName: null, postalCode: "00000");
+        await RegisterAsync(client, next);
+    }
+
+    [Fact]
+    public async Task StateFromAnotherCountry_IsRejectedForAddressOutsideIndia()
+    {
+        var client = await factory.CreateSignedInClientAsync();
+        var request = Student();
+        request["permanentAddress"] = AddressOutsideIndia(stateId: 11, newStateName: null); // Karnataka with UAE
+
+        var response = await client.PostAsJsonAsync("/api/v1/members", request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<Envelope<object>>();
+        Assert.Contains(body!.Errors, e => e.Field == "permanentAddress.stateId");
+    }
+
+    [Fact]
     public async Task RegistrationIds_AreSequentialWithinTemple_AndIndependentAcrossTemples()
     {
         var client = await factory.CreateSignedInClientAsync();

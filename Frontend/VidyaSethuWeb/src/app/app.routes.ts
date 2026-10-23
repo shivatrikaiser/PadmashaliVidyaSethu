@@ -27,6 +27,22 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/organizations/organizations').then((m) => m.Organizations),
     data: seo('organizations'),
   },
+  // Padmashali Vidya Sethu app documents (linked from Google Play and from the app).
+  {
+    path: 'organizations/padmashali-vidya-sethu/privacy',
+    loadComponent: () => import('./pages/legal/legal').then((m) => m.Legal),
+    data: { ...seo('pvsPrivacy'), document: 'pvsPrivacy' },
+  },
+  {
+    path: 'organizations/padmashali-vidya-sethu/terms',
+    loadComponent: () => import('./pages/legal/legal').then((m) => m.Legal),
+    data: { ...seo('pvsTerms'), document: 'pvsTerms' },
+  },
+  {
+    path: 'organizations/padmashali-vidya-sethu/delete-account',
+    loadComponent: () => import('./pages/legal/legal').then((m) => m.Legal),
+    data: { ...seo('pvsDeleteAccount'), document: 'pvsDeleteAccount' },
+  },
   {
     // Title and description come from the organization record (set by the page).
     path: 'organizations/:slug',

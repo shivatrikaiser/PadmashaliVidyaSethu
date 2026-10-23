@@ -36,6 +36,27 @@ describe('OrganizationPage (Padmashali Vidya Sethu)', () => {
     expect(el.textContent).toContain('Jobs and career opportunities');
   });
 
+  it('links to the app Privacy Policy, Terms and account deletion pages', async () => {
+    const el = await open(production);
+    const links = [...el.querySelectorAll<HTMLAnchorElement>('[data-testid="app-policies"] a')];
+    expect(links.map((a) => a.getAttribute('href'))).toEqual([
+      `${PVS_URL}/privacy`,
+      `${PVS_URL}/terms`,
+      `${PVS_URL}/delete-account`,
+    ]);
+  });
+
+  it.each([
+    ['privacy', 'Padmashali Vidya Sethu app - Privacy Policy', 'Who we share it with'],
+    ['terms', 'Padmashali Vidya Sethu app - Terms and Conditions', 'Acceptable use'],
+    ['delete-account', 'Padmashali Vidya Sethu app - Delete your account', 'What happens when you delete'],
+  ])('/%s shows the app document, marked as a draft', async (page, title, heading) => {
+    const el = await open(production, `${PVS_URL}/${page}`);
+    expect(el.querySelector('h1')?.textContent).toContain(title);
+    expect(el.textContent).toContain(heading);
+    expect(el.querySelector('[data-testid="legal-draft"]')).toBeTruthy();
+  });
+
   it('production without a configured destination: explains the portal is not available and shows no link', async () => {
     const el = await open(production);
     expect(el.querySelector('[data-testid="portal-unavailable"]')?.textContent).toContain(

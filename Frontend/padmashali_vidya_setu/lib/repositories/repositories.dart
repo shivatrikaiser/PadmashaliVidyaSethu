@@ -58,6 +58,20 @@ class MemberRepository {
   Future<VerificationChallenge> requestMemberMobileCode(String mobileNumber) =>
       _api.post('/api/v1/members/mobile-verifications', {'mobileNumber': mobileNumber}, VerificationChallenge.fromJson);
 
+  /// Deletes the signed-in account: kept for the records but marked deleted; the number cannot sign in again.
+  Future<void> deleteMyAccount() => _api.post('/api/v1/me/deletion', null, (_) {});
+
+  /// Sends a code (separate from the mobile number's) to a member's optional email address.
+  Future<EmailChallenge> requestMemberEmailCode(String email) =>
+      _api.post('/api/v1/members/email-verifications', {'email': email}, EmailChallenge.fromJson);
+
+  /// Returns the verified challenge id, sent as `emailVerificationId` when registering.
+  Future<String> verifyMemberEmailCode(String challengeId, String code) => _api.post(
+    '/api/v1/members/email-verifications/verify',
+    {'challengeId': challengeId, 'code': code},
+    (d) => (d! as Map<String, Object?>)['challengeId']! as String,
+  );
+
   /// Checks that code; the returned challenge id goes into the registration as `mobileVerificationId`.
   Future<String> verifyMemberMobileCode(String challengeId, String code) => _api.post(
     '/api/v1/members/mobile-verifications/verify',

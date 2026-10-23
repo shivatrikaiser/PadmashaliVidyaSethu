@@ -15,7 +15,10 @@ extension ValidationIssueText on ValidationIssue {
     ValidationIssue.nameInvalid => l10n.validationNameInvalid,
     ValidationIssue.addressTooShort => l10n.validationAddressTooShort,
     ValidationIssue.phoneInvalid => l10n.phoneInvalid,
+    ValidationIssue.phoneInvalidInternational => l10n.phoneInvalidInternational,
+    ValidationIssue.emailInvalid => l10n.emailInvalid,
     ValidationIssue.pinInvalid => l10n.validationPinInvalid,
+    ValidationIssue.postalCodeInvalid => l10n.validationPostalCodeInvalid,
   };
 }
 

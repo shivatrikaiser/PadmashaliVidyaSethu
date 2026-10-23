@@ -22,6 +22,17 @@ public sealed class MembersController(IRegistrationService registration, IMember
     public async Task<ActionResult<ApiResponse<MyAccountDto>>> Me(CancellationToken ct) =>
         Ok(ApiResponse<MyAccountDto>.Ok(await members.GetMyAccountAsync(ct)));
 
+    /// <summary>
+    /// Deletes the signed-in account (Google Play "account deletion"): the account and all its members are marked
+    /// deleted / inactive and kept for the records; every session ends. The number cannot sign in or register again.
+    /// </summary>
+    [HttpPost("me/deletion")]
+    public async Task<ActionResult<ApiResponse<object>>> DeleteMyAccount(CancellationToken ct)
+    {
+        await auth.DeleteMyAccountAsync(ct);
+        return Ok(ApiResponse<object>.Ok(new { Deleted = true }, "Your account has been deleted."));
+    }
+
     /// <summary>Sends a verification code to a member's own (optional) mobile number while registering them.</summary>
     [HttpPost("members/mobile-verifications")]
     [EnableRateLimiting(RateLimitPolicies.Verification)]
@@ -29,6 +40,22 @@ public sealed class MembersController(IRegistrationService registration, IMember
         RequestVerificationCodeRequest request, CancellationToken ct) =>
         Ok(ApiResponse<VerificationCodeIssuedResponse>.Ok(await auth.RequestMemberMobileCodeAsync(request.MobileNumber!, ct),
             "Verification code sent."));
+
+    /// <summary>Sends a verification code (its own, not the mobile number's) to a member's optional email address.</summary>
+    [HttpPost("members/email-verifications")]
+    [EnableRateLimiting(RateLimitPolicies.Verification)]
+    public async Task<ActionResult<ApiResponse<EmailCodeIssuedResponse>>> RequestEmailCode(
+        RequestEmailCodeRequest request, CancellationToken ct) =>
+        Ok(ApiResponse<EmailCodeIssuedResponse>.Ok(await auth.RequestMemberEmailCodeAsync(request.Email!, ct),
+            "Verification code sent."));
+
+    /// <summary>Verifies the email code; pass the returned challenge id as <c>emailVerificationId</c> when registering.</summary>
+    [HttpPost("members/email-verifications/verify")]
+    [EnableRateLimiting(RateLimitPolicies.Verification)]
+    public async Task<ActionResult<ApiResponse<MemberEmailVerifiedResponse>>> VerifyEmailCode(
+        VerifyCodeRequest request, CancellationToken ct) =>
+        Ok(ApiResponse<MemberEmailVerifiedResponse>.Ok(await auth.VerifyMemberEmailCodeAsync(request.ChallengeId, request.Code!, ct),
+            "Email address verified."));
 
     /// <summary>Verifies that code; pass the returned challenge id as <c>mobileVerificationId</c> when registering.</summary>
     [HttpPost("members/mobile-verifications/verify")]

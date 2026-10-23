@@ -5,11 +5,18 @@ import '../core/storage/token_storage.dart';
 import '../models/auth_models.dart';
 import '../models/member_models.dart';
 import '../repositories/repositories.dart';
+import '../utils/phone_countries.dart';
 
 enum SessionStatus { unknown, signedOut, signedIn }
 
 class SessionState {
-  const SessionState({required this.status, this.account, this.selectedRegistrationId, this.expired = false});
+  const SessionState({
+    required this.status,
+    this.account,
+    this.selectedRegistrationId,
+    this.expired = false,
+    this.accountDeleted = false,
+  });
 
   final SessionStatus status;
   final MyAccount? account;
@@ -17,6 +24,9 @@ class SessionState {
 
   /// True when the session ended because tokens could not be refreshed (shown once on the welcome screen).
   final bool expired;
+
+  /// True right after the user deleted their account (shown once on the welcome screen).
+  final bool accountDeleted;
 
   bool get hasMembers => (account?.members.isNotEmpty) ?? false;
 
@@ -34,8 +44,17 @@ class SessionState {
 }
 
 class PendingVerification {
-  const PendingVerification({required this.mobileNumber, required this.challenge, required this.issuedAt});
+  const PendingVerification({
+    required this.mobileNumber,
+    required this.challenge,
+    required this.issuedAt,
+    this.countryCode = DialCodes.india,
+  });
+
+  /// The number as typed (national digits) and its calling code; [apiMobileNumber] is what the API gets.
   final String mobileNumber;
+  final String countryCode;
+  String get apiMobileNumber => DialCodes.apiNumber(countryCode, mobileNumber);
   final VerificationChallenge challenge;
   final DateTime issuedAt;
 }
@@ -102,6 +121,13 @@ class SessionNotifier extends StateNotifier<SessionState> {
     }
     await _tokens.clear();
     state = const SessionState(status: SessionStatus.signedOut);
+  }
+
+  /// Deletes the account on the server (data kept, number blocked), then signs out on this device.
+  Future<void> deleteAccount() async {
+    await _members.deleteMyAccount();
+    await _tokens.clear();
+    state = const SessionState(status: SessionStatus.signedOut, accountDeleted: true);
   }
 
   void onSessionExpired() {

@@ -17,6 +17,14 @@ public class Account : AuditableEntity
     public DateTime? LastLoginDate { get; set; }
 
     /// <summary>
+    /// Set when the user deleted their account in the app. Nothing is removed - the account and its members are kept
+    /// (inactive) for the records - but the number can never sign in or register again.
+    /// </summary>
+    public DateTime? DeletedDate { get; set; }
+
+    public bool IsDeleted => DeletedDate is not null;
+
+    /// <summary>
     /// Admin portal password (ASP.NET Core Identity PBKDF2 hash), set by a Super Admin on the Admin users page.
     /// Only accounts with an admin role can sign in with it; null = no password sign-in.
     /// </summary>
@@ -61,11 +69,17 @@ public class RefreshToken
     public bool IsActiveAt(DateTime utcNow) => RevokedDate is null && ExpiresDate > utcNow;
 }
 
-/// <summary>A single "Phone Number Verification Code" issued to a mobile number.</summary>
+/// <summary>
+/// A single verification code, issued to a mobile number ("Phone Number Verification Code") or - for
+/// <see cref="VerificationPurposes.MemberEmail"/> - to an email address. Exactly one of the two is set.
+/// </summary>
 public class PhoneVerificationChallenge
 {
     public Guid ChallengeId { get; set; }
-    public string MobileNumber { get; set; } = string.Empty;
+    public string? MobileNumber { get; set; }
+
+    /// <summary>The email address the code was sent to (lower case); only for <see cref="VerificationPurposes.MemberEmail"/>.</summary>
+    public string? Email { get; set; }
 
     /// <summary><see cref="VerificationPurposes.SignIn"/> or <see cref="VerificationPurposes.MemberMobile"/>.</summary>
     public string Purpose { get; set; } = VerificationPurposes.SignIn;
@@ -91,7 +105,10 @@ public static class VerificationPurposes
     /// <summary>Proves a family member's own mobile number at registration; never signs in.</summary>
     public const string MemberMobile = "MEMBER_MOBILE";
 
-    /// <summary>How long a verified member-number code may be used to register that number.</summary>
+    /// <summary>Proves a member's (optional) email address at registration, with its own code sent to that address.</summary>
+    public const string MemberEmail = "MEMBER_EMAIL";
+
+    /// <summary>How long a verified member-number (or member-email) code may be used to register it.</summary>
     public static readonly TimeSpan MemberMobileProofLifetime = TimeSpan.FromHours(1);
 }
 

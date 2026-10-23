@@ -86,9 +86,10 @@ class _VerifyCodeScreenState extends ConsumerState<VerifyCodeScreen> {
       _error = null;
     });
     try {
-      final challenge = await ref.read(authRepositoryProvider).requestCode(pending.mobileNumber);
+      final challenge = await ref.read(authRepositoryProvider).requestCode(pending.apiMobileNumber);
       ref.read(pendingVerificationProvider.notifier).state = PendingVerification(
         mobileNumber: pending.mobileNumber,
+        countryCode: pending.countryCode,
         challenge: challenge,
         issuedAt: DateTime.now(),
       );

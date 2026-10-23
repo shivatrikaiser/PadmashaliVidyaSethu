@@ -11,6 +11,7 @@ using PadmashaliVidyaSetu.Api.Data;
 using PadmashaliVidyaSetu.Api.Entities.Accounts;
 using PadmashaliVidyaSetu.Api.Services.Notifications;
 using PadmashaliVidyaSetu.Api.Services.Locations;
+using PadmashaliVidyaSetu.Api.Services.Verification;
 
 namespace PadmashaliVidyaSetu.Api.Tests.Infrastructure;
 
@@ -35,6 +36,9 @@ public sealed class PvsApiFactory : WebApplicationFactory<Program>, IAsyncLifeti
             ["Jwt:SigningKey"] = Convert.ToBase64String(RandomNumberGenerator.GetBytes(48)),
             ["PhoneVerification:CodeHashingKey"] = Convert.ToBase64String(RandomNumberGenerator.GetBytes(48)),
             ["PhoneVerification:Sender"] = "Development",
+            ["PhoneVerification:InternationalSender"] = "Development",
+            ["PhoneVerification:TestLogin:MobileNumber"] = TestLoginMobile,
+            ["PhoneVerification:TestLogin:Code"] = TestLoginCode,
             ["PhoneVerification:ExposeCodeInResponse"] = "true",
             ["PhoneVerification:ResendCooldownSeconds"] = "30",
             ["RateLimiting:VerificationPermitLimit"] = "10000",
@@ -52,10 +56,25 @@ public sealed class PvsApiFactory : WebApplicationFactory<Program>, IAsyncLifeti
             // Never call Firebase from tests: record what would have been sent.
             services.RemoveAll<IPushSender>();
             services.AddSingleton<IPushSender>(PushSender);
+            // Record every phone code (SMS / WhatsApp) instead of using the Development sender.
+            services.RemoveAll<IVerificationCodeSender>();
+            services.AddSingleton<IVerificationCodeSender>(CodeSender);
+            // Record email verification codes instead of using SMTP.
+            services.RemoveAll<IVerificationEmailSender>();
+            services.AddSingleton<IVerificationEmailSender>(EmailSender);
         });
     }
 
     public FakePushSender PushSender { get; } = new();
+    public FakeEmailSender EmailSender { get; } = new();
+    public RecordingCodeSender CodeSender { get; } = new();
+
+    /// <summary>The store-review test login used by the tests (national digits) and its fixed code.</summary>
+    public const string TestLoginMobile = "9000012345";
+    public const string TestLoginCode = "9876";
+
+    /// <summary>A unique UAE mobile number in E.164 (a number outside India: code on WhatsApp).</summary>
+    public static string NewUaeMobileNumber() => "+97150" + Random.Shared.Next(1_000_000, 9_999_999);
 
     public Task InitializeAsync() => Task.CompletedTask;
 
@@ -145,7 +164,34 @@ public sealed class ApiCollection : ICollectionFixture<PvsApiFactory>
 public sealed record Envelope<T>(bool Success, string Message, T? Data, List<ErrorItem> Errors);
 public sealed record ErrorItem(string? Field, string Message);
 public sealed record ChallengeData(Guid ChallengeId, string MaskedMobileNumber, int CodeLength, string? DevelopmentCode);
+public sealed record EmailChallengeData(Guid ChallengeId, string MaskedEmail, int CodeLength, string? DevelopmentCode);
 public sealed record TestTokens(string AccessToken, string RefreshToken, bool IsNewAccount, int RegisteredMemberCount);
+
+/// <summary>Records phone verification codes (SMS / WhatsApp) instead of sending them.</summary>
+public sealed class RecordingCodeSender : IVerificationCodeSender
+{
+    public System.Collections.Concurrent.ConcurrentQueue<(string Mobile, string Code)> Sent { get; } = new();
+
+    public Task SendAsync(string mobileNumberE164, string code, CancellationToken cancellationToken)
+    {
+        Sent.Enqueue((mobileNumberE164, code));
+        return Task.CompletedTask;
+    }
+}
+
+/// <summary>Records verification emails instead of sending them; <see cref="Fail"/> makes the next sends fail.</summary>
+public sealed class FakeEmailSender : IVerificationEmailSender
+{
+    public System.Collections.Concurrent.ConcurrentQueue<(string Email, string Code)> Sent { get; } = new();
+    public bool Fail { get; set; }
+
+    public Task SendAsync(string email, string code, CancellationToken cancellationToken)
+    {
+        if (Fail) throw new PadmashaliVidyaSetu.Api.Common.ServiceUnavailableException("email down");
+        Sent.Enqueue((email, code));
+        return Task.CompletedTask;
+    }
+}
 
 /// <summary>Records push notifications instead of sending them to Firebase.</summary>
 public sealed class FakePushSender : IPushSender

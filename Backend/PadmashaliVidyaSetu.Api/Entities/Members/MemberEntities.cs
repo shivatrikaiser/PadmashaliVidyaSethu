@@ -26,6 +26,10 @@ public class Member : AuditableEntity
     public string? MobileNumber { get; set; }
     public DateTime? MobileVerifiedDate { get; set; }
 
+    /// <summary>The member's email address (optional, lower case), verified with its own code at registration.</summary>
+    public string? Email { get; set; }
+    public DateTime? EmailVerifiedDate { get; set; }
+
     public string FatherName { get; set; } = string.Empty;
     public string MotherName { get; set; } = string.Empty;
 
@@ -79,18 +83,20 @@ public class MemberAddress : AuditableEntity
     public string AddressLine1 { get; set; } = string.Empty;
     public string? AddressLine2 { get; set; }
 
-    public string PinCode { get; set; } = string.Empty;
+    /// <summary>Indian PIN code (6 digits, required); for an address outside India the postal code, if it has one.</summary>
+    public string? PinCode { get; set; }
 
     /// <summary>Authoritative display text (user may edit the locality suggested by the PIN lookup).</summary>
     public string CityVillageName { get; set; } = string.Empty;
     public int? CityId { get; set; }
     public City? City { get; set; }
 
-    public int TalukId { get; set; }
-    public Taluk Taluk { get; set; } = null!;
+    /// <summary>Taluk and District are required for Indian addresses and empty for addresses outside India.</summary>
+    public int? TalukId { get; set; }
+    public Taluk? Taluk { get; set; }
 
-    public int DistrictId { get; set; }
-    public District District { get; set; } = null!;
+    public int? DistrictId { get; set; }
+    public District? District { get; set; }
 
     public int StateId { get; set; }
     public State State { get; set; } = null!;

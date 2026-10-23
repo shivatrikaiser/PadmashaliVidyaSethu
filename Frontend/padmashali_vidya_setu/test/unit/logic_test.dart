@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:padmashali_vidya_setu/utils/phone_countries.dart';
 import 'package:padmashali_vidya_setu/models/location_models.dart';
 import 'package:padmashali_vidya_setu/models/master_data_item.dart';
 import 'package:padmashali_vidya_setu/models/member_models.dart';
@@ -26,12 +27,26 @@ void main() {
       expect(Validators.mobile('98765'), ValidationIssue.phoneInvalid);
     });
 
+    test('mobile outside India: E.164 length with the country code; sent as +CC number', () {
+      expect(Validators.mobile('501234567', countryCode: '971'), isNull);
+      expect(Validators.mobile('07911123456', countryCode: '44'), isNull); // trunk 0 is dropped
+      expect(Validators.mobile('1234', countryCode: '971'), ValidationIssue.phoneInvalidInternational);
+      expect(Validators.mobile('1234567890123', countryCode: '971'), ValidationIssue.phoneInvalidInternational);
+      expect(Validators.mobile('', countryCode: '971'), ValidationIssue.required);
+      expect(DialCodes.apiNumber('971', '501234567'), '+971501234567');
+      expect(DialCodes.apiNumber('44', '07911123456'), '+447911123456');
+      expect(DialCodes.apiNumber('91', '9876543210'), '9876543210'); // Indian numbers unchanged
+    });
+
     test('PIN code must be exactly 6 digits and not start with 0', () {
       expect(Validators.pinCode('574201'), isNull);
       expect(Validators.pinCode('57420'), ValidationIssue.pinInvalid);
       expect(Validators.pinCode('074201'), ValidationIssue.pinInvalid);
       expect(Validators.pinCode('5742011'), ValidationIssue.pinInvalid);
       expect(Validators.pinCode(''), ValidationIssue.required);
+      expect(Validators.postalCode(''), isNull);
+      expect(Validators.postalCode('SW1A 1AA'), isNull);
+      expect(Validators.postalCode('#12'), ValidationIssue.postalCodeInvalid);
     });
 
     test('names accept Kannada and English, reject digits and symbols', () {

@@ -70,6 +70,30 @@ app shows it in a "Development mode" box. To send real SMS from your PC, also ru
 `dotnet user-secrets set "PhoneVerification:Sender" "SmsGatewayHub"`. Staging/Production always use SMS Gateway Hub and
 refuse to start if the SMS settings or API key are missing.
 
+Numbers **outside India** (not +91) get the code on **WhatsApp** (Cloud API, template `iqe_validate` with the parameters
+name and code; settings in the `WhatsApp` section). The access token is a secret as well:
+
+```bash
+dotnet user-secrets set "WhatsApp:AccessToken" "<WhatsApp Cloud API access token>"   # development
+dotnet user-secrets set "PhoneVerification:InternationalSender" "WhatsApp"           # to send for real from your PC
+# servers: environment variable WhatsApp__AccessToken (or Key Vault)
+```
+
+Staging/Production use WhatsApp for these numbers and refuse to start if the token is missing.
+
+A member may also add an **email address** (optional; the mobile number stays compulsory). It is verified with its
+**own** code, emailed through **SMTP** (settings in the `Email` section: `Host`, `Port` 587, `Security` StartTls,
+`UserName`, `FromAddress`); the phone code is never sent by email. The SMTP password is a secret:
+
+```bash
+dotnet user-secrets set "Email:Password" "<SMTP password>"      # development
+dotnet user-secrets set "PhoneVerification:EmailSender" "Smtp"  # to send real emails from your PC
+# servers: environment variable Email__Password (or Key Vault)
+```
+
+Staging/Production send these emails and refuse to start if `Email:Host` or `Email:FromAddress` is missing (or the
+password, when a user name is set). Test with `POST /api/v1/diagnostics/email-test` while Swagger is enabled.
+
 ### 2. App
 ```bash
 flutter emulators --launch Medium_Phone   # or any AVD with free storage

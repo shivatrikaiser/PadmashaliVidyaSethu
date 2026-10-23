@@ -3,7 +3,7 @@ namespace PadmashaliVidyaSetu.Api.Tests.Infrastructure;
 /// <summary>
 /// Builds registration payloads using seeded master-data IDs.
 /// Seed IDs: MemberStatus 1=Student 2=Working 3=Unemployed; Class 13=PUC 1; EducationLevel 6=Undergraduate;
-/// Country 1=India; State 11=Karnataka; District 11=Dakshina Kannada; Taluk 3=Puttur; DisabilityType 2=Hearing, 8=Other.
+/// Country 1=India, 2=United Arab Emirates; State 11=Karnataka; District 11=Dakshina Kannada; Taluk 3=Puttur; DisabilityType 2=Hearing, 8=Other.
 /// </summary>
 public static class RegistrationRequests
 {
@@ -22,6 +22,19 @@ public static class RegistrationRequests
         districtId = 11,
         stateId = 11,
         countryId = 1,
+    };
+
+    public const int CountryUae = 2;
+
+    /// <summary>An address outside India: no PIN code, district or taluk; the state either chosen or typed.</summary>
+    public static object AddressOutsideIndia(int? stateId = null, string? newStateName = "Dubai", string? postalCode = null) => new
+    {
+        addressLine1 = "Flat 504, Al Nahda Tower",
+        pinCode = postalCode,
+        cityVillageName = "Dubai",
+        stateId,
+        newStateName,
+        countryId = CountryUae,
     };
 
     public static Dictionary<string, object?> Student(string fullName = "Anu Suresh", int templeId = 1) => new()

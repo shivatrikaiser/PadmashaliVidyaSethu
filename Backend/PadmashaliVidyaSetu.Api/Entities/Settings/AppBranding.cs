@@ -23,8 +23,13 @@ public class AppBranding
     public byte[]? SponsorLogo { get; set; }
     public string? SponsorLogoContentType { get; set; }
 
-    /// <summary>Text after "Powered by :"; null hides the line.</summary>
+    /// <summary>Text after "Technology Powered by"; null hides the line.</summary>
     public string? PoweredBy { get; set; }
+
+    /// <summary>Opened when <see cref="PoweredBy"/> is tapped in the app (the IQ Explore app on Google Play); null = not a link.</summary>
+    public string? PoweredByUrl { get; set; }
+
+    public const string DefaultPoweredByUrl = "https://play.google.com/store/apps/details?id=com.iqexplore.app";
 
     public DateTime? ModifiedDate { get; set; }
     public string? ModifiedBy { get; set; }

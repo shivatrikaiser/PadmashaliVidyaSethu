@@ -1,26 +1,29 @@
 ﻿/*
 ================================================================================================================
-  Padmashali Vidya Setu (PVS) - UPDATE for IQExplore Live: members' own mobile numbers
-  Brings Live from migration 20261020155916_AdminPasswords to 20261022042837_MemberMobileNumber.
-  Tested on IQExploreDB_dev_02 (same starting migration as Live) before release.
+  Padmashali Vidya Setu (PVS) - UPDATE for IQExplore Live, 23 Oct 2026 (part 2)
+  Brings Live from migration 20261023110803_MemberEmail (applied on Live 23 Oct 2026 by PVS_Update_Live_2026-10-23.sql)
+  to 20261023123334_FooterSponsors. Tested on IQExploreDB_dev_02.
 ================================================================================================================
-  WHAT IT CHANGES (PVS objects only)
-    PVS_Members: adds MobileNumber varchar(16) NULL and MobileVerifiedDate datetime2(3) NULL (a family member's own,
-    verified number - optional; existing members are unchanged).
-    PVS_PhoneVerificationChallenges: adds Purpose varchar(20) NOT NULL DEFAULT 'SIGN_IN' and AccountId int NULL, so a
-    code sent to verify a member's number can never be used to sign in. Existing codes count as sign-in codes.
-    Nothing outside PVS_ objects is created, altered or written.
+  WHAT IT CHANGES (PVS objects only - nothing outside PVS_ objects is created, altered or written)
+    1. 20261023114125_AccountDeletion - "Delete my account" in the app (Google Play requirement):
+         PVS_Accounts  + DeletedDate datetime2(3) NULL. Deleting keeps all data (account marked deleted, members
+         inactive); the number can no longer sign in or register again. Existing accounts are unchanged.
+    2. 20261023123334_FooterSponsors - footer sponsors and the "Technology Powered by" link:
+         new table PVS_FooterSponsors (name, designation, company, display order, active) + its permissions for the
+         API role PVS_AppRole; the current sponsor (name + organisation) is copied in as the first entry.
+         PVS_AppBranding + PoweredByUrl nvarchar(500) NULL, set to the IQ Explore app on Google Play.
 
   SAFETY
-    * Stops before changing anything unless PVS is deployed here with 20261020155916_AdminPasswords applied.
-    * Runs in ONE transaction; on any error everything is rolled back.
-    * Before committing it verifies the change and that no non-PVS object changed.
+    * Stops before changing anything unless PVS is deployed here with 20261023110803_MemberEmail applied.
+    * ONE transaction: on any error everything is rolled back.
+    * Before committing: checks every change above is in place and that no non-PVS object changed.
     * Safe to run again: steps already applied are skipped.
 
-  HOW TO RUN  (login with ALTER TABLE permission in dbo, e.g. the server admin)
+  HOW TO RUN  (login with ALTER/CREATE TABLE permission in dbo, e.g. the server admin)
     * SSMS / Azure Data Studio: connect to IQExploreDB_Live (check the database drop-down!) and execute.
     * NOT the Azure Portal query editor - it does not support GO batch separators.
-    Expected result: "PVS deployment SUCCEEDED: ..." at the end of the messages. Then deploy the new API.
+    Expected result: "PVS deployment SUCCEEDED: 49 PVS tables; migrations: ..." at the end of the messages.
+    Then publish the new API, admin portal and app.
 ================================================================================================================
 */
 SET NOCOUNT ON;
@@ -54,15 +57,15 @@ BEGIN
 END;
 GO
 
--- This update needs PVS deployed up to 20261020155916_AdminPasswords; otherwise use PVS_Deploy_SharedDatabase.sql.
+-- This update needs PVS deployed up to 20261023110803_MemberEmail; otherwise use PVS_Deploy_SharedDatabase.sql.
 IF OBJECT_ID(N'dbo.PVS_EFMigrationsHistory', N'U') IS NULL
 BEGIN
     RAISERROR(N'PVS deployment STOPPED: PVS is not deployed in this database. Use Database/deploy/PVS_Deploy_SharedDatabase.sql instead. Nothing was changed.', 16, 1);
     SET NOEXEC ON;
 END
-ELSE IF NOT EXISTS (SELECT 1 FROM dbo.PVS_EFMigrationsHistory WHERE MigrationId = N'20261020155916_AdminPasswords')
+ELSE IF NOT EXISTS (SELECT 1 FROM dbo.PVS_EFMigrationsHistory WHERE MigrationId = N'20261023110803_MemberEmail')
 BEGIN
-    RAISERROR(N'PVS deployment STOPPED: migration 20261020155916_AdminPasswords is not applied here. Apply the earlier updates (or PVS_Deploy_SharedDatabase.sql) first. Nothing was changed.', 16, 1);
+    RAISERROR(N'PVS deployment STOPPED: migration 20261023110803_MemberEmail is not applied here. Nothing was changed.', 16, 1);
     SET NOEXEC ON;
 END;
 GO
@@ -101,17 +104,17 @@ GO
 BEGIN TRANSACTION;
 GO
 
--------------------------------------------------------------------------------- 2. Changes since 20261020155916_AdminPasswords
+-------------------------------------------------------------------------------- 2. Changes since 20261023110803_MemberEmail
 IF @@TRANCOUNT = 0
 BEGIN
     RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
     SET NOEXEC ON;
 END;
 IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
-    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+    WHERE [MigrationId] = N'20261023114125_AccountDeletion'
 )
 BEGIN
-    ALTER TABLE [PVS_PhoneVerificationChallenges] ADD [AccountId] int NULL;
+    ALTER TABLE [PVS_Accounts] ADD [DeletedDate] datetime2(3) NULL;
 END;
 GO
 
@@ -121,50 +124,11 @@ BEGIN
     SET NOEXEC ON;
 END;
 IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
-    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
-)
-BEGIN
-    ALTER TABLE [PVS_PhoneVerificationChallenges] ADD [Purpose] varchar(20) NOT NULL CONSTRAINT [PVS_DF_PhoneVerificationChallenges_Purpose] DEFAULT 'SIGN_IN';
-END;
-GO
-
-IF @@TRANCOUNT = 0
-BEGIN
-    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
-    SET NOEXEC ON;
-END;
-IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
-    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
-)
-BEGIN
-    ALTER TABLE [PVS_Members] ADD [MobileNumber] varchar(16) NULL;
-END;
-GO
-
-IF @@TRANCOUNT = 0
-BEGIN
-    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
-    SET NOEXEC ON;
-END;
-IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
-    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
-)
-BEGIN
-    ALTER TABLE [PVS_Members] ADD [MobileVerifiedDate] datetime2(3) NULL;
-END;
-GO
-
-IF @@TRANCOUNT = 0
-BEGIN
-    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
-    SET NOEXEC ON;
-END;
-IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
-    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+    WHERE [MigrationId] = N'20261023114125_AccountDeletion'
 )
 BEGIN
     INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20261022042837_MemberMobileNumber', N'10.0.12');
+    VALUES (N'20261023114125_AccountDeletion', N'10.0.12');
 END;
 GO
 
@@ -173,10 +137,119 @@ BEGIN
     RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
     SET NOEXEC ON;
 END;
-IF NOT (COL_LENGTH(N'dbo.PVS_Members', N'MobileNumber') IS NOT NULL AND COL_LENGTH(N'dbo.PVS_Members', N'MobileVerifiedDate') IS NOT NULL AND COL_LENGTH(N'dbo.PVS_PhoneVerificationChallenges', N'Purpose') IS NOT NULL AND COL_LENGTH(N'dbo.PVS_PhoneVerificationChallenges', N'AccountId') IS NOT NULL)
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023123334_FooterSponsors'
+)
+BEGIN
+    ALTER TABLE [PVS_AppBranding] ADD [PoweredByUrl] nvarchar(500) NULL;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023123334_FooterSponsors'
+)
+BEGIN
+    CREATE TABLE [PVS_FooterSponsors] (
+        [FooterSponsorId] int NOT NULL IDENTITY,
+        [Name] nvarchar(150) NOT NULL,
+        [Designation] nvarchar(150) NULL,
+        [CompanyName] nvarchar(150) NULL,
+        [DisplayOrder] int NOT NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_FooterSponsors_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [ModifiedDate] datetime2(3) NULL,
+        [CreatedBy] nvarchar(100) NULL,
+        [ModifiedBy] nvarchar(100) NULL,
+        [IsActive] bit NOT NULL CONSTRAINT [PVS_DF_FooterSponsors_IsActive] DEFAULT CAST(1 AS bit),
+        CONSTRAINT [PVS_PK_FooterSponsors] PRIMARY KEY ([FooterSponsorId])
+    );
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023123334_FooterSponsors'
+)
+BEGIN
+    EXEC(N'UPDATE [PVS_AppBranding] SET [PoweredByUrl] = N''https://play.google.com/store/apps/details?id=com.iqexplore.app''
+    WHERE [AppBrandingId] = 1;
+    SELECT @@ROWCOUNT');
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023123334_FooterSponsors'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_FooterSponsors_IsActive_DisplayOrder] ON [PVS_FooterSponsors] ([IsActive], [DisplayOrder]);
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023123334_FooterSponsors'
+)
+BEGIN
+    INSERT INTO [PVS_FooterSponsors] ([Name], [CompanyName], [DisplayOrder], [CreatedBy]) SELECT [SponsorName], [SponsorOrganisation], 0, N'migration' FROM [PVS_AppBranding] WHERE [AppBrandingId] = 1 AND NULLIF(LTRIM(RTRIM([SponsorName])), N'') IS NOT NULL;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023123334_FooterSponsors'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261023123334_FooterSponsors', N'10.0.12');
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+-- Let the API (role PVS_AppRole, see PVS_CreateApiUser.sql) use the new table.
+IF DATABASE_PRINCIPAL_ID(N'PVS_AppRole') IS NOT NULL
+    GRANT SELECT, INSERT, UPDATE, DELETE ON [dbo].[PVS_FooterSponsors] TO [PVS_AppRole];
+ELSE
+    PRINT N'Note: role PVS_AppRole not found - run PVS_CreateApiUser.sql after this script.';
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF COL_LENGTH(N'dbo.PVS_Accounts', N'DeletedDate') IS NULL
+   OR OBJECT_ID(N'dbo.PVS_FooterSponsors', N'U') IS NULL
+   OR COL_LENGTH(N'dbo.PVS_AppBranding', N'PoweredByUrl') IS NULL
+   OR NOT EXISTS (SELECT 1 FROM dbo.PVS_EFMigrationsHistory WHERE MigrationId = N'20261023114125_AccountDeletion')
+   OR NOT EXISTS (SELECT 1 FROM dbo.PVS_EFMigrationsHistory WHERE MigrationId = N'20261023123334_FooterSponsors')
 BEGIN
     ROLLBACK TRANSACTION;
-    RAISERROR(N'PVS deployment ROLLED BACK: the change is not in place. Nothing was changed.', 16, 1);
+    RAISERROR(N'PVS deployment ROLLED BACK: not every change is in place. Nothing was changed.', 16, 1);
     SET NOEXEC ON;
 END;
 GO
@@ -212,6 +285,7 @@ INSERT INTO @expected (TableName) VALUES
     (N'PVS_EFMigrationsHistory'),
     (N'PVS_EducationLevels'),
     (N'PVS_Genders'),
+    (N'PVS_FooterSponsors'),
     (N'PVS_Hobbies'),
     (N'PVS_InterestAreas'),
     (N'PVS_MemberAddresses'),
@@ -227,6 +301,7 @@ INSERT INTO @expected (TableName) VALUES
     (N'PVS_Members'),
     (N'PVS_Organisations'),
     (N'PVS_PhoneVerificationChallenges'),
+    (N'PVS_PushNotifications'),
     (N'PVS_RefreshTokens'),
     (N'PVS_Roles'),
     (N'PVS_Skills'),

@@ -46,6 +46,7 @@ export const ORGANIZATIONS: readonly Organization[] = [
     // application has no scholarship or job pages yet, so only the application link is published.
     enabledPublicLinks: ['application'],
     publicContact: null,
+    appPolicyPages: true,
     highlights: [
       {
         title: { en: 'Student and member registry' },

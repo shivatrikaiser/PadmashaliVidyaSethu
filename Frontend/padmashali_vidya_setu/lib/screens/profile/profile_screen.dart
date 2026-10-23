@@ -114,8 +114,11 @@ class _ProfileBody extends StatelessWidget {
                         a.addressLine1,
                         if (a.addressLine2 != null) a.addressLine2!,
                         a.cityVillageName,
-                        '${l10n.taluk}: ${a.taluk}',
-                        '${a.district}, ${a.state} - ${a.pinCode}',
+                        if (a.taluk != null) '${l10n.taluk}: ${a.taluk}',
+                        [
+                          [if (a.district != null) a.district!, a.state].join(', '),
+                          if (a.pinCode != null) a.pinCode!,
+                        ].join(' - '),
                         a.country,
                       ].join('\n'),
                     ),

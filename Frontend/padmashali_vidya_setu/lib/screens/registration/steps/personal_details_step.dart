@@ -9,6 +9,7 @@ import '../../../utils/l10n.dart';
 import '../../../utils/validators.dart';
 import '../../../widgets/common.dart';
 import '../../../widgets/master_data_choice.dart';
+import '../widgets/member_email_field.dart';
 import '../widgets/member_mobile_field.dart';
 import 'step_base.dart';
 
@@ -109,6 +110,12 @@ class _PersonalDetailsStepState extends State<PersonalDetailsStep> {
           draft: draft,
           serverError: widget.serverErrors['mobileNumber'],
           onChanged: () => widget.onFieldChanged('mobileNumber'),
+        ),
+        const FieldGap(),
+        MemberEmailField(
+          draft: draft,
+          serverError: widget.serverErrors['email'],
+          onChanged: () => widget.onFieldChanged('email'),
         ),
         const FieldGap(),
         TextFormField(

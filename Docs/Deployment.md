@@ -17,10 +17,16 @@ Hosting has not been chosen yet. This is the recommended path on Azure (any SQL 
    | `Jwt__SigningKey` | ≥ 32 random bytes |
    | `PhoneVerification__CodeHashingKey` | ≥ 32 random bytes, different from the JWT key |
    | `SMS__APIKey` | SMS Gateway Hub API key (other `SMS` settings are in appsettings.json) |
-   | `PhoneVerification__Sender` | `SmsGatewayHub` (default in appsettings.json) |
+   | `PhoneVerification__Sender` | `SmsGatewayHub` (default in appsettings.json) - Indian (+91) numbers |
+   | `WhatsApp__AccessToken` | WhatsApp Cloud API access token (permanent System User token); other `WhatsApp` settings (phone number id, template `iqe_validate`) are in appsettings.json |
+   | `PhoneVerification__InternationalSender` | `WhatsApp` (default in appsettings.json) - numbers outside India |
+   | `Email__Host`, `Email__UserName`, `Email__FromAddress` | SMTP server for email verification codes (a member's optional email address); `Email__Port` 587 / `Email__Security` StartTls by default |
+   | `Email__Password` | SMTP password (secret) |
+   | `PhoneVerification__EmailSender` | `Smtp` (default in appsettings.json) |
+   | `PhoneVerification__TestLogin__MobileNumber` / `__Code` | Store-review sign-in (Google Play): `917795276699` / `9876` in appsettings.json. That number signs in with the fixed code and is never sent anything; "Delete account" closes its members but does not block it. Set the number empty to switch it off |
    | `Cors__AllowedOrigins__0` | `https://pvs.vidyasethu.co.in` (admin portal) |
    | `Cors__AllowedOrigins__1` | `https://app.vidyasethu.co.in` (member web app) |
-   | `Swagger__Enabled` | `true` only while testing - serves `/swagger`, `/openapi/v1.json` and the SMS test (`POST /api/v1/diagnostics/sms-test`); remove afterwards |
+   | `Swagger__Enabled` | `true` only while testing - serves `/swagger`, `/openapi/v1.json` and the SMS / WhatsApp / email tests (`POST /api/v1/diagnostics/sms-test`, `.../whatsapp-test`, `.../email-test`); remove afterwards |
 
 4. HTTPS only; HSTS is enabled automatically outside Development. If behind a proxy/Front Door, configure
    forwarded headers so rate limiting sees client IPs.

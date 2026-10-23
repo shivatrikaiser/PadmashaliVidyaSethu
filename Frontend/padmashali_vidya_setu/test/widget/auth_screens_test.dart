@@ -42,6 +42,30 @@ void main() {
     expect(find.textContaining('OTP'), findsNothing);
   });
 
+  testWidgets('Privacy Policy and Terms open from the welcome screen without signing in', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2.75;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(ProviderScope(overrides: testOverrides(), child: const PvsApp()));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.byKey(const Key('privacyPolicyLink')));
+    await tester.tap(find.byKey(const Key('privacyPolicyLink')));
+    await tester.pumpAndSettle();
+    expect(find.text('Who we are'), findsOneWidget);
+    expect(find.text('How long we keep it, and deleting your account'), findsOneWidget);
+    expect(find.byKey(const Key('legalDraftNote')), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('termsLink')));
+    await tester.tap(find.byKey(const Key('termsLink')));
+    await tester.pumpAndSettle();
+    expect(find.text('Your account'), findsOneWidget);
+    expect(find.text('Acceptable use'), findsOneWidget);
+  });
+
   testWidgets('phone number is validated before sending', (tester) async {
     await pumpLocalized(tester, const SizedBox(height: 800, child: PhoneScreen()));
 
@@ -54,6 +78,26 @@ void main() {
     await tester.tap(find.byKey(const Key('sendCodeButton')));
     await tester.pumpAndSettle();
     expect(find.text('Please enter a valid 10-digit mobile number.'), findsOneWidget);
+  });
+
+  testWidgets('number outside India: country code picked, WhatsApp note shown, length checked for that country', (
+    tester,
+  ) async {
+    await pumpLocalized(tester, const SizedBox(height: 900, child: PhoneScreen()));
+    expect(find.byKey(const Key('whatsAppNote')), findsNothing);
+
+    await tester.tap(find.byKey(const Key('countryCodePicker')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('+971  United Arab Emirates').last);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('whatsAppNote')), findsOneWidget);
+    await tester.enterText(find.byKey(const Key('mobileField')), '1234');
+    await tester.ensureVisible(find.byKey(const Key('sendCodeButton')));
+    await tester.tap(find.byKey(const Key('sendCodeButton')));
+    await tester.pumpAndSettle();
+    expect(find.text('Please enter a valid mobile number for the selected country code.'), findsOneWidget);
+    expect(find.byKey(const Key('emailField')), findsNothing); // sign-in needs only the phone number
   });
 
   testWidgets('verification code input accepts exactly 4 digits', (tester) async {

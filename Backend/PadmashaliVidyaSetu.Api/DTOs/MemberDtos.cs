@@ -1,5 +1,10 @@
 namespace PadmashaliVidyaSetu.Api.DTOs;
 
+/// <summary>
+/// An address. In India: PIN code, City / Village, Taluk, District and State from the lists (PIN-code lookup).
+/// Outside India: the postal code (optional), City / Town and State / Province - <c>StateId</c> from that country's
+/// states, or <c>NewStateName</c> when it is not listed; District, Taluk and City are not used.
+/// </summary>
 public sealed record AddressRequest(
     string? AddressLine1,
     string? AddressLine2,
@@ -11,7 +16,9 @@ public sealed record AddressRequest(
     string? NewTalukName,
     int? DistrictId,
     int? StateId,
-    int? CountryId);
+    int? CountryId,
+    /// <summary>Outside India only: the state / province when it is not in the country's list; it is added to the master.</summary>
+    string? NewStateName = null);
 
 public sealed record RegisterMemberRequest(
     string? FullName,
@@ -36,7 +43,11 @@ public sealed record RegisterMemberRequest(
     /// <summary>Optional: the member's own mobile number. Unless it is the signed-in number, it must be verified first
     /// (POST members/mobile-verifications, then .../verify) and <c>MobileVerificationId</c> set to that challenge.</summary>
     string? MobileNumber = null,
-    Guid? MobileVerificationId = null);
+    Guid? MobileVerificationId = null,
+    /// <summary>Optional: the member's email address, verified first (POST members/email-verifications, then .../verify)
+    /// with <c>EmailVerificationId</c> set to that challenge.</summary>
+    string? Email = null,
+    Guid? EmailVerificationId = null);
 
 public sealed record RegistrationResultDto(string RegistrationId, string FullName, string TempleName);
 
@@ -46,10 +57,11 @@ public sealed record AddressDto(
     string AddressType,
     string AddressLine1,
     string? AddressLine2,
-    string PinCode,
+    string? PinCode,
     string CityVillageName,
-    LookupRefDto Taluk,
-    LookupRefDto District,
+    /// <summary>Null for an address outside India (also District).</summary>
+    LookupRefDto? Taluk,
+    LookupRefDto? District,
     LookupRefDto State,
     LookupRefDto Country);
 
@@ -73,7 +85,9 @@ public sealed record MemberProfileDto(
     IReadOnlyList<LookupRefDto> DisabilityTypes,
     DateTime RegistrationCompletedDate,
     /// <summary>The member's own verified mobile number, if any.</summary>
-    string? MobileNumber = null);
+    string? MobileNumber = null,
+    /// <summary>The member's verified email address, if any.</summary>
+    string? Email = null);
 
 public sealed record MemberSummaryDto(
     string RegistrationId,

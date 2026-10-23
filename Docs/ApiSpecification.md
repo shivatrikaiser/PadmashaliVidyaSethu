@@ -79,7 +79,11 @@ The code is sent by SMS (SMS Gateway Hub) and is valid for 10 minutes. `developm
 Rules: age 5–100 (calendar date in IST); Student ⇒ `classId` required and `highestEducationLevelId` must be null;
 Working/Unemployed ⇒ the reverse; `isDisabled=false` ⇒ no types; `isDisabled=true` ⇒ ≥1 type; type `OTHER` ⇒
 description required (added to the master list); `currentAddress` required unless same as permanent; `talukId` or
-`newTalukName`; taluk ∈ district ∈ state ∈ country (India only in V1); privacy policy must be accepted;
+`newTalukName`; taluk ∈ district ∈ state ∈ country. Address outside India (`countryId` ≠ India): `pinCode` optional
+(postal code, letters/digits/spaces/hyphens, ≤ 10), `cityVillageName` typed, `stateId` from
+`GET /locations/countries/{id}/states` or `newStateName` (added to that country's states); no district, taluk or
+`cityId` (profile returns them as null); optional `email` needs `emailVerificationId` from
+`POST /members/email-verifications` + `.../verify` (its own code, sent to the address); privacy policy must be accepted;
 guardian consent required under 18; max 10 members per account; duplicate name + DOB on the same account ⇒ 409.
 
 ## Master data & locations (bearer)
@@ -91,6 +95,7 @@ guardian consent required under 18; max 10 members per account; duplicate name +
 | `GET /locations/countries/{id}/states` | States |
 | `GET /locations/states/{id}/districts` | Districts |
 | `GET /locations/districts/{id}/taluks` | Taluks |
+| `POST /me/deletion` | Signed in. "Delete my account": account marked deleted (`DeletedDate`), its members inactive, all sessions revoked; **no data removed**. Afterwards the number gets 403 *"Your account is deleted. Hence can't re-register."* on `POST /auth/verification-codes` (no code sent) and on verify |
 | `GET /locations/pin-codes/{pin}` | `{ pinCode, country, state, district, localities[{cityId,name,talukId}], taluks[], suggestedTalukId }`; 404 unknown PIN; 503 provider down (select manually) |
 
 ## App content (anonymous)

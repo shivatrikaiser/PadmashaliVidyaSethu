@@ -11,6 +11,8 @@ public sealed class MemberMobileTests(PvsApiFactory factory)
 {
     private const string Send = "/api/v1/members/mobile-verifications";
     private const string Verify = "/api/v1/members/mobile-verifications/verify";
+    private const string SendEmail = "/api/v1/members/email-verifications";
+    private const string VerifyEmail = "/api/v1/members/email-verifications/verify";
 
     [Fact]
     public async Task VerifiedNumber_IsSavedWithTheMember()
@@ -29,6 +31,70 @@ public sealed class MemberMobileTests(PvsApiFactory factory)
 
         var profile = (await client.GetFromJsonAsync<Envelope<MemberProfileDto>>($"/api/v1/members/{id}"))!.Data!;
         Assert.Equal("+91" + childMobile, profile.MobileNumber);
+    }
+
+    [Fact]
+    public async Task VerifiedEmail_IsSavedWithTheMember_WithItsOwnCode()
+    {
+        var client = await factory.CreateSignedInClientAsync();
+        var email = $"Kavya.{Guid.NewGuid():N}@Example.com";
+        var lower = email.ToLowerInvariant();
+
+        var challenge = await SendEmailCodeAsync(client, email);
+        Assert.Contains(factory.EmailSender.Sent, s => s.Email == lower && s.Code == challenge.DevelopmentCode);
+        Assert.EndsWith("@example.com", challenge.MaskedEmail);
+        var verified = await client.PostAsJsonAsync(VerifyEmail, new { challengeId = challenge.ChallengeId, code = challenge.DevelopmentCode });
+        Assert.Equal(HttpStatusCode.OK, verified.StatusCode);
+
+        var request = RegistrationRequests.Student("Kavya Email");
+        request["email"] = email;
+        request["emailVerificationId"] = challenge.ChallengeId;
+        var id = await PvsApiFactory.RegisterMemberAsync(client, request);
+
+        var profile = (await client.GetFromJsonAsync<Envelope<MemberProfileDto>>($"/api/v1/members/{id}"))!.Data!;
+        Assert.Equal(lower, profile.Email);
+    }
+
+    [Fact]
+    public async Task EmailIsOptional_ButAnUnverifiedEmailIsRejected()
+    {
+        var client = await factory.CreateSignedInClientAsync();
+        var noEmail = await PvsApiFactory.RegisterMemberAsync(client, RegistrationRequests.Student("No Email"));
+        Assert.Null((await client.GetFromJsonAsync<Envelope<MemberProfileDto>>($"/api/v1/members/{noEmail}"))!.Data!.Email);
+
+        var request = RegistrationRequests.Student("Unverified Email");
+        request["email"] = "someone@example.com";
+        Assert.Equal("email", await RegisterErrorFieldAsync(client, request));
+
+        // A code sent to one address does not prove another.
+        var challenge = await SendEmailCodeAsync(client, "first@example.com");
+        (await client.PostAsJsonAsync(VerifyEmail, new { challengeId = challenge.ChallengeId, code = challenge.DevelopmentCode })).EnsureSuccessStatusCode();
+        request["email"] = "second@example.com";
+        request["emailVerificationId"] = challenge.ChallengeId;
+        Assert.Equal("email", await RegisterErrorFieldAsync(client, request));
+    }
+
+    [Fact]
+    public async Task EmailCode_CannotBeUsedAsAMobileProof_NorToSignIn()
+    {
+        var client = await factory.CreateSignedInClientAsync();
+        var challenge = await SendEmailCodeAsync(client, "proof@example.com");
+
+        var asMobile = await client.PostAsJsonAsync(Verify, new { challengeId = challenge.ChallengeId, code = challenge.DevelopmentCode });
+        Assert.Equal(HttpStatusCode.BadRequest, asMobile.StatusCode);
+        var asSignIn = await factory.CreateClient().PostAsJsonAsync("/api/v1/auth/verification-codes/verify",
+            new { challengeId = challenge.ChallengeId, code = challenge.DevelopmentCode });
+        Assert.Equal(HttpStatusCode.BadRequest, asSignIn.StatusCode);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("not-an-email")]
+    public async Task EmailCode_InvalidAddress_Returns400(string email)
+    {
+        var client = await factory.CreateSignedInClientAsync();
+        var response = await client.PostAsJsonAsync(SendEmail, new { email });
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     [Fact]
@@ -118,6 +184,13 @@ public sealed class MemberMobileTests(PvsApiFactory factory)
         var response = await client.PostAsJsonAsync(Send, new { mobileNumber = mobile });
         Assert.True(response.IsSuccessStatusCode, await response.Content.ReadAsStringAsync());
         return (await response.Content.ReadFromJsonAsync<Envelope<ChallengeData>>())!.Data!;
+    }
+
+    private static async Task<EmailChallengeData> SendEmailCodeAsync(HttpClient client, string email)
+    {
+        var response = await client.PostAsJsonAsync(SendEmail, new { email });
+        Assert.True(response.IsSuccessStatusCode, await response.Content.ReadAsStringAsync());
+        return (await response.Content.ReadFromJsonAsync<Envelope<EmailChallengeData>>())!.Data!;
     }
 
     private static async Task<string?> RegisterErrorFieldAsync(HttpClient client, object request)

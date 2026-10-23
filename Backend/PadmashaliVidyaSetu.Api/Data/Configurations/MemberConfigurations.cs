@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PadmashaliVidyaSetu.Api.Common;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PadmashaliVidyaSetu.Api.Data.Seed;
 using PadmashaliVidyaSetu.Api.Entities.Compliance;
@@ -24,6 +25,8 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
 
         b.Property(e => e.FullName).HasMaxLength(150).IsRequired();
         b.Property(e => e.MobileNumber).HasMaxLength(16).IsUnicode(false);
+        b.Property(e => e.Email).HasMaxLength(EmailAddress.MaxLength).IsUnicode(false);
+        b.Property(e => e.EmailVerifiedDate).HasColumnType("datetime2(3)");
         b.Property(e => e.MobileVerifiedDate).HasColumnType("datetime2(3)");
         b.Property(e => e.FatherName).HasMaxLength(150).IsRequired();
         b.Property(e => e.MotherName).HasMaxLength(150).IsRequired();
@@ -57,14 +60,17 @@ public class MemberAddressConfiguration : IEntityTypeConfiguration<MemberAddress
         {
             t.HasCheckConstraint("CK_MemberAddresses_AddressType",
                 $"[AddressType] IN ('{AddressTypes.Permanent}', '{AddressTypes.Current}')");
-            t.HasCheckConstraint("CK_MemberAddresses_PinCode", "[PinCode] LIKE '[1-9][0-9][0-9][0-9][0-9][0-9]'");
+            // Indian addresses: 6-digit PIN, district and taluk. Outside India: no district, taluk or PIN-code place.
+            t.HasCheckConstraint("CK_MemberAddresses_CountryRules",
+                $"([CountryId] = {SeedData.IndiaCountryId} AND [PinCode] LIKE '[1-9][0-9][0-9][0-9][0-9][0-9]' AND [DistrictId] IS NOT NULL AND [TalukId] IS NOT NULL)" +
+                $" OR ([CountryId] <> {SeedData.IndiaCountryId} AND [DistrictId] IS NULL AND [TalukId] IS NULL AND [CityId] IS NULL)");
         });
         b.HasKey(e => e.MemberAddressId);
         b.Property(e => e.RegistrationId).HasMaxLength(11).IsFixedLength().IsUnicode(false);
         b.Property(e => e.AddressType).HasMaxLength(10).IsUnicode(false).IsRequired();
         b.Property(e => e.AddressLine1).HasMaxLength(200).IsRequired();
         b.Property(e => e.AddressLine2).HasMaxLength(200);
-        b.Property(e => e.PinCode).HasMaxLength(6).IsFixedLength().IsUnicode(false).IsRequired();
+        b.Property(e => e.PinCode).HasMaxLength(10).IsUnicode(false);
         b.Property(e => e.CityVillageName).HasMaxLength(150).IsRequired();
         b.ConfigureAudit();
 

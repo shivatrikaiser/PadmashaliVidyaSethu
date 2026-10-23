@@ -12,6 +12,10 @@ public sealed class CommonTests
     [InlineData("919876543210", "+919876543210")]
     [InlineData("09876543210", "+919876543210")]
     [InlineData("6000000000", "+916000000000")]
+    [InlineData("+971 50 123 4567", "+971501234567")] // outside India: with the country code
+    [InlineData("00971-50-123-4567", "+971501234567")]
+    [InlineData("+1 415 555 0100", "+14155550100")]
+    [InlineData("+44 7911 123456", "+447911123456")]
     public void MobileNumber_Normalizes(string input, string expected)
     {
         Assert.True(MobileNumber.TryNormalize(input, out var e164));
@@ -24,9 +28,40 @@ public sealed class CommonTests
     [InlineData("98765")]
     [InlineData("5876543210")]
     [InlineData("98765432100")]
-    [InlineData("+1 415 555 0100")]
+    [InlineData("+91 12345")] // +91 still follows the Indian rules
+    [InlineData("+91 5876543210")]
+    [InlineData("+0 123 456 789")]
+    [InlineData("+1234567")] // fewer than 8 digits
+    [InlineData("+1234567890123456")] // more than 15 digits
+    [InlineData("971501234567")] // without "+" a number is read as Indian
     public void MobileNumber_RejectsInvalid(string? input) =>
         Assert.False(MobileNumber.TryNormalize(input, out _));
+
+    [Theory]
+    [InlineData("+919876543210", true)]
+    [InlineData("+971501234567", false)]
+    public void MobileNumber_IsIndian(string e164, bool expected) => Assert.Equal(expected, MobileNumber.IsIndian(e164));
+
+    [Theory]
+    [InlineData(" Anu.Suresh@Example.COM ", "anu.suresh@example.com")]
+    [InlineData("a+tag@mail.co.ae", "a+tag@mail.co.ae")]
+    public void EmailAddress_Normalizes(string input, string expected)
+    {
+        Assert.True(EmailAddress.TryNormalize(input, out var email));
+        Assert.Equal(expected, email);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("anu")]
+    [InlineData("anu@example")]
+    [InlineData("anu @example.com")]
+    [InlineData("anu@-example.com")]
+    public void EmailAddress_RejectsInvalid(string? input) => Assert.False(EmailAddress.TryNormalize(input, out _));
+
+    [Fact]
+    public void EmailAddress_Mask_KeepsDomain() => Assert.Equal("an********@example.com", EmailAddress.Mask("anusuresh1@example.com"));
 
     [Fact]
     public void MobileNumber_MaskKeepsOnlyLastFourDigits() =>

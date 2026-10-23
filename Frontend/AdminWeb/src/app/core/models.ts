@@ -55,10 +55,12 @@ export interface Address {
   addressType: string;
   addressLine1: string;
   addressLine2: string | null;
-  pinCode: string;
+  /** PIN code in India; outside India the postal code, if any. */
+  pinCode: string | null;
   cityVillageName: string;
-  taluk: LookupRef;
-  district: LookupRef;
+  /** Null for an address outside India (also district). */
+  taluk: LookupRef | null;
+  district: LookupRef | null;
   state: LookupRef;
   country: LookupRef;
 }
@@ -84,6 +86,8 @@ export interface MemberProfile {
   registrationCompletedDate: string;
   /** The member's own verified mobile number, if one was added at registration. */
   mobileNumber: string | null;
+  /** Email address given with a mobile number outside India. */
+  email: string | null;
 }
 
 export interface MemberDetail {
@@ -150,6 +154,29 @@ export interface AppBranding {
   hasSponsorLogo: boolean;
   sponsorLogoVersion: string | null;
   modifiedDate: string | null;
+  /** Opened when "Powered by" is tapped in the app (the IQ Explore app on Google Play). */
+  poweredByUrl: string | null;
+  /** Active footer sponsors, in display order. */
+  footerSponsors: { name: string; designation: string | null; companyName: string | null }[];
+}
+
+/** A footer sponsor as the admin portal manages it (active or not). */
+export interface FooterSponsor {
+  id: number;
+  name: string;
+  designation: string | null;
+  companyName: string | null;
+  displayOrder: number;
+  isActive: boolean;
+  modifiedDate: string | null;
+}
+
+export interface FooterSponsorInput {
+  name: string;
+  designation: string;
+  companyName: string;
+  displayOrder: number;
+  isActive: boolean;
 }
 
 /** The editable text of [AppBranding]. */
@@ -158,6 +185,7 @@ export interface BrandingText {
   sponsorOrganisation: string;
   sponsorAddress: string;
   poweredBy: string;
+  poweredByUrl: string;
 }
 
 export interface LocationItem {

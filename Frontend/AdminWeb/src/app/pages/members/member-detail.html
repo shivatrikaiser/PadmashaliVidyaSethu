@@ -31,6 +31,9 @@
       @if (d.profile.mobileNumber) {
         <dt>Member's own mobile</dt><dd>{{ d.profile.mobileNumber }} <span class="muted">(verified)</span></dd>
       }
+      @if (d.profile.email) {
+        <dt>Email</dt><dd>{{ d.profile.email }}</dd>
+      }
       <dt>Temple</dt><dd>{{ d.profile.temple.name }}</dd>
       <dt>Organisation</dt><dd>{{ d.profile.organisation.name }}</dd>
       <dt>Current status</dt><dd>{{ d.profile.memberStatus.name }}</dd>
@@ -46,8 +49,8 @@
       <h3>{{ a.addressType }}</h3>
       <p>
         {{ a.addressLine1 }}@if (a.addressLine2) {, {{ a.addressLine2 }}}<br />
-        {{ a.cityVillageName }}, {{ a.taluk.name }} taluk, {{ a.district.name }} district<br />
-        {{ a.state.name }}, {{ a.country.name }} - {{ a.pinCode }}
+        {{ a.cityVillageName }}@if (a.taluk) {, {{ a.taluk.name }} taluk}@if (a.district) {, {{ a.district.name }} district}<br />
+        {{ a.state.name }}, {{ a.country.name }}@if (a.pinCode) { - {{ a.pinCode }}}
       </p>
     }
   </section>

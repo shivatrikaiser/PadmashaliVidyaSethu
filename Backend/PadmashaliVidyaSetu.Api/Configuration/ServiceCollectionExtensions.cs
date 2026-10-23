@@ -38,6 +38,12 @@ public static class ServiceCollectionExtensions
                 "PhoneVerification:ExposeCodeInResponse may only be enabled in Development.")
             .Validate<IHostEnvironment>((o, env) => env.IsDevelopment() || !IsDevelopmentSender(o),
                 "PhoneVerification:Sender 'Development' may only be used in Development.")
+            .Validate<IHostEnvironment>((o, env) => env.IsDevelopment() || !IsSender(o.InternationalSender, VerificationSenders.Development),
+                "PhoneVerification:InternationalSender 'Development' may only be used in Development.")
+            .Validate<IHostEnvironment>((o, env) => env.IsDevelopment() || !IsSender(o.EmailSender, VerificationSenders.Development),
+                "PhoneVerification:EmailSender 'Development' may only be used in Development.")
+            .Validate(o => o.TestLogin.IsValid,
+                "PhoneVerification:TestLogin needs a valid MobileNumber and a 4-digit Code (or an empty MobileNumber to switch it off).")
             .ValidateOnStart();
         services.AddOptions<SmsOptions>().Bind(configuration.GetSection(SmsOptions.Section))
             .ValidateDataAnnotations()
@@ -45,6 +51,21 @@ public static class ServiceCollectionExtensions
                 (sms, verification) => !IsSender(verification.Value, VerificationSenders.SmsGatewayHub) || !sms.MissingSettings().Any(),
                 "PhoneVerification:Sender is SmsGatewayHub but SMS settings are incomplete (SMS:APIKey, OTPSenderId, " +
                 "OTPTemplateId, OTPEntityId, OTPTemplate with a {#...#} variable, https SMSURL).")
+            .ValidateOnStart();
+        services.AddOptions<WhatsAppOptions>().Bind(configuration.GetSection(WhatsAppOptions.Section))
+            .ValidateDataAnnotations()
+            .Validate<IOptions<PhoneVerificationOptions>>(
+                (whatsApp, verification) => !IsSender(verification.Value.InternationalSender, VerificationSenders.WhatsApp)
+                                            || !whatsApp.MissingSettings().Any(),
+                "PhoneVerification:InternationalSender is WhatsApp but WhatsApp settings are incomplete (WhatsApp:AccessToken, " +
+                "PhoneNumberId, TemplateName, TemplateLanguage, RecipientName, https GraphApiUrl).")
+            .ValidateOnStart();
+        services.AddOptions<EmailOptions>().Bind(configuration.GetSection(EmailOptions.Section))
+            .ValidateDataAnnotations()
+            .Validate<IOptions<PhoneVerificationOptions>>(
+                (email, verification) => !IsSender(verification.Value.EmailSender, VerificationSenders.Smtp) || !email.MissingSettings().Any(),
+                "PhoneVerification:EmailSender is Smtp but Email settings are incomplete (Email:Host, FromAddress, Security, " +
+                "Password when UserName is set).")
             .ValidateOnStart();
         services.AddOptions<RegistrationOptions>().Bind(configuration.GetSection(RegistrationOptions.Section)).ValidateDataAnnotations().ValidateOnStart();
         services.AddOptions<PinCodeLookupOptions>().Bind(configuration.GetSection(PinCodeLookupOptions.Section)).ValidateDataAnnotations().ValidateOnStart();
@@ -76,8 +97,9 @@ public static class ServiceCollectionExtensions
 
     private static bool IsDevelopmentSender(PhoneVerificationOptions o) => IsSender(o, VerificationSenders.Development);
 
-    private static bool IsSender(PhoneVerificationOptions o, string sender) =>
-        o.Sender.Equals(sender, StringComparison.OrdinalIgnoreCase);
+    private static bool IsSender(PhoneVerificationOptions o, string sender) => IsSender(o.Sender, sender);
+
+    private static bool IsSender(string configured, string sender) => configured.Equals(sender, StringComparison.OrdinalIgnoreCase);
 
     public static IServiceCollection AddPvsAuthentication(this IServiceCollection services)
     {
@@ -160,14 +182,35 @@ public static class ServiceCollectionExtensions
                 client.Timeout = TimeSpan.FromSeconds(sp.GetRequiredService<IOptions<SmsOptions>>().Value.TimeoutSeconds))
             // The request URL carries the API key and the code: never let HttpClient log it.
             .RemoveAllLoggers();
+        services.AddHttpClient<WhatsAppVerificationCodeSender>((sp, client) =>
+                client.Timeout = TimeSpan.FromSeconds(sp.GetRequiredService<IOptions<WhatsAppOptions>>().Value.TimeoutSeconds))
+            // The request carries the access token and the code: never let HttpClient log it.
+            .RemoveAllLoggers();
+        // Indian numbers: PhoneVerification:Sender (SMS). Other countries: PhoneVerification:InternationalSender (WhatsApp).
         services.AddScoped<IVerificationCodeSender>(sp =>
         {
             var verification = sp.GetRequiredService<IOptions<PhoneVerificationOptions>>().Value;
-            if (IsSender(verification, VerificationSenders.SmsGatewayHub))
-                return sp.GetRequiredService<SmsGatewayHubVerificationCodeSender>();
-            if (IsDevelopmentSender(verification))
-                return sp.GetRequiredService<DevelopmentVerificationCodeSender>();
-            return sp.GetRequiredService<NotConfiguredVerificationCodeSender>();
+            IVerificationCodeSender Resolve(string configured)
+            {
+                if (IsSender(configured, VerificationSenders.SmsGatewayHub))
+                    return sp.GetRequiredService<SmsGatewayHubVerificationCodeSender>();
+                if (IsSender(configured, VerificationSenders.WhatsApp))
+                    return sp.GetRequiredService<WhatsAppVerificationCodeSender>();
+                if (IsSender(configured, VerificationSenders.Development))
+                    return sp.GetRequiredService<DevelopmentVerificationCodeSender>();
+                return sp.GetRequiredService<NotConfiguredVerificationCodeSender>();
+            }
+            return new RoutingVerificationCodeSender(Resolve(verification.Sender), Resolve(verification.InternationalSender));
+        });
+        services.AddSingleton<SmtpVerificationEmailSender>();
+        services.AddSingleton<DevelopmentVerificationEmailSender>();
+        services.AddSingleton<NotConfiguredVerificationEmailSender>();
+        services.AddScoped<IVerificationEmailSender>(sp =>
+        {
+            var configured = sp.GetRequiredService<IOptions<PhoneVerificationOptions>>().Value.EmailSender;
+            if (IsSender(configured, VerificationSenders.Smtp)) return sp.GetRequiredService<SmtpVerificationEmailSender>();
+            if (IsSender(configured, VerificationSenders.Development)) return sp.GetRequiredService<DevelopmentVerificationEmailSender>();
+            return sp.GetRequiredService<NotConfiguredVerificationEmailSender>();
         });
 
         services.AddValidatorsFromAssemblyContaining<RegisterMemberRequestValidator>(ServiceLifetime.Singleton);

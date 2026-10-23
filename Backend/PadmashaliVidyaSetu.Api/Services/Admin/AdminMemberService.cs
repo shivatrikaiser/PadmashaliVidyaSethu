@@ -58,11 +58,14 @@ public sealed class AdminMemberService(
                 m.HighestEducationLevelOtherText,
                 Organisation = m.Organisation.Name,
                 Mobile = m.Account.MobileNumber,
+                m.Email,
                 Address = m.Addresses.Where(a => a.AddressType == AddressTypes.Permanent)
                     .Select(a => new
                     {
                         a.AddressLine1, a.AddressLine2, a.CityVillageName, a.PinCode,
-                        Taluk = a.Taluk.Name, District = a.District.Name, State = a.State.Name,
+                        Taluk = a.Taluk != null ? a.Taluk.Name : null,
+                        District = a.District != null ? a.District.Name : null,
+                        State = a.State.Name, Country = a.Country.Name,
                     })
                     .FirstOrDefault(),
                 m.IsActive, m.RegistrationCompletedDate,
@@ -72,9 +75,9 @@ public sealed class AdminMemberService(
         var today = clock.TodayInIndia();
         var csv = new StringBuilder();
         csv.AppendLine(string.Join(',', "Registration ID", "Full Name", "Father Name", "Mother Name", "Date of Birth", "Age",
-            "Gender", "Temple", "Current Status", "Class Studying", "Highest Education", "Organisation", "Mobile",
+            "Gender", "Temple", "Current Status", "Class Studying", "Highest Education", "Organisation", "Mobile", "Email",
             "Address Line 1", "Address Line 2", "City / Village", "PIN Code", "Taluk", "District", "State",
-            "Active", "Registered (UTC)"));
+            "Country", "Active", "Registered (UTC)"));
         foreach (var r in rows)
         {
             var education = r.HighestEducationLevelOtherText is null ? r.Education : $"{r.Education}: {r.HighestEducationLevelOtherText}";
@@ -82,9 +85,9 @@ public sealed class AdminMemberService(
             {
                 r.RegistrationId, r.FullName, r.FatherName, r.MotherName, r.DateOfBirth.ToString("yyyy-MM-dd"),
                 AgeCalculator.AgeOn(r.DateOfBirth, today), r.Gender, r.Temple, r.Status, r.Class, education,
-                r.Organisation, r.Mobile, r.Address?.AddressLine1, r.Address?.AddressLine2, r.Address?.CityVillageName,
+                r.Organisation, r.Mobile, r.Email, r.Address?.AddressLine1, r.Address?.AddressLine2, r.Address?.CityVillageName,
                 r.Address?.PinCode, r.Address?.Taluk, r.Address?.District, r.Address?.State,
-                r.IsActive ? "Yes" : "No", r.RegistrationCompletedDate.ToString("yyyy-MM-dd HH:mm"),
+                r.Address?.Country, r.IsActive ? "Yes" : "No", r.RegistrationCompletedDate.ToString("yyyy-MM-dd HH:mm"),
             }.Select(CsvField)));
         }
 
@@ -156,8 +159,8 @@ public sealed class AdminMemberService(
         query.Select(m => new MemberRow(
             m.RegistrationId, m.FullName, m.DateOfBirth, m.Gender.Name, m.Temple.Name, m.MemberStatus.Name,
             m.Class != null ? m.Class.Name : m.HighestEducationLevel != null ? m.HighestEducationLevel.Name : null,
-            m.Addresses.Where(a => a.AddressType == AddressTypes.Permanent).Select(a => a.District.Name).FirstOrDefault(),
-            m.Addresses.Where(a => a.AddressType == AddressTypes.Permanent).Select(a => a.Taluk.Name).FirstOrDefault(),
+            m.Addresses.Where(a => a.AddressType == AddressTypes.Permanent).Select(a => a.District != null ? a.District.Name : a.Country.Name).FirstOrDefault(),
+            m.Addresses.Where(a => a.AddressType == AddressTypes.Permanent).Select(a => a.Taluk != null ? a.Taluk.Name : null).FirstOrDefault(),
             m.Account.MobileNumber, m.IsActive, m.RegistrationCompletedDate));
 
     private sealed record MemberRow(

@@ -103,6 +103,7 @@ public sealed class RegistrationService(
             : [];
 
         var memberMobile = await ResolveMemberMobileAsync(r, accountId, now, errors, ct);
+        var memberEmail = await ResolveMemberEmailAsync(r, accountId, now, errors, ct);
 
         if (errors.Count > 0) throw new RequestValidationException(errors);
 
@@ -115,6 +116,8 @@ public sealed class RegistrationService(
             FullName = r.FullName.Tidy(),
             MobileNumber = memberMobile,
             MobileVerifiedDate = memberMobile is null ? null : now,
+            Email = memberEmail,
+            EmailVerifiedDate = memberEmail is null ? null : now,
             FatherName = r.FatherName.Tidy(),
             MotherName = r.MotherName.Tidy(),
             DateOfBirth = r.DateOfBirth.Value,
@@ -164,7 +167,7 @@ public sealed class RegistrationService(
         if (string.IsNullOrWhiteSpace(r.MobileNumber)) return null;
         if (!MobileNumber.TryNormalize(r.MobileNumber, out var mobile))
         {
-            errors.Add(new("mobileNumber", "Please enter a valid 10-digit mobile number, or leave it empty."));
+            errors.Add(new("mobileNumber", "Please enter a valid mobile number (with the country code outside India), or leave it empty."));
             return null;
         }
 
@@ -178,6 +181,29 @@ public sealed class RegistrationService(
         if (!verified)
             errors.Add(new("mobileNumber", "Please verify this mobile number with the code sent to it, or leave it empty."));
         return mobile;
+    }
+
+    /// <summary>
+    /// The member's email address: optional. When given it needs a <see cref="VerificationPurposes.MemberEmail"/> code
+    /// that this account verified for exactly that address within the last hour.
+    /// </summary>
+    private async Task<string?> ResolveMemberEmailAsync(RegisterMemberRequest r, int accountId, DateTime now,
+        List<ApiError> errors, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(r.Email)) return null;
+        if (!EmailAddress.TryNormalize(r.Email, out var email))
+        {
+            errors.Add(new("email", "Please enter a valid email address, or leave it empty."));
+            return null;
+        }
+
+        var since = now - VerificationPurposes.MemberMobileProofLifetime;
+        var verified = r.EmailVerificationId is { } challengeId && await db.PhoneVerificationChallenges.AnyAsync(c =>
+            c.ChallengeId == challengeId && c.Purpose == VerificationPurposes.MemberEmail && c.AccountId == accountId
+            && c.Email == email && c.VerifiedDate != null && c.VerifiedDate >= since, ct);
+        if (!verified)
+            errors.Add(new("email", "Please verify this email address with the code sent to it, or leave it empty."));
+        return email;
     }
 
     private async Task EnsureAccountCanAddMemberAsync(int accountId, RegisterMemberRequest r, CancellationToken ct)
@@ -211,11 +237,7 @@ public sealed class RegistrationService(
             errors.Add(new($"{prefix}.countryId", "Please select a valid country."));
             return null;
         }
-        if (country.Code != MasterCodes.CountryIndia)
-        {
-            errors.Add(new($"{prefix}.countryId", "Only addresses in India are supported at the moment."));
-            return null;
-        }
+        if (country.Code != MasterCodes.CountryIndia) return await BuildAddressOutsideIndiaAsync(a, prefix, addressType, country, errors, ct);
 
         var state = await db.States.FirstOrDefaultAsync(s => s.Id == a.StateId && s.CountryId == country.Id && s.IsActive, ct);
         if (state is null)
@@ -261,6 +283,40 @@ public sealed class RegistrationService(
             City = city,
             Taluk = taluk!,
             District = district,
+            State = state,
+            Country = country,
+        };
+    }
+
+    /// <summary>
+    /// An address outside India: State / Province from the country's list, or typed (added to that country's states
+    /// so the next member can pick it); optional postal code; no District, Taluk or PIN-code place.
+    /// </summary>
+    private async Task<MemberAddress?> BuildAddressOutsideIndiaAsync(
+        AddressRequest a, string prefix, string addressType, Country country, List<ApiError> errors, CancellationToken ct)
+    {
+        State? state;
+        if (a.StateId is not null)
+        {
+            state = await db.States.FirstOrDefaultAsync(s => s.Id == a.StateId && s.CountryId == country.Id && s.IsActive, ct);
+            if (state is null)
+            {
+                errors.Add(new($"{prefix}.stateId", "Please select a valid state / province for the selected country."));
+                return null;
+            }
+        }
+        else
+        {
+            state = await locations.ResolveStateAsync(country, a.NewStateName.Tidy(), ct);
+        }
+
+        return new MemberAddress
+        {
+            AddressType = addressType,
+            AddressLine1 = a.AddressLine1.Tidy(),
+            AddressLine2 = string.IsNullOrWhiteSpace(a.AddressLine2) ? null : a.AddressLine2.Tidy(),
+            PinCode = string.IsNullOrWhiteSpace(a.PinCode) ? null : a.PinCode.Tidy().ToUpperInvariant(),
+            CityVillageName = a.CityVillageName.Tidy(),
             State = state,
             Country = country,
         };

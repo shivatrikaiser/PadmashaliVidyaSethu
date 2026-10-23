@@ -7,8 +7,11 @@ import '../../core/api/api_exception.dart';
 import '../../providers/providers.dart';
 import '../../routing/routes.dart';
 import '../../utils/l10n.dart';
+import '../../utils/phone_countries.dart';
 import '../../utils/validators.dart';
 import '../../widgets/common.dart';
+import '../../widgets/country_code_picker.dart';
+import '../legal/legal_document_screen.dart';
 
 class PhoneScreen extends ConsumerStatefulWidget {
   const PhoneScreen({super.key});
@@ -20,6 +23,7 @@ class PhoneScreen extends ConsumerStatefulWidget {
 class _PhoneScreenState extends ConsumerState<PhoneScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _mobile;
+  late String _countryCode;
   bool _sending = false;
   String? _serverError;
 
@@ -27,7 +31,9 @@ class _PhoneScreenState extends ConsumerState<PhoneScreen> {
   void initState() {
     super.initState();
     // Coming back via "Change Mobile Number" keeps the previous entry for editing.
-    _mobile = TextEditingController(text: ref.read(pendingVerificationProvider)?.mobileNumber ?? '');
+    final pending = ref.read(pendingVerificationProvider);
+    _mobile = TextEditingController(text: pending?.mobileNumber ?? '');
+    _countryCode = pending?.countryCode ?? DialCodes.india;
   }
 
   @override
@@ -43,9 +49,10 @@ class _PhoneScreenState extends ConsumerState<PhoneScreen> {
     final mobile = Validators.digitsOnly(_mobile.text);
     setState(() => _sending = true);
     try {
-      final challenge = await ref.read(authRepositoryProvider).requestCode(mobile);
+      final challenge = await ref.read(authRepositoryProvider).requestCode(DialCodes.apiNumber(_countryCode, mobile));
       ref.read(pendingVerificationProvider.notifier).state = PendingVerification(
         mobileNumber: mobile,
+        countryCode: _countryCode,
         challenge: challenge,
         issuedAt: DateTime.now(),
       );
@@ -61,6 +68,7 @@ class _PhoneScreenState extends ConsumerState<PhoneScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
+    final india = _countryCode == DialCodes.india;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.phoneTitle)),
       body: SafeArea(
@@ -82,23 +90,37 @@ class _PhoneScreenState extends ConsumerState<PhoneScreen> {
                     autofocus: true,
                     keyboardType: TextInputType.phone,
                     autofillHints: const [AutofillHints.telephoneNumberNational],
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(10)],
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(DialCodes.maxDigits(_countryCode)),
+                    ],
                     style: theme.textTheme.titleLarge,
                     decoration: InputDecoration(
                       labelText: l10n.phoneLabel,
-                      hintText: l10n.phoneHint,
-                      prefixText: '+91  ',
-                      prefixIcon: const Icon(Icons.phone_outlined),
+                      hintText: india ? l10n.phoneHint : l10n.phoneHintInternational,
+                      prefixIcon: CountryCodePicker(
+                        key: const Key('countryCodePicker'),
+                        value: _countryCode,
+                        enabled: !_sending,
+                        onChanged: (code) => setState(() {
+                          _countryCode = code;
+                          _serverError = null;
+                        }),
+                      ),
                       errorText: _serverError,
                       errorMaxLines: 3,
                     ),
-                    validator: (v) => switch (Validators.mobile(v)) {
+                    validator: (v) => switch (Validators.mobile(v, countryCode: _countryCode)) {
                       null => null,
                       ValidationIssue.required => l10n.phoneRequired,
                       final issue => issue.text(l10n),
                     },
                     onFieldSubmitted: (_) => _send(),
                   ),
+                  if (!india) ...[
+                    const SizedBox(height: 16),
+                    InfoNote(key: const Key('whatsAppNote'), text: l10n.codeViaWhatsApp, icon: Icons.chat_outlined),
+                  ],
                   const SizedBox(height: 16),
                   InfoNote(text: l10n.phoneFamilyNote, icon: Icons.family_restroom_outlined),
                   const SizedBox(height: 32),
@@ -108,6 +130,9 @@ class _PhoneScreenState extends ConsumerState<PhoneScreen> {
                     loading: _sending,
                     onPressed: _send,
                   ),
+                  const SizedBox(height: 12),
+                  Text(l10n.agreeByContinuing, style: theme.textTheme.bodySmall, textAlign: TextAlign.center),
+                  LegalLinks(onPrivacy: () => context.push(Routes.privacy), onTerms: () => context.push(Routes.terms)),
                 ],
               ),
             ),

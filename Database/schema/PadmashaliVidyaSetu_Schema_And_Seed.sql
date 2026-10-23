@@ -2871,3 +2871,231 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023100540_AddressOutsideIndia'
+)
+BEGIN
+    ALTER TABLE [PVS_MemberAddresses] DROP CONSTRAINT [PVS_CK_MemberAddresses_PinCode];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023100540_AddressOutsideIndia'
+)
+BEGIN
+    DECLARE @var nvarchar(max);
+    SELECT @var = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[PVS_MemberAddresses]') AND [c].[name] = N'TalukId');
+    IF @var IS NOT NULL EXEC(N'ALTER TABLE [PVS_MemberAddresses] DROP CONSTRAINT ' + @var + ';');
+    ALTER TABLE [PVS_MemberAddresses] ALTER COLUMN [TalukId] int NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023100540_AddressOutsideIndia'
+)
+BEGIN
+    DROP INDEX [PVS_IX_MemberAddresses_PinCode] ON [PVS_MemberAddresses];
+    DECLARE @var1 nvarchar(max);
+    SELECT @var1 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[PVS_MemberAddresses]') AND [c].[name] = N'PinCode');
+    IF @var1 IS NOT NULL EXEC(N'ALTER TABLE [PVS_MemberAddresses] DROP CONSTRAINT ' + @var1 + ';');
+    ALTER TABLE [PVS_MemberAddresses] ALTER COLUMN [PinCode] varchar(10) NULL;
+    CREATE INDEX [PVS_IX_MemberAddresses_PinCode] ON [PVS_MemberAddresses] ([PinCode]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023100540_AddressOutsideIndia'
+)
+BEGIN
+    DECLARE @var2 nvarchar(max);
+    SELECT @var2 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[PVS_MemberAddresses]') AND [c].[name] = N'DistrictId');
+    IF @var2 IS NOT NULL EXEC(N'ALTER TABLE [PVS_MemberAddresses] DROP CONSTRAINT ' + @var2 + ';');
+    ALTER TABLE [PVS_MemberAddresses] ALTER COLUMN [DistrictId] int NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023100540_AddressOutsideIndia'
+)
+BEGIN
+    EXEC(N'ALTER TABLE [PVS_MemberAddresses] ADD CONSTRAINT [PVS_CK_MemberAddresses_CountryRules] CHECK (([CountryId] = 1 AND [PinCode] LIKE ''[1-9][0-9][0-9][0-9][0-9][0-9]'' AND [DistrictId] IS NOT NULL AND [TalukId] IS NOT NULL) OR ([CountryId] <> 1 AND [DistrictId] IS NULL AND [TalukId] IS NULL AND [CityId] IS NULL))');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023100540_AddressOutsideIndia'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261023100540_AddressOutsideIndia', N'10.0.12');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023110803_MemberEmail'
+)
+BEGIN
+    DECLARE @var3 nvarchar(max);
+    SELECT @var3 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[PVS_PhoneVerificationChallenges]') AND [c].[name] = N'MobileNumber');
+    IF @var3 IS NOT NULL EXEC(N'ALTER TABLE [PVS_PhoneVerificationChallenges] DROP CONSTRAINT ' + @var3 + ';');
+    ALTER TABLE [PVS_PhoneVerificationChallenges] ALTER COLUMN [MobileNumber] varchar(16) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023110803_MemberEmail'
+)
+BEGIN
+    ALTER TABLE [PVS_PhoneVerificationChallenges] ADD [Email] varchar(254) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023110803_MemberEmail'
+)
+BEGIN
+    ALTER TABLE [PVS_Members] ADD [Email] varchar(254) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023110803_MemberEmail'
+)
+BEGIN
+    ALTER TABLE [PVS_Members] ADD [EmailVerifiedDate] datetime2(3) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023110803_MemberEmail'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_PhoneVerificationChallenges_Email_CreatedDate] ON [PVS_PhoneVerificationChallenges] ([Email], [CreatedDate]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023110803_MemberEmail'
+)
+BEGIN
+    EXEC(N'ALTER TABLE [PVS_PhoneVerificationChallenges] ADD CONSTRAINT [PVS_CK_PhoneVerificationChallenges_Target] CHECK (([MobileNumber] IS NOT NULL AND [Email] IS NULL) OR ([MobileNumber] IS NULL AND [Email] IS NOT NULL))');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023110803_MemberEmail'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261023110803_MemberEmail', N'10.0.12');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023114125_AccountDeletion'
+)
+BEGIN
+    ALTER TABLE [PVS_Accounts] ADD [DeletedDate] datetime2(3) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023114125_AccountDeletion'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261023114125_AccountDeletion', N'10.0.12');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023123334_FooterSponsors'
+)
+BEGIN
+    ALTER TABLE [PVS_AppBranding] ADD [PoweredByUrl] nvarchar(500) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023123334_FooterSponsors'
+)
+BEGIN
+    CREATE TABLE [PVS_FooterSponsors] (
+        [FooterSponsorId] int NOT NULL IDENTITY,
+        [Name] nvarchar(150) NOT NULL,
+        [Designation] nvarchar(150) NULL,
+        [CompanyName] nvarchar(150) NULL,
+        [DisplayOrder] int NOT NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_FooterSponsors_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [ModifiedDate] datetime2(3) NULL,
+        [CreatedBy] nvarchar(100) NULL,
+        [ModifiedBy] nvarchar(100) NULL,
+        [IsActive] bit NOT NULL CONSTRAINT [PVS_DF_FooterSponsors_IsActive] DEFAULT CAST(1 AS bit),
+        CONSTRAINT [PVS_PK_FooterSponsors] PRIMARY KEY ([FooterSponsorId])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023123334_FooterSponsors'
+)
+BEGIN
+    EXEC(N'UPDATE [PVS_AppBranding] SET [PoweredByUrl] = N''https://play.google.com/store/apps/details?id=com.iqexplore.app''
+    WHERE [AppBrandingId] = 1;
+    SELECT @@ROWCOUNT');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023123334_FooterSponsors'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_FooterSponsors_IsActive_DisplayOrder] ON [PVS_FooterSponsors] ([IsActive], [DisplayOrder]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023123334_FooterSponsors'
+)
+BEGIN
+    INSERT INTO [PVS_FooterSponsors] ([Name], [CompanyName], [DisplayOrder], [CreatedBy]) SELECT [SponsorName], [SponsorOrganisation], 0, N'migration' FROM [PVS_AppBranding] WHERE [AppBrandingId] = 1 AND NULLIF(LTRIM(RTRIM([SponsorName])), N'') IS NOT NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023123334_FooterSponsors'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261023123334_FooterSponsors', N'10.0.12');
+END;
+
+COMMIT;
+GO
+

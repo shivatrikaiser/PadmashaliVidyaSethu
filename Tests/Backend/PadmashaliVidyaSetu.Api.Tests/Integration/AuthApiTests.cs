@@ -43,6 +43,31 @@ public sealed class AuthApiTests(PvsApiFactory factory)
     }
 
     [Fact]
+    public async Task RequestCode_NumberOutsideIndia_IsAccepted_AndStoredInE164()
+    {
+        var mobile = PvsApiFactory.NewUaeMobileNumber();
+        var response = await factory.CreateClient().PostAsJsonAsync("/api/v1/auth/verification-codes",
+            new { mobileNumber = mobile });
+
+        response.EnsureSuccessStatusCode();
+        var data = (await response.Content.ReadFromJsonAsync<Envelope<ChallengeData>>())!.Data!;
+        Assert.EndsWith(mobile[^4..], data.MaskedMobileNumber);
+        var stored = await factory.WithDbAsync(db => db.PhoneVerificationChallenges.SingleAsync(c => c.ChallengeId == data.ChallengeId));
+        Assert.Equal(mobile, stored.MobileNumber);
+    }
+
+    [Fact]
+    public async Task RequestCode_NumberOutsideIndia_SendsNoEmail()
+    {
+        var before = factory.EmailSender.Sent.Count;
+        var response = await factory.CreateClient().PostAsJsonAsync("/api/v1/auth/verification-codes",
+            new { mobileNumber = PvsApiFactory.NewUaeMobileNumber(), email = "ignored@example.com" });
+
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(before, factory.EmailSender.Sent.Count); // the phone code goes only to the phone (WhatsApp)
+    }
+
+    [Fact]
     public async Task StoredChallenge_NeverContainsPlainCode()
     {
         var mobile = PvsApiFactory.NewMobileNumber();

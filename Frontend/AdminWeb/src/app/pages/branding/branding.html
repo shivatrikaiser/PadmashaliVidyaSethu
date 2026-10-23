@@ -1,8 +1,8 @@
 <h1>App sponsor</h1>
 <p class="muted">
-  The sponsor appears on the app's splash screen, on the welcome screen (with organisation and address) and, with
-  "Powered by", in the footer of every screen. Leave the sponsor empty (and remove the logo) to hide it; leave
-  "Powered by" empty to hide that line.
+  The sponsor appears on the app's splash screen and on the welcome screen (with organisation and address). The
+  footer of every screen shows "Sponsored by:" with the active <a href="#footer-sponsors">footer sponsors</a>
+  scrolling beside it, and "Technology Powered by" with a link. Leave a field empty to hide it.
 </p>
 
 @if (error()) { <p class="alert">{{ error() }}</p> }
@@ -22,9 +22,16 @@
         <textarea name="address" [(ngModel)]="sponsorAddress" maxlength="300" rows="4"
           placeholder="e.g. 12, Car Street&#10;Udupi 576101"></textarea>
       </label>
-      <label>Powered by
+      <label>Technology Powered by
         <input name="poweredBy" [(ngModel)]="poweredBy" maxlength="150" placeholder="e.g. IQ Explore" />
       </label>
+      <label>"Powered by" link <small class="muted">(opened when it is tapped in the app - e.g. its Google Play page)</small>
+        <input name="poweredByUrl" [(ngModel)]="poweredByUrl" maxlength="500" type="url"
+          placeholder="https://play.google.com/store/apps/details?id=..." />
+      </label>
+      @if (!poweredByUrl.trim()) {
+        <div><button type="button" class="secondary" (click)="useIqExploreLink()">Use the IQ Explore Google Play link</button></div>
+      }
       @if (addressLines().length > 4) { <p class="alert">The address can have at most 4 lines.</p> }
       <div><button type="submit" [disabled]="busy()">Save text</button></div>
     </form>
@@ -45,6 +52,68 @@
 
     @if (branding()?.modifiedDate; as modified) {
       <p class="muted small">Last changed {{ modified | date: 'dd MMM yyyy, HH:mm' }}</p>
+    }
+
+    <h2 id="footer-sponsors">Footer sponsors
+      <small class="muted">(active ones scroll after "Sponsored by:", lowest order first)</small>
+    </h2>
+    @if (footerSponsors().length) {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Order</th><th>Name</th><th>Designation</th><th>Company</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody>
+            @for (s of footerSponsors(); track s.id) {
+              <tr [class.inactive]="!s.isActive">
+                <td>{{ s.displayOrder }}</td>
+                <td>{{ s.name }}</td>
+                <td>{{ s.designation }}</td>
+                <td>{{ s.companyName }}</td>
+                <td>
+                  <button type="button" class="link" (click)="toggleSponsor(s)" [disabled]="busy()"
+                    [title]="s.isActive ? 'Hide from the app' : 'Show in the app'">
+                    {{ s.isActive ? 'Active' : 'Inactive' }}
+                  </button>
+                </td>
+                <td class="row-actions">
+                  <button type="button" class="secondary" (click)="editSponsor(s)" [disabled]="busy()">Edit</button>
+                  <button type="button" class="secondary" (click)="deleteSponsor(s)" [disabled]="busy()">Remove</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <p class="muted">No footer sponsors yet.</p>
+    }
+
+    @if (editing; as e) {
+      <form class="fields sponsor-form" (ngSubmit)="saveSponsor()">
+        <h3>{{ e.id === null ? 'Add sponsor' : 'Edit sponsor' }}</h3>
+        <label>Name
+          <input name="sName" [(ngModel)]="e.value.name" maxlength="150" required placeholder="e.g. Sri K. Ramesh" />
+        </label>
+        <label>Designation <small class="muted">(optional)</small>
+          <input name="sDesignation" [(ngModel)]="e.value.designation" maxlength="150" placeholder="e.g. Managing Director" />
+        </label>
+        <label>Company <small class="muted">(optional)</small>
+          <input name="sCompany" [(ngModel)]="e.value.companyName" maxlength="150" placeholder="e.g. Sri Laxmi Silks" />
+        </label>
+        <label>Display order <small class="muted">(lower first)</small>
+          <input name="sOrder" type="number" min="0" max="9999" [(ngModel)]="e.value.displayOrder" />
+        </label>
+        <label class="check">
+          <input name="sActive" type="checkbox" [(ngModel)]="e.value.isActive" /> Active (shown in the app)
+        </label>
+        <div class="actions">
+          <button type="submit" [disabled]="busy() || !e.value.name.trim()">Save sponsor</button>
+          <button type="button" class="secondary" (click)="editing = null">Cancel</button>
+        </div>
+      </form>
+    } @else {
+      <div><button type="button" (click)="addSponsor()" [disabled]="busy()">Add sponsor</button></div>
     }
   </section>
 
@@ -85,9 +154,17 @@
     <!-- Footer on every screen -->
     <p class="preview-title">Footer (every screen)</p>
     <div class="footer">
-      @if (sponsorName.trim()) { <span>Sponsored by: <b>{{ sponsorName.trim() }}</b></span> }
-      @if (poweredBy.trim()) { <span>Powered by: <b>{{ poweredBy.trim() }}</b></span> }
-      @if (!sponsorName.trim() && !poweredBy.trim()) { <span class="muted">No footer.</span> }
+      @if (footerLine()) {
+        <span class="sponsor-line">Sponsored by: <span class="scroller"><b>{{ footerLine() }}</b></span></span>
+      }
+      @if (poweredBy.trim()) {
+        <span>Technology Powered by
+          @if (poweredByUrl.trim()) { <a [href]="poweredByUrl.trim()" target="_blank" rel="noopener"><b>{{ poweredBy.trim() }}</b></a> }
+          @else { <b>{{ poweredBy.trim() }}</b> }
+        </span>
+      }
+      @if (!footerLine() && !poweredBy.trim()) { <span class="muted">No footer.</span> }
     </div>
+    @if (footerLine()) { <p class="muted small">In the app the sponsor names scroll when they do not fit.</p> }
   </section>
 </div>

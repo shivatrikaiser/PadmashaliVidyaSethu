@@ -54,7 +54,7 @@ Engine: SQL Server 2019+ / Azure SQL. Schema source of truth: EF Core migrations
 | Table | Notes |
 |-------|-------|
 | `Members` | **PK `RegistrationId` char(11)** CHECK `PVS-[0-9][0-9]-[0-9][0-9][0-9][0-9]`. FKs to Account, Gender, Temple, MemberStatus, Class?, HighestEducationLevel?, Organisation. CHECK: `ClassId` and `HighestEducationLevelId` not both set. Indexes for temple, status+class, organisation, DOB (age-group reports). |
-| `MemberAddresses` | One `Permanent` + one `Current` per member (unique). Current is stored even when "same as permanent" (copied) so reports by current location work. CHECK PIN 6 digits. |
+| `MemberAddresses` | One `Permanent` + one `Current` per member (unique). Current is stored even when "same as permanent" (copied) so reports by current location work. CHECK `CountryRules`: India ⇒ 6-digit PIN, `DistrictId` and `TalukId` required; other countries ⇒ `DistrictId`, `TalukId`, `CityId` null and `PinCode` an optional postal code. |
 | `MemberDisabilities` | Member ↔ DisabilityType. **Sensitive.** |
 | `TempleRegistrationSequences` | Per-temple counter (0–9999) used by an atomic `MERGE … OUTPUT` to allocate `NNNN`. |
 
@@ -67,7 +67,7 @@ account deletion; never contains codes, tokens or sensitive personal data).
 ```
 Accounts 1─* Members *─1 Temples / Genders / MemberStatuses / Organisations
                 │  └─0..1 Classes | 0..1 EducationLevels
-                ├─1..2 MemberAddresses *─1 Taluks *─1 Districts *─1 States *─1 Countries
+                ├─1..2 MemberAddresses *─0..1 Taluks *─1 Districts *─1 States *─1 Countries  (abroad: address ─ State directly)
                 │                      └─0..1 Cities (PIN cache)
                 ├─* MemberDisabilities *─1 DisabilityTypes
                 └─* ConsentRecords

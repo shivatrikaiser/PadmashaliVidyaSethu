@@ -32,6 +32,36 @@ class VerificationChallenge {
   }
 }
 
+/// A code sent to a member's (optional) email address - its own code, separate from the mobile number's.
+class EmailChallenge {
+  const EmailChallenge({
+    required this.challengeId,
+    required this.maskedEmail,
+    required this.codeLength,
+    required this.resendAfterSeconds,
+    this.developmentCode,
+  });
+
+  final String challengeId;
+  final String maskedEmail;
+  final int codeLength;
+  final int resendAfterSeconds;
+
+  /// Only present when the backend runs in Development with code exposure enabled.
+  final String? developmentCode;
+
+  factory EmailChallenge.fromJson(Object? json) {
+    final m = json! as Json;
+    return EmailChallenge(
+      challengeId: m['challengeId']! as String,
+      maskedEmail: m['maskedEmail']! as String,
+      codeLength: m['codeLength']! as int,
+      resendAfterSeconds: m['resendAfterSeconds']! as int,
+      developmentCode: m['developmentCode'] as String?,
+    );
+  }
+}
+
 class AuthResult {
   const AuthResult({
     required this.accessToken,

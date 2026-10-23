@@ -16,6 +16,9 @@ public interface IBrandingService
     Task<AppBrandingDto> UpdateTextAsync(UpdateBrandingRequest request, CancellationToken ct);
     Task<AppBrandingDto> SetSponsorLogoAsync(byte[] bytes, CancellationToken ct);
     Task<AppBrandingDto> RemoveSponsorLogoAsync(CancellationToken ct);
+    Task<IReadOnlyList<FooterSponsorAdminDto>> ListFooterSponsorsAsync(CancellationToken ct);
+    Task<FooterSponsorAdminDto> SaveFooterSponsorAsync(int? id, SaveFooterSponsorRequest request, CancellationToken ct);
+    Task DeleteFooterSponsorAsync(int id, CancellationToken ct);
 }
 
 /// <summary>Sponsor (name, organisation, address) / "Powered by" for the app (single settings row).</summary>
@@ -30,15 +33,74 @@ public sealed class BrandingService(
     public const int MaxAddressLength = 300;
     public const int MaxAddressLines = 4;
 
+    public const int MaxUrlLength = 500;
+
     public async Task<AppBrandingDto> GetAsync(CancellationToken ct) =>
         ToDto(await db.AppBranding.AsNoTracking()
             .Select(b => new AppBranding
             {
                 SponsorName = b.SponsorName, SponsorOrganisation = b.SponsorOrganisation, SponsorAddress = b.SponsorAddress,
-                PoweredBy = b.PoweredBy, ModifiedDate = b.ModifiedDate,
+                PoweredBy = b.PoweredBy, PoweredByUrl = b.PoweredByUrl, ModifiedDate = b.ModifiedDate,
                 SponsorLogoContentType = b.SponsorLogoContentType,
             })
-            .SingleAsync(ct));
+            .SingleAsync(ct), await ActiveFooterSponsorsAsync(ct));
+
+    private async Task<IReadOnlyList<FooterSponsorDto>> ActiveFooterSponsorsAsync(CancellationToken ct) =>
+        await db.FooterSponsors.AsNoTracking()
+            .Where(s => s.IsActive)
+            .OrderBy(s => s.DisplayOrder).ThenBy(s => s.FooterSponsorId)
+            .Select(s => new FooterSponsorDto(s.Name, s.Designation, s.CompanyName))
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<FooterSponsorAdminDto>> ListFooterSponsorsAsync(CancellationToken ct) =>
+        await db.FooterSponsors.AsNoTracking()
+            .OrderBy(s => s.DisplayOrder).ThenBy(s => s.FooterSponsorId)
+            .Select(s => new FooterSponsorAdminDto(s.FooterSponsorId, s.Name, s.Designation, s.CompanyName, s.DisplayOrder,
+                s.IsActive, s.ModifiedDate ?? s.CreatedDate))
+            .ToListAsync(ct);
+
+    /// <summary>Adds (<paramref name="id"/> null) or updates a footer sponsor.</summary>
+    public async Task<FooterSponsorAdminDto> SaveFooterSponsorAsync(int? id, SaveFooterSponsorRequest request, CancellationToken ct)
+    {
+        var name = ValidText(request.Name, "name")
+                   ?? throw new RequestValidationException([new ApiError("name", "Enter the sponsor's name.")]);
+        var designation = ValidText(request.Designation, "designation");
+        var company = ValidText(request.CompanyName, "companyName");
+        if (request.DisplayOrder is < 0 or > 9999)
+            throw new RequestValidationException([new ApiError("displayOrder", "Use a number from 0 to 9999.")]);
+
+        FooterSponsor sponsor;
+        if (id is null)
+        {
+            sponsor = new FooterSponsor();
+            db.FooterSponsors.Add(sponsor);
+        }
+        else
+        {
+            sponsor = await db.FooterSponsors.SingleOrDefaultAsync(s => s.FooterSponsorId == id, ct)
+                      ?? throw new NotFoundException("This sponsor no longer exists.");
+        }
+        sponsor.Name = name;
+        sponsor.Designation = designation;
+        sponsor.CompanyName = company;
+        sponsor.DisplayOrder = request.DisplayOrder;
+        sponsor.IsActive = request.IsActive;
+
+        audit.Add(AuditActions.BrandingUpdated, "FooterSponsor", id?.ToString(),
+            $"{(id is null ? "added" : "updated")} footer sponsor '{name}' ({(request.IsActive ? "active" : "inactive")})");
+        await db.SaveChangesAsync(ct);
+        return new FooterSponsorAdminDto(sponsor.FooterSponsorId, sponsor.Name, sponsor.Designation, sponsor.CompanyName,
+            sponsor.DisplayOrder, sponsor.IsActive, sponsor.ModifiedDate ?? sponsor.CreatedDate);
+    }
+
+    public async Task DeleteFooterSponsorAsync(int id, CancellationToken ct)
+    {
+        var sponsor = await db.FooterSponsors.SingleOrDefaultAsync(s => s.FooterSponsorId == id, ct)
+                      ?? throw new NotFoundException("This sponsor no longer exists.");
+        db.FooterSponsors.Remove(sponsor);
+        audit.Add(AuditActions.BrandingUpdated, "FooterSponsor", id.ToString(), $"removed footer sponsor '{sponsor.Name}'");
+        await db.SaveChangesAsync(ct);
+    }
 
     public async Task<(byte[] Bytes, string ContentType, string Version)?> GetSponsorLogoAsync(CancellationToken ct)
     {
@@ -56,12 +118,14 @@ public sealed class BrandingService(
         var organisation = ValidText(request.SponsorOrganisation, "sponsorOrganisation");
         var address = ValidAddress(request.SponsorAddress);
         var poweredBy = ValidText(request.PoweredBy, "poweredBy");
+        var poweredByUrl = ValidUrl(request.PoweredByUrl, "poweredByUrl");
         var branding = await db.AppBranding.SingleAsync(ct);
         branding.SponsorName = sponsor;
         branding.SponsorOrganisation = organisation;
         branding.SponsorAddress = address;
         branding.PoweredBy = poweredBy;
-        return await SaveAsync(branding, $"sponsor '{sponsor}', organisation '{organisation}', powered by '{poweredBy}'", ct);
+        branding.PoweredByUrl = poweredByUrl;
+        return await SaveAsync(branding, $"sponsor '{sponsor}', organisation '{organisation}', powered by '{poweredBy}' ({poweredByUrl})", ct);
     }
 
     public async Task<AppBrandingDto> SetSponsorLogoAsync(byte[] bytes, CancellationToken ct)
@@ -90,12 +154,22 @@ public sealed class BrandingService(
         branding.ModifiedBy = currentUser.AuditName;
         audit.Add(AuditActions.BrandingUpdated, "AppBranding", null, details);
         await db.SaveChangesAsync(ct);
-        return ToDto(branding);
+        return ToDto(branding, await ActiveFooterSponsorsAsync(ct));
     }
 
-    private static AppBrandingDto ToDto(AppBranding b) => new(
+    private static AppBrandingDto ToDto(AppBranding b, IReadOnlyList<FooterSponsorDto> footerSponsors) => new(
         b.SponsorName, b.SponsorOrganisation, b.SponsorAddress, b.PoweredBy, b.SponsorLogoContentType is not null,
-        b.SponsorLogoContentType is null ? null : Version(b.ModifiedDate), b.ModifiedDate);
+        b.SponsorLogoContentType is null ? null : Version(b.ModifiedDate), b.ModifiedDate, b.PoweredByUrl, footerSponsors);
+
+    /// <summary>An https link (or nothing).</summary>
+    private static string? ValidUrl(string? value, string field)
+    {
+        var text = (value ?? string.Empty).Trim();
+        if (text.Length == 0) return null;
+        if (text.Length > MaxUrlLength || !Uri.TryCreate(text, UriKind.Absolute, out var url) || url.Scheme != Uri.UriSchemeHttps)
+            throw new RequestValidationException([new ApiError(field, "Enter a full https:// link, e.g. the app's Google Play page.")]);
+        return text;
+    }
 
     /// <summary>Changes whenever the settings change, so apps can cache the logo URL safely.</summary>
     private static string Version(DateTime? modified) => (modified?.Ticks ?? 0).ToString("x");

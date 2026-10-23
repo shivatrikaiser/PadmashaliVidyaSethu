@@ -112,6 +112,12 @@ abstract class AppLocalizations {
   /// **'Powered by'**
   String get poweredBy;
 
+  /// No description provided for @technologyPoweredBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Technology Powered by'**
+  String get technologyPoweredBy;
+
   /// No description provided for @appTagline.
   ///
   /// In en, this message translates to:
@@ -207,6 +213,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter a valid 10-digit mobile number.'**
   String get phoneInvalid;
+
+  /// No description provided for @phoneInvalidInternational.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid mobile number for the selected country code.'**
+  String get phoneInvalidInternational;
+
+  /// No description provided for @phoneHintInternational.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile number'**
+  String get phoneHintInternational;
+
+  /// No description provided for @codeViaWhatsApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Outside India, the verification code is sent to this number on WhatsApp.'**
+  String get codeViaWhatsApp;
+
+  /// No description provided for @emailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address.'**
+  String get emailInvalid;
+
+  /// No description provided for @memberEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email address (optional)'**
+  String get memberEmailLabel;
+
+  /// No description provided for @memberEmailHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'If you add an email address, we will send a separate code to it to confirm it.'**
+  String get memberEmailHelp;
+
+  /// No description provided for @memberEmailCodeSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 4-digit code sent to {email}.'**
+  String memberEmailCodeSent(String email);
+
+  /// No description provided for @memberEmailNeedsVerification.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify this email address, or leave it empty.'**
+  String get memberEmailNeedsVerification;
 
   /// No description provided for @verifyTitle.
   ///
@@ -562,6 +616,36 @@ abstract class AppLocalizations {
   /// **'Country'**
   String get country;
 
+  /// No description provided for @countryHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the country first. For India, the PIN code fills in the rest.'**
+  String get countryHelp;
+
+  /// No description provided for @cityTown.
+  ///
+  /// In en, this message translates to:
+  /// **'City / Town'**
+  String get cityTown;
+
+  /// No description provided for @stateProvince.
+  ///
+  /// In en, this message translates to:
+  /// **'State / Province / Region'**
+  String get stateProvince;
+
+  /// No description provided for @stateNotListed.
+  ///
+  /// In en, this message translates to:
+  /// **'My state / province is not listed'**
+  String get stateNotListed;
+
+  /// No description provided for @postalCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Postal Code (optional)'**
+  String get postalCode;
+
   /// No description provided for @isDisabled.
   ///
   /// In en, this message translates to:
@@ -613,14 +697,8 @@ abstract class AppLocalizations {
   /// No description provided for @privacyAgree.
   ///
   /// In en, this message translates to:
-  /// **'I have read and agree to the Privacy Policy.'**
+  /// **'I have read and agree to the Privacy Policy and the Terms and Conditions.'**
   String get privacyAgree;
-
-  /// No description provided for @viewPrivacyPolicy.
-  ///
-  /// In en, this message translates to:
-  /// **'View Privacy Policy'**
-  String get viewPrivacyPolicy;
 
   /// No description provided for @privacyPolicy.
   ///
@@ -628,11 +706,29 @@ abstract class AppLocalizations {
   /// **'Privacy Policy'**
   String get privacyPolicy;
 
-  /// No description provided for @privacyPolicyBody.
+  /// No description provided for @termsAndConditions.
   ///
   /// In en, this message translates to:
-  /// **'This is a placeholder. The D. K. Jilla Padmashali Vidyavardhaka Sangha (R), Udupi will publish the final privacy policy here.\n\nSummary of current practice:\n• We collect only the information needed for education, career and support programs.\n• Information is never shown in any public directory.\n• Disability information is visible only to you and specifically authorised Sangha staff.\n• You can ask the Sangha to correct or delete your information.\n• Communication from the Sangha will be sent only on the channels and topics you choose.'**
-  String get privacyPolicyBody;
+  /// **'Terms and Conditions'**
+  String get termsAndConditions;
+
+  /// No description provided for @agreeByContinuing.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing, you agree to our Terms and Conditions and Privacy Policy.'**
+  String get agreeByContinuing;
+
+  /// No description provided for @legalLastUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated: {date}'**
+  String legalLastUpdated(String date);
+
+  /// No description provided for @legalDraftNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft - this text is being reviewed and may change before the app is published.'**
+  String get legalDraftNote;
 
   /// No description provided for @guardianConsent.
   ///
@@ -778,6 +874,72 @@ abstract class AppLocalizations {
   /// **'Sign out of Padmashali Vidya Sethu on this device?'**
   String get signOutConfirm;
 
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'You can delete your Padmashali Vidya Sethu account. Please read what this means:'**
+  String get deleteAccountIntro;
+
+  /// No description provided for @deleteAccountPointMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Your account is closed.} =1{Your account and the 1 member registered with it are closed.} other{Your account and the {count} members registered with it are closed.}}'**
+  String deleteAccountPointMembers(int count);
+
+  /// No description provided for @deleteAccountPointNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'This mobile number cannot sign in or register again.'**
+  String get deleteAccountPointNumber;
+
+  /// No description provided for @deleteAccountPointRecords.
+  ///
+  /// In en, this message translates to:
+  /// **'The information you gave is kept in the Sangha\'s records, marked as deleted. It is no longer shown in the app.'**
+  String get deleteAccountPointRecords;
+
+  /// No description provided for @deleteAccountPointSignOut.
+  ///
+  /// In en, this message translates to:
+  /// **'You are signed out on this device.'**
+  String get deleteAccountPointSignOut;
+
+  /// No description provided for @deleteAccountUnderstood.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand that this cannot be undone.'**
+  String get deleteAccountUnderstood;
+
+  /// No description provided for @deleteAccountButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete My Account'**
+  String get deleteAccountButton;
+
+  /// No description provided for @deleteAccountConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your account?'**
+  String get deleteAccountConfirmTitle;
+
+  /// No description provided for @deleteAccountConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account will be deleted and this mobile number cannot be used to register again.'**
+  String get deleteAccountConfirmBody;
+
+  /// No description provided for @accountDeletedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been deleted.'**
+  String get accountDeletedNote;
+
   /// No description provided for @notifications.
   ///
   /// In en, this message translates to:
@@ -915,6 +1077,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PIN code must be exactly 6 digits.'**
   String get validationPinInvalid;
+
+  /// No description provided for @validationPostalCodeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check the postal code.'**
+  String get validationPostalCodeInvalid;
 
   /// No description provided for @validationDobRequired.
   ///

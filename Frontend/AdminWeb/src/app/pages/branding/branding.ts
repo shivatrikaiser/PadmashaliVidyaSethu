@@ -5,11 +5,20 @@ import { Observable } from 'rxjs';
 
 import { AdminApi } from '../../core/admin-api.service';
 import { errorMessage } from '../../core/api';
-import { AppBranding } from '../../core/models';
+import { AppBranding, FooterSponsor, FooterSponsorInput } from '../../core/models';
 
 const MAX_LOGO_KB = 300;
+const IQ_EXPLORE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.iqexplore.app';
 
-/** Sponsor (name, organisation, address) and "Powered by" shown in the app (Super Admin only). */
+const emptySponsor = (order: number): FooterSponsorInput => ({
+  name: '',
+  designation: '',
+  companyName: '',
+  displayOrder: order,
+  isActive: true,
+});
+
+/** Sponsor (name, organisation, address), footer sponsors and "Technology Powered by" shown in the app (Super Admin only). */
 @Component({
   selector: 'app-branding',
   imports: [FormsModule, DatePipe],
@@ -32,6 +41,19 @@ export class Branding {
   protected sponsorOrganisation = '';
   protected sponsorAddress = '';
   protected poweredBy = '';
+  protected poweredByUrl = '';
+
+  protected readonly footerSponsors = signal<FooterSponsor[]>([]);
+  /** The sponsor being added (id null) or edited; null when the form is closed. */
+  protected editing: { id: number | null; value: FooterSponsorInput } | null = null;
+
+  /** What the app's footer scrolls: active sponsors, in order, "Name, Designation, Company". */
+  protected readonly footerLine = computed(() =>
+    this.footerSponsors()
+      .filter((s) => s.isActive)
+      .map((s) => [s.name, s.designation, s.companyName].filter((p) => !!p).join(', '))
+      .join('   •   '),
+  );
 
   /** Address lines as the app shows them (blank lines dropped). */
   protected addressLines(): string[] {
@@ -43,6 +65,70 @@ export class Branding {
       next: (b) => this.apply(b),
       error: (e: unknown) => this.error.set(errorMessage(e)),
     });
+    this.loadSponsors();
+  }
+
+  private loadSponsors(): void {
+    this.api.footerSponsors().subscribe({
+      next: (list) => this.footerSponsors.set(list),
+      error: (e: unknown) => this.error.set(errorMessage(e)),
+    });
+  }
+
+  protected addSponsor(): void {
+    const last = this.footerSponsors().reduce((max, s) => Math.max(max, s.displayOrder), 0);
+    this.editing = { id: null, value: emptySponsor(last + 10) };
+  }
+
+  protected editSponsor(s: FooterSponsor): void {
+    this.editing = {
+      id: s.id,
+      value: {
+        name: s.name,
+        designation: s.designation ?? '',
+        companyName: s.companyName ?? '',
+        displayOrder: s.displayOrder,
+        isActive: s.isActive,
+      },
+    };
+  }
+
+  protected saveSponsor(): void {
+    const editing = this.editing;
+    if (!editing) return;
+    this.sponsorRequest(this.api.saveFooterSponsor(editing.id, editing.value), editing.id === null ? 'Sponsor added.' : 'Sponsor saved.');
+  }
+
+  protected toggleSponsor(s: FooterSponsor): void {
+    const value = { name: s.name, designation: s.designation ?? '', companyName: s.companyName ?? '', displayOrder: s.displayOrder, isActive: !s.isActive };
+    this.sponsorRequest(this.api.saveFooterSponsor(s.id, value), value.isActive ? 'Sponsor shown in the app.' : 'Sponsor hidden from the app.');
+  }
+
+  protected deleteSponsor(s: FooterSponsor): void {
+    if (!confirm(`Remove ${s.name} from the sponsor list? To hide a sponsor for now, make it inactive instead.`)) return;
+    this.sponsorRequest(this.api.deleteFooterSponsor(s.id), 'Sponsor removed.');
+  }
+
+  private sponsorRequest(request: Observable<unknown>, success: string): void {
+    this.busy.set(true);
+    this.error.set(null);
+    this.message.set(null);
+    request.subscribe({
+      next: () => {
+        this.busy.set(false);
+        this.editing = null;
+        this.message.set(`${success} The app shows it at the next start.`);
+        this.loadSponsors();
+      },
+      error: (e: unknown) => {
+        this.busy.set(false);
+        this.error.set(errorMessage(e));
+      },
+    });
+  }
+
+  protected useIqExploreLink(): void {
+    this.poweredByUrl = IQ_EXPLORE_PLAY_URL;
   }
 
   protected save(): void {
@@ -51,6 +137,7 @@ export class Branding {
       sponsorOrganisation: this.sponsorOrganisation,
       sponsorAddress: this.sponsorAddress,
       poweredBy: this.poweredBy,
+      poweredByUrl: this.poweredByUrl,
     };
     this.run(this.api.saveBranding(text), 'Saved. The app shows it at the next start.');
   }
@@ -94,5 +181,6 @@ export class Branding {
     this.sponsorOrganisation = b.sponsorOrganisation ?? '';
     this.sponsorAddress = b.sponsorAddress ?? '';
     this.poweredBy = b.poweredBy ?? '';
+    this.poweredByUrl = b.poweredByUrl ?? '';
   }
 }

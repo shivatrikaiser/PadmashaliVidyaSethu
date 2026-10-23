@@ -94,6 +94,18 @@ export const site = {
       title: 'Terms of use | VidyaSethu',
       description: 'Terms for using the VidyaSethu website.',
     },
+    pvsPrivacy: {
+      title: 'Padmashali Vidya Sethu app - Privacy Policy | VidyaSethu',
+      description: 'How the Padmashali Vidya Sethu app collects, uses, shares and keeps personal information.',
+    },
+    pvsTerms: {
+      title: 'Padmashali Vidya Sethu app - Terms and Conditions | VidyaSethu',
+      description: 'Terms for using the Padmashali Vidya Sethu app.',
+    },
+    pvsDeleteAccount: {
+      title: 'Padmashali Vidya Sethu app - Delete your account | VidyaSethu',
+      description: 'How to delete your Padmashali Vidya Sethu account, and what happens to your information.',
+    },
     accessibility: {
       title: 'Accessibility | VidyaSethu',
       description: 'Our approach to making VidyaSethu accessible, and how to report a problem.',

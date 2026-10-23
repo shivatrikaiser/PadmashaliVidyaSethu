@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.Options;
 using PadmashaliVidyaSetu.Api.Common;
 using PadmashaliVidyaSetu.Api.Configuration;
+using PadmashaliVidyaSetu.Api.Data.Seed;
 using DataConfig = PadmashaliVidyaSetu.Api.Data.Configurations.ConfigurationExtensions;
 using PadmashaliVidyaSetu.Api.DTOs;
 
@@ -74,22 +75,42 @@ public sealed class AddressRequestValidator : AbstractValidator<AddressRequest>
             .MinimumLength(3).WithMessage("Address is too short.")
             .MaximumLength(200);
         RuleFor(x => x.AddressLine2).MaximumLength(200);
-        RuleFor(x => x.PinCode)
-            .NotEmpty().WithMessage("Please enter the PIN code.")
-            .Matches(@"^[1-9]\d{5}$").WithMessage("PIN code must be exactly 6 digits.");
         RuleFor(x => x.CityVillageName)
             .NotEmpty().WithMessage("Please enter the city / village.")
             .MaximumLength(150);
         RuleFor(x => x.CountryId).NotNull().GreaterThan(0).WithMessage("Please select the country.");
-        RuleFor(x => x.StateId).NotNull().GreaterThan(0).WithMessage("Please select the state.");
-        RuleFor(x => x.DistrictId).NotNull().GreaterThan(0).WithMessage("Please select the district.");
-        RuleFor(x => x.TalukId)
-            .NotNull().WithMessage("Please select the taluk.")
-            .When(x => string.IsNullOrWhiteSpace(x.NewTalukName));
-        RuleFor(x => x.NewTalukName)
-            .MinimumLength(2).MaximumLength(100)
-            .Matches(RegisterMemberRequestValidator.NamePattern).WithMessage("Please use letters only for the taluk name.")
-            .When(x => x.TalukId is null && !string.IsNullOrWhiteSpace(x.NewTalukName));
+
+        // India: PIN code, then State / District / Taluk from the lists.
+        When(x => x.CountryId == SeedData.IndiaCountryId, () =>
+        {
+            RuleFor(x => x.PinCode)
+                .NotEmpty().WithMessage("Please enter the PIN code.")
+                .Matches(@"^[1-9]\d{5}$").WithMessage("PIN code must be exactly 6 digits.");
+            RuleFor(x => x.StateId).NotNull().GreaterThan(0).WithMessage("Please select the state.");
+            RuleFor(x => x.DistrictId).NotNull().GreaterThan(0).WithMessage("Please select the district.");
+            RuleFor(x => x.TalukId)
+                .NotNull().WithMessage("Please select the taluk.")
+                .When(x => string.IsNullOrWhiteSpace(x.NewTalukName));
+            RuleFor(x => x.NewTalukName)
+                .MinimumLength(2).MaximumLength(100)
+                .Matches(RegisterMemberRequestValidator.NamePattern).WithMessage("Please use letters only for the taluk name.")
+                .When(x => x.TalukId is null && !string.IsNullOrWhiteSpace(x.NewTalukName));
+        });
+
+        // Outside India: optional postal code and a State / Province, chosen or typed. No district or taluk.
+        When(x => x.CountryId is not null && x.CountryId != SeedData.IndiaCountryId, () =>
+        {
+            RuleFor(x => x.PinCode)
+                .Matches(@"^[A-Za-z0-9][A-Za-z0-9 \-]{1,9}$").WithMessage("Please check the postal code.")
+                .When(x => !string.IsNullOrWhiteSpace(x.PinCode));
+            RuleFor(x => x.StateId)
+                .NotNull().GreaterThan(0).WithMessage("Please select the state / province.")
+                .When(x => string.IsNullOrWhiteSpace(x.NewStateName));
+            RuleFor(x => x.NewStateName)
+                .MinimumLength(2).MaximumLength(100)
+                .Matches(RegisterMemberRequestValidator.NamePattern).WithMessage("Please use letters only for the state / province.")
+                .When(x => x.StateId is null && !string.IsNullOrWhiteSpace(x.NewStateName));
+        });
     }
 }
 

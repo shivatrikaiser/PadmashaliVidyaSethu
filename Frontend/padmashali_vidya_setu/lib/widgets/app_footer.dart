@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../providers/app_update.dart';
 import '../providers/providers.dart';
 import '../routing/routes.dart';
 import '../utils/l10n.dart';
 import 'app_update_views.dart';
+import 'marquee_text.dart';
 
 /// Wraps every screen (used from `MaterialApp.builder`):
 /// * [AppFooter] at the bottom - hidden on the splash screen, which shows its own sponsor card, and while the
@@ -90,36 +92,29 @@ class _AppFrameState extends ConsumerState<AppFrame> with WidgetsBindingObserver
   }
 }
 
-/// "Sponsored by" and "Powered by" from the admin portal ([appBrandingProvider]); nothing while they load or when
-/// both are empty.
+/// Footer of every screen, from the admin portal ([appBrandingProvider]); nothing while it loads or when empty:
+/// * "Sponsored by:" stays fixed and the active sponsors ("Name, Designation, Company", one after another) scroll
+///   beside it when they do not fit;
+/// * "Technology Powered by IQ Explore" - tapping the name opens its link (the IQ Explore app on Google Play).
 class AppFooter extends ConsumerWidget {
   const AppFooter({super.key});
+
+  static const _separator = '   \u2022   ';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final branding = ref.watch(appBrandingProvider).valueOrNull;
-    final sponsor = branding?.sponsorName;
+    final sponsors = branding?.footerSponsors ?? const [];
     final poweredBy = branding?.poweredBy;
-    final hasSponsor = sponsor != null && sponsor.isNotEmpty;
+    final poweredByUrl = branding?.poweredByUrl;
+    final hasSponsors = sponsors.isNotEmpty;
     final hasPoweredBy = poweredBy != null && poweredBy.isNotEmpty;
-    if (!hasSponsor && !hasPoweredBy) return const SizedBox.shrink();
+    if (!hasSponsors && !hasPoweredBy) return const SizedBox.shrink();
 
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final labelStyle = theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant);
     final nameStyle = labelStyle?.copyWith(fontWeight: FontWeight.w700, color: theme.colorScheme.primary);
-    Widget credit(Key key, String label, String name) => Text.rich(
-      key: key,
-      TextSpan(
-        text: '$label ',
-        style: labelStyle,
-        children: [TextSpan(text: name, style: nameStyle)],
-      ),
-      textAlign: TextAlign.center,
-      // Each credit on its own single line; a very long name is shortened with "...".
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-    );
 
     return Material(
       color: theme.colorScheme.surfaceContainer,
@@ -130,12 +125,62 @@ class AppFooter extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (hasSponsor) credit(const Key('footerSponsor'), l10n.sponsoredBy, sponsor),
-            if (hasSponsor && hasPoweredBy) const SizedBox(height: 2),
-            if (hasPoweredBy) credit(const Key('footerPoweredBy'), '${l10n.poweredBy}:', poweredBy),
+            if (hasSponsors)
+              Row(
+                key: const Key('footerSponsor'),
+                children: [
+                  Text(l10n.sponsoredBy, style: labelStyle),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: MarqueeText(
+                      key: const Key('footerSponsorNames'),
+                      sponsors.map((s) => s.text).join(_separator),
+                      style: nameStyle,
+                    ),
+                  ),
+                ],
+              ),
+            if (hasSponsors && hasPoweredBy) const SizedBox(height: 4),
+            if (hasPoweredBy)
+              Row(
+                key: const Key('footerPoweredBy'),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // On a narrow screen the label gives way ("...") so the name stays readable and tappable.
+                  Flexible(
+                    child: Text(
+                      '${l10n.technologyPoweredBy} ',
+                      style: labelStyle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (poweredByUrl != null && poweredByUrl.isNotEmpty)
+                    Semantics(
+                      link: true,
+                      child: InkWell(
+                        key: const Key('footerPoweredByLink'),
+                        onTap: () => _open(poweredByUrl),
+                        child: Text(
+                          poweredBy,
+                          style: nameStyle?.copyWith(decoration: TextDecoration.underline),
+                          maxLines: 1,
+                        ),
+                      ),
+                    )
+                  else
+                    Text(poweredBy, style: nameStyle, maxLines: 1),
+                ],
+              ),
           ],
         ),
       ),
     );
+  }
+
+  /// Opens the link outside the app, so a Google Play link opens the Play Store app.
+  static Future<void> _open(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri != null) await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 }

@@ -39,4 +39,25 @@ public sealed class AdminBrandingController(IBrandingService branding) : Control
     [HttpDelete("sponsor-logo")]
     public async Task<ActionResult<ApiResponse<AppBrandingDto>>> RemoveLogo(CancellationToken ct) =>
         Ok(ApiResponse<AppBrandingDto>.Ok(await branding.RemoveSponsorLogoAsync(ct), "Logo removed."));
+
+    /// <summary>All footer sponsors (active and inactive), in display order.</summary>
+    [HttpGet("footer-sponsors")]
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<FooterSponsorAdminDto>>>> FooterSponsors(CancellationToken ct) =>
+        Ok(ApiResponse<IReadOnlyList<FooterSponsorAdminDto>>.Ok(await branding.ListFooterSponsorsAsync(ct)));
+
+    [HttpPost("footer-sponsors")]
+    public async Task<ActionResult<ApiResponse<FooterSponsorAdminDto>>> AddFooterSponsor(SaveFooterSponsorRequest request, CancellationToken ct) =>
+        Ok(ApiResponse<FooterSponsorAdminDto>.Ok(await branding.SaveFooterSponsorAsync(null, request, ct), "Sponsor added."));
+
+    [HttpPut("footer-sponsors/{id:int}")]
+    public async Task<ActionResult<ApiResponse<FooterSponsorAdminDto>>> UpdateFooterSponsor(int id, SaveFooterSponsorRequest request,
+        CancellationToken ct) =>
+        Ok(ApiResponse<FooterSponsorAdminDto>.Ok(await branding.SaveFooterSponsorAsync(id, request, ct), "Sponsor saved."));
+
+    [HttpDelete("footer-sponsors/{id:int}")]
+    public async Task<ActionResult<ApiResponse<object>>> DeleteFooterSponsor(int id, CancellationToken ct)
+    {
+        await branding.DeleteFooterSponsorAsync(id, ct);
+        return Ok(ApiResponse<object>.Ok(new { Deleted = true }, "Sponsor removed."));
+    }
 }

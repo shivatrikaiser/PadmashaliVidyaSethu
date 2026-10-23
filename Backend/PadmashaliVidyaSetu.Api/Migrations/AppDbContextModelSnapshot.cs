@@ -39,6 +39,9 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasColumnType("datetime2(3)")
                         .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Accounts_CreatedDate");
 
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2(3)");
+
                     b.Property<int>("FailedPasswordAttempts")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
@@ -136,6 +139,11 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2(3)");
 
+                    b.Property<string>("Email")
+                        .HasMaxLength(254)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(254)");
+
                     b.Property<DateTime>("ExpiresDate")
                         .HasColumnType("datetime2(3)");
 
@@ -143,7 +151,6 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("MobileNumber")
-                        .IsRequired()
                         .HasMaxLength(16)
                         .IsUnicode(false)
                         .HasColumnType("varchar(16)");
@@ -167,10 +174,17 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.HasKey("ChallengeId")
                         .HasName("PVS_PK_PhoneVerificationChallenges");
 
+                    b.HasIndex("Email", "CreatedDate")
+                        .HasDatabaseName("PVS_IX_PhoneVerificationChallenges_Email_CreatedDate");
+
                     b.HasIndex("MobileNumber", "CreatedDate")
                         .HasDatabaseName("PVS_IX_PhoneVerificationChallenges_MobileNumber_CreatedDate");
 
-                    b.ToTable("PVS_PhoneVerificationChallenges", (string)null);
+                    b.ToTable("PVS_PhoneVerificationChallenges", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_PhoneVerificationChallenges_Target", "([MobileNumber] IS NOT NULL AND [Email] IS NULL) OR ([MobileNumber] IS NULL AND [Email] IS NOT NULL)")
+                                .HasName("PVS_CK_PhoneVerificationChallenges_Target");
+                        });
                 });
 
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Accounts.RefreshToken", b =>
@@ -6155,6 +6169,14 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date");
 
+                    b.Property<string>("Email")
+                        .HasMaxLength(254)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(254)");
+
+                    b.Property<DateTime?>("EmailVerifiedDate")
+                        .HasColumnType("datetime2(3)");
+
                     b.Property<string>("FatherName")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -6298,7 +6320,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasColumnType("datetime2(3)")
                         .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_MemberAddresses_CreatedDate");
 
-                    b.Property<int>("DistrictId")
+                    b.Property<int?>("DistrictId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
@@ -6314,11 +6336,9 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasColumnType("datetime2(3)");
 
                     b.Property<string>("PinCode")
-                        .IsRequired()
-                        .HasMaxLength(6)
+                        .HasMaxLength(10)
                         .IsUnicode(false)
-                        .HasColumnType("char(6)")
-                        .IsFixedLength();
+                        .HasColumnType("varchar(10)");
 
                     b.Property<string>("RegistrationId")
                         .IsRequired()
@@ -6330,7 +6350,7 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.Property<int>("StateId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TalukId")
+                    b.Property<int?>("TalukId")
                         .HasColumnType("int");
 
                     b.HasKey("MemberAddressId")
@@ -6363,8 +6383,8 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                             t.HasCheckConstraint("CK_MemberAddresses_AddressType", "[AddressType] IN ('Permanent', 'Current')")
                                 .HasName("PVS_CK_MemberAddresses_AddressType");
 
-                            t.HasCheckConstraint("CK_MemberAddresses_PinCode", "[PinCode] LIKE '[1-9][0-9][0-9][0-9][0-9][0-9]'")
-                                .HasName("PVS_CK_MemberAddresses_PinCode");
+                            t.HasCheckConstraint("CK_MemberAddresses_CountryRules", "([CountryId] = 1 AND [PinCode] LIKE '[1-9][0-9][0-9][0-9][0-9][0-9]' AND [DistrictId] IS NOT NULL AND [TalukId] IS NOT NULL) OR ([CountryId] <> 1 AND [DistrictId] IS NULL AND [TalukId] IS NULL AND [CityId] IS NULL)")
+                                .HasName("PVS_CK_MemberAddresses_CountryRules");
                         });
                 });
 
@@ -6749,6 +6769,10 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.Property<string>("PoweredByUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("SponsorAddress")
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
@@ -6782,7 +6806,8 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         new
                         {
                             AppBrandingId = 1,
-                            PoweredBy = "IQ Explore"
+                            PoweredBy = "IQ Explore",
+                            PoweredByUrl = "https://play.google.com/store/apps/details?id=com.iqexplore.app"
                         });
                 });
 
@@ -6839,6 +6864,60 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                             IsMandatory = true,
                             LatestVersion = "1.0.0"
                         });
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Settings.FooterSponsor", b =>
+                {
+                    b.Property<int>("FooterSponsorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FooterSponsorId"));
+
+                    b.Property<string>("CompanyName")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_FooterSponsors_CreatedDate");
+
+                    b.Property<string>("Designation")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true, "PVS_DF_FooterSponsors_IsActive");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("FooterSponsorId")
+                        .HasName("PVS_PK_FooterSponsors");
+
+                    b.HasIndex("IsActive", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_FooterSponsors_IsActive_DisplayOrder");
+
+                    b.ToTable("PVS_FooterSponsors", (string)null);
                 });
 
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Settings.PushNotification", b =>
@@ -7095,7 +7174,6 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .WithMany()
                         .HasForeignKey("DistrictId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
                         .HasConstraintName("PVS_FK_MemberAddresses_Districts_DistrictId");
 
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.Members.Member", "Member")
@@ -7116,7 +7194,6 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .WithMany()
                         .HasForeignKey("TalukId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
                         .HasConstraintName("PVS_FK_MemberAddresses_Taluks_TalukId");
 
                     b.Navigation("City");

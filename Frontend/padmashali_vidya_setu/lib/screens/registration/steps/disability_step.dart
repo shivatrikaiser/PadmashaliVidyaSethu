@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../models/master_data_item.dart';
 import '../../../providers/providers.dart';
+import '../../../routing/routes.dart';
 import '../../../utils/l10n.dart';
 import '../../../utils/validators.dart';
 import '../../../widgets/common.dart';
+import '../../legal/legal_document_screen.dart';
 import 'step_base.dart';
 
 /// "Is Disabled?" (default No). Type of Disability appears only for Yes; "Other" asks to specify.
@@ -24,18 +27,6 @@ class _DisabilityStepState extends State<DisabilityStep> {
   void dispose() {
     _other.dispose();
     super.dispose();
-  }
-
-  void _showPrivacyPolicy() {
-    final l10n = context.l10n;
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.privacyPolicy),
-        content: SingleChildScrollView(child: Text(l10n.privacyPolicyBody)),
-        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.ok))],
-      ),
-    );
   }
 
   @override
@@ -110,13 +101,10 @@ class _DisabilityStepState extends State<DisabilityStep> {
             widget.onFieldChanged('acceptPrivacyPolicy');
           },
         ),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: TextButton.icon(
-            onPressed: _showPrivacyPolicy,
-            icon: const Icon(Icons.policy_outlined),
-            label: Text(l10n.viewPrivacyPolicy),
-          ),
+        LegalLinks(
+          alignment: WrapAlignment.start,
+          onPrivacy: () => context.push(Routes.privacy),
+          onTerms: () => context.push(Routes.terms),
         ),
         if (draft.needsGuardianConsent)
           _ConsentCheckbox(

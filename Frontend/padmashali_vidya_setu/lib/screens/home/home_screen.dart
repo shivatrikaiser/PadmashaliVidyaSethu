@@ -292,6 +292,12 @@ class _AccountMenu extends ConsumerWidget {
       onSelected: (value) async {
         if (value == 'add') {
           await context.push(Routes.register);
+        } else if (value == 'delete') {
+          await context.push(Routes.deleteAccount);
+        } else if (value == 'privacy') {
+          await context.push(Routes.privacy);
+        } else if (value == 'terms') {
+          await context.push(Routes.terms);
         } else if (value == 'signOut') {
           final confirmed = await showDialog<bool>(
             context: context,
@@ -308,7 +314,10 @@ class _AccountMenu extends ConsumerWidget {
       },
       itemBuilder: (_) => [
         if (canAddMember) PopupMenuItem(value: 'add', child: Text(l10n.addFamilyMember)),
+        PopupMenuItem(value: 'privacy', child: Text(l10n.privacyPolicy)),
+        PopupMenuItem(value: 'terms', child: Text(l10n.termsAndConditions)),
         PopupMenuItem(value: 'signOut', child: Text(l10n.signOut)),
+        PopupMenuItem(key: const Key('deleteAccountMenuItem'), value: 'delete', child: Text(l10n.deleteAccountTitle)),
       ],
     );
   }

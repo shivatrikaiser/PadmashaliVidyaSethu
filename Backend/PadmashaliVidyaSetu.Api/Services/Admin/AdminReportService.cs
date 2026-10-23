@@ -77,7 +77,8 @@ public sealed class AdminReportService(AppDbContext db, TimeProvider clock) : IA
 
         var byDistrict = await active
             .SelectMany(m => m.Addresses.Where(a => a.AddressType == AddressTypes.Permanent))
-            .GroupBy(a => a.District.Name)
+            // Members living outside India are counted under their country.
+            .GroupBy(a => a.District != null ? a.District.Name : a.Country.Name)
             .Select(g => new { Name = g.Key, Count = g.Count() })
             .OrderByDescending(x => x.Count).ThenBy(x => x.Name)
             .Take(15)

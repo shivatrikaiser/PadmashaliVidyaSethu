@@ -31,6 +31,8 @@ export interface Organization {
   publicContact: OrganizationContact | null;
   highlights: readonly OrganizationHighlight[];
   branding: OrganizationBranding;
+  /** The organization's app documents are published at /organizations/{slug}/privacy, /terms and /delete-account. */
+  appPolicyPages?: boolean;
 }
 
 export type OrganizationCategory =

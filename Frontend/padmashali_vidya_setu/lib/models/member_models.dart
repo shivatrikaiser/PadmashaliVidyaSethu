@@ -152,10 +152,10 @@ class AddressView {
     required this.addressType,
     required this.addressLine1,
     this.addressLine2,
-    required this.pinCode,
+    this.pinCode,
     required this.cityVillageName,
-    required this.taluk,
-    required this.district,
+    this.taluk,
+    this.district,
     required this.state,
     required this.country,
   });
@@ -163,10 +163,14 @@ class AddressView {
   final String addressType;
   final String addressLine1;
   final String? addressLine2;
-  final String pinCode;
+
+  /// PIN code in India; outside India the postal code, if any.
+  final String? pinCode;
   final String cityVillageName;
-  final String taluk;
-  final String district;
+
+  /// Null for an address outside India (also [district]).
+  final String? taluk;
+  final String? district;
   final String state;
   final String country;
 
@@ -178,10 +182,10 @@ class AddressView {
       addressType: m['addressType']! as String,
       addressLine1: m['addressLine1']! as String,
       addressLine2: m['addressLine2'] as String?,
-      pinCode: m['pinCode']! as String,
+      pinCode: m['pinCode'] as String?,
       cityVillageName: m['cityVillageName']! as String,
-      taluk: LookupRef.fromJson(m['taluk'])!.name,
-      district: LookupRef.fromJson(m['district'])!.name,
+      taluk: LookupRef.fromJson(m['taluk'])?.name,
+      district: LookupRef.fromJson(m['district'])?.name,
       state: LookupRef.fromJson(m['state'])!.name,
       country: LookupRef.fromJson(m['country'])!.name,
     );

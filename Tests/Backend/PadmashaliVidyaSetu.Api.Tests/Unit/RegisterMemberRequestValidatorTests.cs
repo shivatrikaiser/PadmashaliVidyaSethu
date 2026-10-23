@@ -73,6 +73,32 @@ public sealed class RegisterMemberRequestValidatorTests
     public void NewTalukName_InsteadOfTalukId_IsAccepted() =>
         Assert.True(_validator.Validate(Valid() with { PermanentAddress = ValidAddress with { TalukId = null, NewTalukName = "Kadaba" } }).IsValid);
 
+    private static readonly AddressRequest AddressOutsideIndia =
+        new("Flat 504, Al Nahda Tower", null, null, "Dubai", null, null, null, null, null, 2, "Dubai");
+
+    [Fact]
+    public void AddressOutsideIndia_WithoutPinDistrictOrTaluk_IsAccepted() =>
+        Assert.True(_validator.Validate(Valid() with { PermanentAddress = AddressOutsideIndia }).IsValid);
+
+    [Theory]
+    [InlineData("SW1A 1AA")]
+    [InlineData("10115")]
+    [InlineData("K1A-0B1")]
+    public void PostalCodeOutsideIndia_IsAccepted(string postalCode) =>
+        Assert.True(_validator.Validate(Valid() with { PermanentAddress = AddressOutsideIndia with { PinCode = postalCode } }).IsValid);
+
+    [Theory]
+    [InlineData("#123")]
+    [InlineData("12345678901")]
+    public void InvalidPostalCodeOutsideIndia_IsRejected(string postalCode) =>
+        Assert.Contains("permanentAddress.pinCode",
+            ErrorFields(Valid() with { PermanentAddress = AddressOutsideIndia with { PinCode = postalCode } }));
+
+    [Fact]
+    public void AddressOutsideIndia_WithoutState_IsRejected() =>
+        Assert.Contains("permanentAddress.stateId",
+            ErrorFields(Valid() with { PermanentAddress = AddressOutsideIndia with { NewStateName = null } }));
+
     [Fact]
     public void CurrentAddressRequired_WhenNotSameAsPermanent() =>
         Assert.Contains("currentAddress", ErrorFields(Valid() with { CurrentAddressSameAsPermanent = false }));

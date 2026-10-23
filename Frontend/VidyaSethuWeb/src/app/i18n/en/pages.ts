@@ -255,6 +255,12 @@ export const pages = {
     highlightsTitle: 'What members can do',
     highlightStatus: { available: 'Available', planned: 'Planned' },
     aboutTitle: 'About the organization',
+    appPoliciesTitle: 'App policies',
+    appPolicyLinks: {
+      privacy: 'Privacy Policy',
+      terms: 'Terms and Conditions',
+      deleteAccount: 'Delete your account',
+    },
     contactTitle: 'Contact',
     contactNone: (name: string) =>
       `Contact details for ${name} have not been published on VidyaSethu. Members can find them in the ${name} portal.`,

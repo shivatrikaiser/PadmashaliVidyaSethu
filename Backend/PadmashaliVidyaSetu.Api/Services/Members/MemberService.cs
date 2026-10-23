@@ -89,7 +89,8 @@ public sealed class MemberService(
             member.Addresses
                 .OrderBy(a => a.AddressType == AddressTypes.Permanent ? 0 : 1)
                 .Select(a => new AddressDto(a.AddressType, a.AddressLine1, a.AddressLine2, a.PinCode, a.CityVillageName,
-                    Ref(a.Taluk.Id, a.Taluk.Name), Ref(a.District.Id, a.District.Name),
+                    a.Taluk is null ? null : Ref(a.Taluk.Id, a.Taluk.Name),
+                    a.District is null ? null : Ref(a.District.Id, a.District.Name),
                     Ref(a.State.Id, a.State.Name), Ref(a.Country.Id, a.Country.Name)))
                 .ToList(),
             canSeeSensitive && member.IsDisabled,
@@ -97,7 +98,8 @@ public sealed class MemberService(
                 ? member.Disabilities.Select(d => Ref(d.DisabilityType.Id, WithOther(d.DisabilityType.Name, d.OtherText))).ToList()
                 : [],
             member.RegistrationCompletedDate,
-            member.MobileNumber);
+            member.MobileNumber,
+            member.Email);
     }
 
     public async Task<MemberDashboardDto> GetDashboardAsync(string registrationId, CancellationToken ct)

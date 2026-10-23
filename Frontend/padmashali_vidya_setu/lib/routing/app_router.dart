@@ -3,11 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../providers/providers.dart';
+import '../screens/account/delete_account_screen.dart';
 import '../screens/auth/phone_screen.dart';
 import '../screens/auth/splash_screen.dart';
 import '../screens/auth/verify_code_screen.dart';
 import '../screens/auth/welcome_screen.dart';
+import '../legal/legal_documents.dart';
 import '../screens/home/home_screen.dart';
+import '../screens/legal/legal_document_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/registration/registration_complete_screen.dart';
 import '../screens/registration/registration_screen.dart';
@@ -38,6 +41,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, state) => RegistrationCompleteScreen(args: state.extra as RegistrationCompleteArgs?),
       ),
       GoRoute(path: Routes.home, builder: (_, _) => const HomeScreen()),
+      GoRoute(path: Routes.deleteAccount, builder: (_, _) => const DeleteAccountScreen()),
+      GoRoute(
+        path: Routes.privacy,
+        builder: (_, _) => const LegalDocumentScreen(document: LegalDocuments.privacyPolicy),
+      ),
+      GoRoute(
+        path: Routes.terms,
+        builder: (_, _) => const LegalDocumentScreen(document: LegalDocuments.termsAndConditions),
+      ),
       GoRoute(
         path: Routes.profilePattern,
         builder: (_, state) => ProfileScreen(registrationId: state.pathParameters['registrationId']!),

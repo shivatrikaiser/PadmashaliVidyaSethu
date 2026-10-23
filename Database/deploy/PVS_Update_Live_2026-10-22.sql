@@ -1,25 +1,32 @@
 ﻿/*
 ================================================================================================================
-  Padmashali Vidya Setu (PVS) - UPDATE for IQExplore Live: Android package name com.vidyasethu.pvs
-  Brings Live from migration 20261022044620_PushNotifications to 20261022051124_AndroidPackageName.
-  Tested on IQExploreDB_dev_02 (same starting migration as Live) before release.
+  Padmashali Vidya Setu (PVS) - UPDATE for IQExplore Live, 22 Oct 2026
+  Brings Live from migration 20261020155916_AdminPasswords (verified read-only on 22 Oct 2026: Live's 47 PVS tables
+  match it exactly) to 20261022051124_AndroidPackageName. Replaces the three separate 2026-10-22 update scripts.
+  Tested on IQExploreDB_dev_02.
 ================================================================================================================
-  WHAT IT CHANGES (PVS objects only)
-    PVS_AppVersions: the android row's StoreUrl ("Update now" link) becomes
-    https://play.google.com/store/apps/details?id=com.vidyasethu.pvs - only if it is still the original
-    org.padmashalividyasetu... link.
-    Nothing outside PVS_ objects is created, altered or written.
+  WHAT IT CHANGES (PVS objects only - nothing outside PVS_ objects is created, altered or written)
+    1. 20261022042837_MemberMobileNumber - a family member's own, verified mobile number:
+         PVS_Members                     + MobileNumber varchar(16) NULL, MobileVerifiedDate datetime2(3) NULL
+         PVS_PhoneVerificationChallenges + Purpose varchar(20) NOT NULL DEFAULT 'SIGN_IN', AccountId int NULL
+       Existing members and verification codes are unchanged (codes count as sign-in codes).
+    2. 20261022044620_PushNotifications - history of push notifications sent from the admin portal:
+         new table PVS_PushNotifications (+ index on SentDate), and its permissions for the API role PVS_AppRole.
+    3. 20261022051124_AndroidPackageName - Android app id is now com.vidyasethu.pvs:
+         PVS_AppVersions (android): StoreUrl -> https://play.google.com/store/apps/details?id=com.vidyasethu.pvs
+         (only if it is still the original org.padmashalividyasetu... link).
 
   SAFETY
-    * Stops before changing anything unless PVS is deployed here with 20261022044620_PushNotifications applied.
-    * Runs in ONE transaction; on any error everything is rolled back.
-    * Before committing it verifies the change and that no non-PVS object changed.
+    * Stops before changing anything unless PVS is deployed here with 20261020155916_AdminPasswords applied.
+    * ONE transaction: on any error everything is rolled back.
+    * Before committing: checks every change above is in place and that no non-PVS object changed.
     * Safe to run again: steps already applied are skipped.
 
-  HOW TO RUN  (login with ALTER TABLE permission in dbo, e.g. the server admin)
+  HOW TO RUN  (login with ALTER/CREATE TABLE permission in dbo, e.g. the server admin)
     * SSMS / Azure Data Studio: connect to IQExploreDB_Live (check the database drop-down!) and execute.
     * NOT the Azure Portal query editor - it does not support GO batch separators.
-    Expected result: "PVS deployment SUCCEEDED: ..." at the end of the messages. Then deploy the new API.
+    Expected result: "PVS deployment SUCCEEDED: 48 PVS tables; migrations: ..." at the end of the messages.
+    Then publish the new API, admin portal and app.
 ================================================================================================================
 */
 SET NOCOUNT ON;
@@ -53,15 +60,15 @@ BEGIN
 END;
 GO
 
--- This update needs PVS deployed up to 20261022044620_PushNotifications; otherwise use PVS_Deploy_SharedDatabase.sql.
+-- This update needs PVS deployed up to 20261020155916_AdminPasswords; otherwise use PVS_Deploy_SharedDatabase.sql.
 IF OBJECT_ID(N'dbo.PVS_EFMigrationsHistory', N'U') IS NULL
 BEGIN
     RAISERROR(N'PVS deployment STOPPED: PVS is not deployed in this database. Use Database/deploy/PVS_Deploy_SharedDatabase.sql instead. Nothing was changed.', 16, 1);
     SET NOEXEC ON;
 END
-ELSE IF NOT EXISTS (SELECT 1 FROM dbo.PVS_EFMigrationsHistory WHERE MigrationId = N'20261022044620_PushNotifications')
+ELSE IF NOT EXISTS (SELECT 1 FROM dbo.PVS_EFMigrationsHistory WHERE MigrationId = N'20261020155916_AdminPasswords')
 BEGIN
-    RAISERROR(N'PVS deployment STOPPED: migration 20261022044620_PushNotifications is not applied here. Apply the earlier updates (or PVS_Deploy_SharedDatabase.sql) first. Nothing was changed.', 16, 1);
+    RAISERROR(N'PVS deployment STOPPED: migration 20261020155916_AdminPasswords is not applied here. Nothing was changed.', 16, 1);
     SET NOEXEC ON;
 END;
 GO
@@ -100,7 +107,122 @@ GO
 BEGIN TRANSACTION;
 GO
 
--------------------------------------------------------------------------------- 2. Changes since 20261022044620_PushNotifications
+-------------------------------------------------------------------------------- 2. Changes since 20261020155916_AdminPasswords
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    ALTER TABLE [PVS_PhoneVerificationChallenges] ADD [AccountId] int NULL;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    ALTER TABLE [PVS_PhoneVerificationChallenges] ADD [Purpose] varchar(20) NOT NULL CONSTRAINT [PVS_DF_PhoneVerificationChallenges_Purpose] DEFAULT 'SIGN_IN';
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    ALTER TABLE [PVS_Members] ADD [MobileNumber] varchar(16) NULL;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    ALTER TABLE [PVS_Members] ADD [MobileVerifiedDate] datetime2(3) NULL;
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022042837_MemberMobileNumber'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022042837_MemberMobileNumber', N'10.0.12');
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022044620_PushNotifications'
+)
+BEGIN
+    CREATE TABLE [PVS_PushNotifications] (
+        [PushNotificationId] int NOT NULL IDENTITY,
+        [Title] nvarchar(65) NOT NULL,
+        [Body] nvarchar(240) NOT NULL,
+        [Topic] varchar(100) NOT NULL,
+        [FcmMessageId] varchar(200) NULL,
+        [SentDate] datetime2(3) NOT NULL,
+        [SentBy] nvarchar(100) NULL,
+        CONSTRAINT [PVS_PK_PushNotifications] PRIMARY KEY ([PushNotificationId])
+    );
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022044620_PushNotifications'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_PushNotifications_SentDate] ON [PVS_PushNotifications] ([SentDate]);
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022044620_PushNotifications'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022044620_PushNotifications', N'10.0.12');
+END;
+GO
+
 IF @@TRANCOUNT = 0
 BEGIN
     RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
@@ -133,10 +255,27 @@ BEGIN
     RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
     SET NOEXEC ON;
 END;
-IF NOT (EXISTS (SELECT 1 FROM dbo.PVS_EFMigrationsHistory WHERE MigrationId = N'20261022051124_AndroidPackageName'))
+-- Let the API (role PVS_AppRole, see PVS_CreateApiUser.sql) use the new table.
+IF DATABASE_PRINCIPAL_ID(N'PVS_AppRole') IS NOT NULL
+    GRANT SELECT, INSERT, UPDATE, DELETE ON [dbo].[PVS_PushNotifications] TO [PVS_AppRole];
+ELSE
+    PRINT N'Note: role PVS_AppRole not found - run PVS_CreateApiUser.sql after this script.';
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF COL_LENGTH(N'dbo.PVS_Members', N'MobileNumber') IS NULL
+   OR COL_LENGTH(N'dbo.PVS_Members', N'MobileVerifiedDate') IS NULL
+   OR COL_LENGTH(N'dbo.PVS_PhoneVerificationChallenges', N'Purpose') IS NULL
+   OR COL_LENGTH(N'dbo.PVS_PhoneVerificationChallenges', N'AccountId') IS NULL
+   OR OBJECT_ID(N'dbo.PVS_PushNotifications', N'U') IS NULL
+   OR NOT EXISTS (SELECT 1 FROM dbo.PVS_EFMigrationsHistory WHERE MigrationId = N'20261022051124_AndroidPackageName')
 BEGIN
     ROLLBACK TRANSACTION;
-    RAISERROR(N'PVS deployment ROLLED BACK: the change is not in place. Nothing was changed.', 16, 1);
+    RAISERROR(N'PVS deployment ROLLED BACK: not every change is in place. Nothing was changed.', 16, 1);
     SET NOEXEC ON;
 END;
 GO

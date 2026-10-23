@@ -11,7 +11,7 @@ Codes the application logic relies on — do not change:
 | `MemberStatuses` | `STUDENT`, `WORKING`, `UNEMPLOYED` | Class Studying vs Highest Education; default status |
 | `DisabilityTypes` | `OTHER` | "Please specify" |
 | `Organisations` | `NONE` | "Not Linked to Any Organisation" |
-| `Countries` | `IN` | Address country (V1 India only) |
+| `Countries` | `IN` | Address country. India uses the PIN-code flow; other countries a typed address (states typed by members are added to `States`) |
 | `Temples` | `01`…`05` (more later) | Embedded in Registration IDs — never change once members exist |
 | `Roles` | `MEMBER`, `ADMIN`, `SUPER_ADMIN`, … | Authorization |
 

@@ -111,9 +111,22 @@ public sealed record AppBrandingDto(
     bool HasSponsorLogo,
     /// <summary>Changes with every edit; appended to the logo URL so caches refresh.</summary>
     string? SponsorLogoVersion,
-    DateTime? ModifiedDate);
+    DateTime? ModifiedDate,
+    /// <summary>Opened when "Powered by" is tapped (the IQ Explore app on Google Play).</summary>
+    string? PoweredByUrl = null,
+    /// <summary>Active footer sponsors in display order (scrolling after the fixed "Sponsored by:").</summary>
+    IReadOnlyList<FooterSponsorDto>? FooterSponsors = null);
 
-public sealed record UpdateBrandingRequest(string? SponsorName, string? PoweredBy, string? SponsorOrganisation = null, string? SponsorAddress = null);
+public sealed record UpdateBrandingRequest(string? SponsorName, string? PoweredBy, string? SponsorOrganisation = null,
+    string? SponsorAddress = null, string? PoweredByUrl = null);
+
+public sealed record FooterSponsorDto(string Name, string? Designation, string? CompanyName);
+
+/// <summary>Admin view of a footer sponsor, active or not.</summary>
+public sealed record FooterSponsorAdminDto(int Id, string Name, string? Designation, string? CompanyName, int DisplayOrder,
+    bool IsActive, DateTime? ModifiedDate);
+
+public sealed record SaveFooterSponsorRequest(string? Name, string? Designation, string? CompanyName, int DisplayOrder, bool IsActive);
 
 // ---------------------------------------------------------------- App version
 

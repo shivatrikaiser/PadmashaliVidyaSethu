@@ -1,10 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 
 import { SITE_CONFIG } from '../../core/site-config';
-import { I18n } from '../../i18n/i18n';
+import { I18n, Messages } from '../../i18n/i18n';
 import { Icon } from '../../shared/icon';
 
-/** /privacy, /terms, /accessibility (route data `document`). Shows a draft notice until legal review approves. */
+type LegalDocumentKey = keyof Messages['legal'];
+
+/**
+ * /privacy, /terms, /accessibility and the Padmashali Vidya Sethu app documents (route data `document`). Shows a draft
+ * notice until legal review approves.
+ */
 @Component({
   selector: 'vs-legal',
   imports: [Icon],
@@ -54,6 +59,6 @@ export class Legal {
   protected readonly approved = inject(SITE_CONFIG).legalPagesApproved;
 
   /** From route data. */
-  readonly document = input<'privacy' | 'terms' | 'accessibility'>('privacy');
+  readonly document = input<LegalDocumentKey>('privacy');
   protected readonly doc = computed(() => this.t().legal[this.document()]);
 }

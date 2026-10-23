@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PadmashaliVidyaSetu.Api.Entities.Settings;
+using PadmashaliVidyaSetu.Api.Services.Admin;
 
 namespace PadmashaliVidyaSetu.Api.Data.Configurations;
 
@@ -15,10 +16,28 @@ public class AppBrandingConfiguration : IEntityTypeConfiguration<AppBranding>
         b.Property(e => e.SponsorOrganisation).HasMaxLength(150);
         b.Property(e => e.SponsorAddress).HasMaxLength(300);
         b.Property(e => e.PoweredBy).HasMaxLength(150);
+        b.Property(e => e.PoweredByUrl).HasMaxLength(500);
         b.Property(e => e.SponsorLogoContentType).HasMaxLength(30).IsUnicode(false);
         b.Property(e => e.ModifiedDate).HasColumnType("datetime2(3)");
         b.Property(e => e.ModifiedBy).HasMaxLength(ConfigurationExtensions.AuditUserLength);
-        b.HasData(new AppBranding { AppBrandingId = AppBranding.SingletonId, PoweredBy = "IQ Explore" });
+        b.HasData(new AppBranding
+        {
+            AppBrandingId = AppBranding.SingletonId, PoweredBy = "IQ Explore", PoweredByUrl = AppBranding.DefaultPoweredByUrl,
+        });
+    }
+}
+
+public class FooterSponsorConfiguration : IEntityTypeConfiguration<FooterSponsor>
+{
+    public void Configure(EntityTypeBuilder<FooterSponsor> b)
+    {
+        b.ToTable("FooterSponsors");
+        b.HasKey(e => e.FooterSponsorId);
+        b.Property(e => e.Name).HasMaxLength(BrandingService.MaxTextLength).IsRequired();
+        b.Property(e => e.Designation).HasMaxLength(BrandingService.MaxTextLength);
+        b.Property(e => e.CompanyName).HasMaxLength(BrandingService.MaxTextLength);
+        b.ConfigureAudit();
+        b.HasIndex(e => new { e.IsActive, e.DisplayOrder });
     }
 }
 

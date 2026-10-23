@@ -287,6 +287,95 @@ void main() {
       expect(a.toJson()['cityVillageName'], 'Kabaka');
     });
 
+    Finder permanentPinLabel() =>
+        find.descendant(of: find.byKey(const Key('permanentAddress.pinCode')), matching: find.text('PIN Code'));
+
+    Future<void> chooseCountry(WidgetTester tester, String name) async {
+      await tester.tap(find.byKey(const Key('permanentAddress.countryId')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(name).last);
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('country outside India: typed city, state and optional postal code; no PIN flow', (tester) async {
+      final repo = FakeMasterDataRepository();
+      final draft = RegistrationDraft();
+      await pumpLocalized(
+        tester,
+        Form(
+          child: AddressStep(draft: draft, serverErrors: const {}, onFieldChanged: (_) {}),
+        ),
+        overrides: testOverrides(masterData: repo),
+      );
+      expect(draft.permanentAddress.country?.name, 'India'); // default
+
+      await chooseCountry(tester, 'United Arab Emirates');
+
+      // No states listed for the country: State / Province is typed straight away.
+      expect(permanentPinLabel(), findsNothing); // postal code field instead
+      expect(find.text('Postal Code (optional)'), findsOneWidget);
+      expect(find.byKey(const Key('permanentAddress.districtId')), findsNothing);
+      expect(find.byKey(const Key('permanentAddress.stateNotListed')), findsNothing);
+      await tester.enterText(find.byKey(const Key('permanentAddress.addressLine1')), 'Flat 504, Al Nahda Tower');
+      await tester.enterText(find.byKey(const Key('permanentAddress.cityVillageName')), 'Dubai');
+      await tester.enterText(find.byKey(const Key('permanentAddress.newStateName')), 'Dubai');
+      await tester.pumpAndSettle();
+
+      expect(repo.pinLookups, 0);
+      final json = draft.permanentAddress.toJson();
+      expect(json['countryId'], 2);
+      expect(json['newStateName'], 'Dubai');
+      expect(json['stateId'], isNull);
+      expect(json['pinCode'], isNull);
+      expect(json.containsKey('districtId'), isFalse);
+      expect(json.containsKey('talukId'), isFalse);
+    });
+
+    testWidgets('country outside India with states: chosen from the list, or typed when not listed', (tester) async {
+      final draft = RegistrationDraft();
+      await pumpLocalized(
+        tester,
+        Form(
+          child: AddressStep(draft: draft, serverErrors: const {}, onFieldChanged: (_) {}),
+        ),
+        overrides: testOverrides(masterData: FakeMasterDataRepository()),
+      );
+      await chooseCountry(tester, 'United States');
+
+      await tester.tap(find.byKey(const Key('permanentAddress.stateId')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('California').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const Key('permanentAddress.pinCode')), '94016');
+      final a = draft.permanentAddress;
+      expect(a.toJson()['stateId'], 40);
+      expect(a.toJson()['pinCode'], '94016');
+
+      await tester.tap(find.byKey(const Key('permanentAddress.stateNotListed')));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const Key('permanentAddress.newStateName')), 'Texas');
+      expect(a.toJson()['stateId'], isNull);
+      expect(a.toJson()['newStateName'], 'Texas');
+    });
+
+    testWidgets('switching back to India restores the PIN flow with a clean address', (tester) async {
+      final draft = RegistrationDraft();
+      await pumpLocalized(
+        tester,
+        Form(
+          child: AddressStep(draft: draft, serverErrors: const {}, onFieldChanged: (_) {}),
+        ),
+        overrides: testOverrides(masterData: FakeMasterDataRepository()),
+      );
+      await chooseCountry(tester, 'United Arab Emirates');
+      await tester.enterText(find.byKey(const Key('permanentAddress.cityVillageName')), 'Dubai');
+      await chooseCountry(tester, 'India');
+
+      expect(permanentPinLabel(), findsOneWidget);
+      expect(draft.permanentAddress.cityVillageName, isEmpty);
+      expect(draft.permanentAddress.toJson()['countryId'], 1);
+    });
+
     testWidgets('unknown PIN shows a hint and allows manual selection', (tester) async {
       final draft = RegistrationDraft();
       await pumpLocalized(

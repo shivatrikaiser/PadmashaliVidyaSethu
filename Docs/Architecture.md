@@ -79,7 +79,7 @@ Frontend tests live with the Flutter project (`test/`, `integration_test/`) beca
 | D4 | Phone verification creates the account; registration is a separate authenticated call. | Lets a returning parent sign in and add another child; no half-registered state. |
 | D5 | PIN look-ups are cached in `Cities`; unknown districts/taluks are learned automatically (`Source = PinLookup`). | Each PIN hits the external service once; the app works when the provider is down (manual State/District selection). |
 | D6 | Legacy postal names (`PostalName`) on states/districts/taluks. | India Post returns "Shimoga", "Bangalore", "Mangalore"; these map onto Shivamogga, Bengaluru Urban, Mangaluru. |
-| D7 | Indian mobile numbers and Indian addresses only in V1. | Phone provider and PIN data are India-specific. International (e.g. Dubai) support needs an E.164 phone field and a non-PIN address form — planned. |
+| D7 | Mobile numbers and addresses may be outside India. | Numbers are stored in E.164. Indian (+91) numbers get the code by SMS (DLT template); all others on WhatsApp (Cloud API template), chosen per number by `RoutingVerificationCodeSender`. Only a code delivered to the number proves it. A member's optional email address is verified separately with its own code (SMTP, `IVerificationEmailSender`, purpose `MEMBER_EMAIL`) and saved on the member. Addresses abroad use a typed form (country → state/province → city, optional postal code) without the PIN lookup. |
 | D8 | Choosing "Other" in a list links the member to the list's `OTHER` row and stores the typed text in a separate `...OtherText` column; it never creates a master row. | Admins review the texts, create the proper row and re-map members (`Docs/MasterData.md`). "My taluk is not listed" still adds a taluk row. |
 | D9 | Guardian consent required below 18; consents stored as immutable `ConsentRecords`. | Children's data; spec §35. |
 | D10 | Unbuilt profile modules appear on the dashboard as "Coming soon" with 0 %. | Spec §52: never present mocked functionality as real. |
@@ -90,6 +90,7 @@ Frontend tests live with the Flutter project (`test/`, `integration_test/`) beca
 * **New profile module** (e.g. Education): entity + configuration + migration → service + DTOs + validator →
   controller → update `ProfileCompletionService` section → Flutter repository/provider/screen → tests.
 * **New role:** roles are seeded (`Roles`); map them to policies in `Authorization/Policies.cs`.
-* **SMS provider:** SMS Gateway Hub is implemented (`SmsGatewayHubVerificationCodeSender`). Another provider =
-  implement `IVerificationCodeSender`, register it in `ServiceCollectionExtensions`, select it with `PhoneVerification:Sender`.
+* **Code senders:** SMS Gateway Hub (`SmsGatewayHubVerificationCodeSender`, +91 numbers, `PhoneVerification:Sender`) and
+  WhatsApp Cloud API (`WhatsAppVerificationCodeSender`, other countries, `PhoneVerification:InternationalSender`). Another
+  provider = implement `IVerificationCodeSender`, register it in `ServiceCollectionExtensions`, select it in that setting.
 * **PIN provider:** implement `IPinCodeProvider`.

@@ -2,6 +2,8 @@
  * DRAFT legal text - must be reviewed by a qualified adviser before production publication.
  * Pages show a draft notice while `legalPagesApproved` is false (src/environments).
  */
+import { pvsDeleteAccount, pvsPrivacy, pvsTerms } from './pvs-legal';
+
 export interface LegalDocument {
   title: string;
   lastUpdated: string;
@@ -204,4 +206,4 @@ const accessibility: LegalDocument = {
   ],
 };
 
-export const legal = { privacy, terms, accessibility };
+export const legal = { privacy, terms, accessibility, pvsPrivacy, pvsTerms, pvsDeleteAccount };

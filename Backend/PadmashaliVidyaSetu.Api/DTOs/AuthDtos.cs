@@ -2,6 +2,9 @@ namespace PadmashaliVidyaSetu.Api.DTOs;
 
 public sealed record RequestVerificationCodeRequest(string? MobileNumber);
 
+/// <summary>POST /api/v1/diagnostics/email-test.</summary>
+public sealed record EmailTestRequest(string? Email);
+
 public sealed record VerificationCodeIssuedResponse(
     Guid ChallengeId,
     string MaskedMobileNumber,
@@ -10,6 +13,21 @@ public sealed record VerificationCodeIssuedResponse(
     int ResendAfterSeconds,
     /// <summary>Only populated in the Development environment when explicitly enabled.</summary>
     string? DevelopmentCode);
+
+/// <summary>A member's (optional) email address: POST members/email-verifications.</summary>
+public sealed record RequestEmailCodeRequest(string? Email);
+
+public sealed record EmailCodeIssuedResponse(
+    Guid ChallengeId,
+    string MaskedEmail,
+    int CodeLength,
+    int ExpiresInSeconds,
+    int ResendAfterSeconds,
+    /// <summary>Only populated in the Development environment when explicitly enabled.</summary>
+    string? DevelopmentCode);
+
+/// <summary>A member's email address is verified; pass <c>ChallengeId</c> as <c>EmailVerificationId</c> when registering.</summary>
+public sealed record MemberEmailVerifiedResponse(Guid ChallengeId, string MaskedEmail);
 
 public sealed record VerifyCodeRequest(Guid ChallengeId, string? Code);
 
@@ -40,3 +58,12 @@ public sealed record SmsTestResponse(
     string? JobId,
     string SenderId,
     string TemplateId);
+
+/// <summary>Result of POST /api/v1/diagnostics/whatsapp-test: what the WhatsApp Cloud API answered.</summary>
+public sealed record WhatsAppTestResponse(
+    string MaskedMobileNumber,
+    bool Accepted,
+    string? ProviderErrorCode,
+    string? ProviderMessage,
+    string? MessageId,
+    string TemplateName);

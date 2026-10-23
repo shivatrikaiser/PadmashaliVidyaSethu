@@ -9,8 +9,10 @@ import '../../../models/auth_models.dart';
 import '../../../models/registration_draft.dart';
 import '../../../providers/providers.dart';
 import '../../../utils/l10n.dart';
+import '../../../utils/phone_countries.dart';
 import '../../../utils/validators.dart';
 import '../../../widgets/code_input.dart';
+import '../../../widgets/country_code_picker.dart';
 
 /// The member's own mobile number - optional. When one is entered it must be verified: "Verify" sends a code to
 /// that number, the code is entered here, and the field shows "Verified". Editing the number afterwards needs a new
@@ -37,7 +39,7 @@ class _MemberMobileFieldState extends ConsumerState<MemberMobileField> {
   Timer? _timer;
 
   RegistrationDraft get _draft => widget.draft;
-  bool get _numberValid => Validators.mobile(_draft.mobileDigits) == null;
+  bool get _numberValid => Validators.mobile(_draft.mobileDigits, countryCode: _draft.mobileCountryCode) == null;
 
   @override
   void dispose() {
@@ -51,13 +53,18 @@ class _MemberMobileFieldState extends ConsumerState<MemberMobileField> {
     setState(() {
       _draft.mobileNumber = value;
       // A different number needs its own verification.
-      if (_draft.verifiedMobileNumber != _draft.mobileDigits) {
+      if (_draft.verifiedMobileNumber != _draft.apiMobileNumber) {
         _challenge = null;
         _code.clear();
         _error = null;
       }
     });
     widget.onChanged();
+  }
+
+  void _countryCodeChanged(String code) {
+    _draft.mobileCountryCode = code;
+    _numberChanged(_number.text);
   }
 
   Future<void> _send() async {
@@ -68,7 +75,7 @@ class _MemberMobileFieldState extends ConsumerState<MemberMobileField> {
       _error = null;
     });
     try {
-      final challenge = await ref.read(memberRepositoryProvider).requestMemberMobileCode(_draft.mobileDigits);
+      final challenge = await ref.read(memberRepositoryProvider).requestMemberMobileCode(_draft.apiMobileNumber);
       if (!mounted) return;
       _code.clear();
       setState(() => _challenge = challenge);
@@ -93,7 +100,7 @@ class _MemberMobileFieldState extends ConsumerState<MemberMobileField> {
       if (!mounted) return;
       setState(() {
         _draft.mobileVerificationId = id;
-        _draft.verifiedMobileNumber = _draft.mobileDigits;
+        _draft.verifiedMobileNumber = _draft.apiMobileNumber;
         _challenge = null;
       });
       _timer?.cancel();
@@ -161,21 +168,32 @@ class _MemberMobileFieldState extends ConsumerState<MemberMobileField> {
           key: const Key('memberMobileField'),
           controller: _number,
           keyboardType: TextInputType.phone,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(10)],
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(DialCodes.maxDigits(_draft.mobileCountryCode)),
+          ],
           autofillHints: const [AutofillHints.telephoneNumberNational],
           decoration: InputDecoration(
             labelText: l10n.memberMobileLabel,
-            helperText: verified || challenge != null ? null : l10n.memberMobileHelp,
+            helperText: verified || challenge != null
+                ? null
+                : _draft.mobileCountryCode == DialCodes.india
+                ? l10n.memberMobileHelp
+                : '${l10n.memberMobileHelp} ${l10n.codeViaWhatsApp}',
             helperMaxLines: 3,
-            prefixIcon: const Icon(Icons.phone_iphone),
-            prefixText: '+91 ',
+            prefixIcon: CountryCodePicker(
+              key: const Key('memberMobileCountryCode'),
+              value: _draft.mobileCountryCode,
+              enabled: !_busy,
+              onChanged: _countryCodeChanged,
+            ),
             suffixIcon: suffix,
             errorText: widget.serverError,
             errorMaxLines: 2,
           ),
           validator: (_) {
             if (!_draft.hasMobileNumber) return null; // optional
-            final issue = Validators.mobile(_draft.mobileDigits);
+            final issue = Validators.mobile(_draft.mobileDigits, countryCode: _draft.mobileCountryCode);
             if (issue != null) return issue.text(l10n);
             return _draft.mobileIsVerified ? null : l10n.memberMobileNeedsVerification;
           },

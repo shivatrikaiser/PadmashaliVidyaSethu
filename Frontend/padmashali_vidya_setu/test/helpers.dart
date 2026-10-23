@@ -42,7 +42,11 @@ final fakeLists = <String, List<MasterDataItem>>{
     item(2, 'Hearing Impairment', 'HEARING'),
     item(8, 'Other', 'OTHER'),
   ],
-  MasterDataTypes.countries: [item(1, 'India', 'IN')],
+  MasterDataTypes.countries: [
+    item(1, 'India', 'IN'),
+    item(2, 'United Arab Emirates', 'AE'),
+    item(8, 'United States', 'US'),
+  ],
 };
 
 class FakeMasterDataRepository implements MasterDataRepository {
@@ -52,6 +56,9 @@ class FakeMasterDataRepository implements MasterDataRepository {
     sponsorOrganisation: 'Test Textiles Pvt Ltd',
     sponsorAddress: '12, Car Street\nUdupi 576101',
     poweredBy: 'IQ Explore',
+    poweredByUrl: 'https://play.google.com/store/apps/details?id=com.iqexplore.app',
+    // Short enough to fit the test screens, so the footer stands still (MarqueeText is tested on its own).
+    footerSponsors: [FooterSponsor(name: 'Test Sponsor')],
   );
 
   int pinLookups = 0;
@@ -72,10 +79,11 @@ class FakeMasterDataRepository implements MasterDataRepository {
   Future<List<MasterDataItem>> list(String type) async => fakeLists[type] ?? const [];
 
   @override
-  Future<List<MasterDataItem>> states(int countryId) async => [
-    item(11, 'Karnataka', 'IN-KA'),
-    item(14, 'Maharashtra', 'IN-MH'),
-  ];
+  Future<List<MasterDataItem>> states(int countryId) async => switch (countryId) {
+    1 => [item(11, 'Karnataka', 'IN-KA'), item(14, 'Maharashtra', 'IN-MH')],
+    8 => [item(40, 'California', 'US-CALIFORNIA')],
+    _ => [], // no states known yet for the country
+  };
 
   @override
   Future<List<MasterDataItem>> districts(int stateId) async => stateId == 11

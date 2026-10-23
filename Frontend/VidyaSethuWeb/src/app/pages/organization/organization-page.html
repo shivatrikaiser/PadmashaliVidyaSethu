@@ -124,6 +124,19 @@
           }
         </div>
 
+        @if (org.appPolicyPages) {
+          <div class="card" data-testid="app-policies">
+            <h2 class="h3">{{ m.appPoliciesTitle }}</h2>
+            <ul class="app-policies">
+              <li><a [routerLink]="['/organizations', org.slug, 'privacy']">{{ m.appPolicyLinks.privacy }}</a></li>
+              <li><a [routerLink]="['/organizations', org.slug, 'terms']">{{ m.appPolicyLinks.terms }}</a></li>
+              <li>
+                <a [routerLink]="['/organizations', org.slug, 'delete-account']">{{ m.appPolicyLinks.deleteAccount }}</a>
+              </li>
+            </ul>
+          </div>
+        }
+
         <p class="independence">{{ m.independence(name()) }}</p>
       </aside>
     </div>
