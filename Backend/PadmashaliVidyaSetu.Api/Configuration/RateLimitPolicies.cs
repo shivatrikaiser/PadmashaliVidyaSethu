@@ -11,6 +11,7 @@ public static class RateLimitPolicies
     public const string Verification = nameof(Verification);
     public const string Auth = nameof(Auth);
     public const string Lookup = nameof(Lookup);
+    public const string Enquiry = nameof(Enquiry);
 }
 
 /// <summary>Per-client-IP limits. Per-mobile-number limits for verification codes are enforced in AuthService.</summary>
@@ -22,6 +23,9 @@ public class RateLimitingOptions
     public int AuthPermitLimit { get; set; } = 30;
     public int LookupPermitLimit { get; set; } = 30;
     public int GlobalPermitLimit { get; set; } = 300;
+
+    /// <summary>Website enquiries per client IP per hour.</summary>
+    public int EnquiryPermitLimit { get; set; } = 5;
 }
 
 public static class RateLimitingSetup
@@ -38,6 +42,8 @@ public static class RateLimitingSetup
                     Window(Limits(ctx).VerificationPermitLimit, Limits(ctx).VerificationWindowSeconds)));
             options.AddPolicy(RateLimitPolicies.Auth, ctx =>
                 RateLimitPartition.GetFixedWindowLimiter(ClientKey(ctx), _ => Window(Limits(ctx).AuthPermitLimit, 60)));
+            options.AddPolicy(RateLimitPolicies.Enquiry, ctx =>
+                RateLimitPartition.GetFixedWindowLimiter(ClientKey(ctx), _ => Window(Limits(ctx).EnquiryPermitLimit, 3600)));
             options.AddPolicy(RateLimitPolicies.Lookup, ctx =>
                 RateLimitPartition.GetFixedWindowLimiter(ClientKey(ctx), _ => Window(Limits(ctx).LookupPermitLimit, 60)));
 

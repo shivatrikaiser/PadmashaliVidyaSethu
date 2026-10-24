@@ -213,6 +213,20 @@ public class EmailOptions
     }
 }
 
+/// <summary>VidyaSethu website enquiries (contact and "For organizations" forms), emailed through <see cref="EmailOptions"/>.</summary>
+public class EnquiryOptions
+{
+    public const string Section = "Enquiries";
+
+    /// <summary>Who receives the enquiries.</summary>
+    public string Recipient { get; set; } = "support@iqexplore.com";
+
+    public string SubjectPrefix { get; set; } = "VidyaSethu enquiry";
+
+    /// <summary>Submissions sent faster than this after the form appeared are treated as automated.</summary>
+    [Range(0, 60000)] public int MinFillMilliseconds { get; set; } = 3000;
+}
+
 public class RegistrationOptions
 {
     public const string Section = "Registration";

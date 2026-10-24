@@ -12,7 +12,12 @@ class LegalSection {
 }
 
 class LegalDocument {
-  const LegalDocument({required this.title, required this.lastUpdated, required this.intro, required this.sections});
+  const LegalDocument({
+    required this.title,
+    required this.lastUpdated,
+    required this.intro,
+    required this.sections,
+  });
   final String title;
   final String lastUpdated;
   final String intro;
@@ -21,7 +26,7 @@ class LegalDocument {
 
 abstract final class LegalDocuments {
   /// Shown on both pages until the texts are approved for publication.
-  static const draft = true;
+  static const draft = false;
 
   static const privacyPolicy = LegalDocument(
     title: 'Privacy Policy',
@@ -34,7 +39,9 @@ abstract final class LegalDocuments {
         'The app is run by the D. K. Jilla Padmashali Vidyavardhaka Sangha (R), Udupi ("the Sangha", "we", "us") to '
             'support the education, careers and welfare of the community. Technology and hosting are provided to the '
             'Sangha by Swaprajna Technologies (OPC) Private Limited, which acts only on the Sangha\'s instructions.',
-        'Contact: [Sangha address, email and phone to be added].',
+        'Contact: Padmashali Suvarna Mahotsava Bhavana, Adi-Udupi, Udupi - 576103.',
+        'Phone: 9741413165',
+        'Email: vidyavardhaka@padmashalimahasabha.com',
       ]),
       LegalSection('Information we collect', [
         'Account: your mobile number, which you verify with a one-time code. One number can register several family '
@@ -71,7 +78,7 @@ abstract final class LegalDocuments {
         'Authorised Sangha office-bearers and staff, only as far as their role needs.',
         'Service providers that run parts of the app for us, only for that purpose: Microsoft Azure (hosting and '
             'database, in India), SMS Gateway Hub (verification codes by SMS in India), Meta WhatsApp Business '
-            '(verification codes for numbers outside India), our email provider (email verification codes), Google '
+            '(verification codes for numbers outside India), Zoho Mail (email verification codes), Google '
             'Firebase (app notifications) and India Post\'s PIN code service (only the PIN code you enter).',
         'Authorities, when the law requires it.',
       ]),
@@ -80,8 +87,8 @@ abstract final class LegalDocuments {
             'it are then closed and no longer shown in the app, and the mobile number cannot be used to sign in or '
             'register again.',
         'The information is kept in the Sangha\'s records, marked as deleted, for record-keeping and to prevent '
-            'misuse. [For review: state the retention period and when records are finally erased, in line with the '
-            'Digital Personal Data Protection Act, 2023.]',
+            'misuse, in line with the Digital '
+            'Personal Data Protection Act, 2023.',
       ]),
       LegalSection('Security', [
         'Information is sent over encrypted connections and stored on secured servers. Verification codes are stored '
@@ -92,7 +99,7 @@ abstract final class LegalDocuments {
         'You may ask for a summary of the information we hold about you or your child, ask us to correct or update '
             'it, withdraw consent, or raise a complaint. To correct information, please contact the Sangha office; '
             'online editing will be available soon.',
-        'Grievance officer: [name, email and phone to be added]. If you are not satisfied with our response, you may '
+        'Grievance officer: President, D K Jilla Paddmashali Vidyavardhaka Sangha (R). If you are not satisfied with our response, you may '
             'complain to the Data Protection Board of India.',
       ]),
       LegalSection('Changes to this policy', [
@@ -150,9 +157,13 @@ abstract final class LegalDocuments {
       LegalSection('Changes and governing law', [
         'We may update these terms; the date at the top shows the latest version, and continuing to use the app means '
             'you accept the updated terms. These terms are governed by the laws of India, and courts at Udupi, '
-            'Karnataka have jurisdiction. [For review: confirm jurisdiction.]',
+            'Karnataka have jurisdiction.',
       ]),
-      LegalSection('Contact', ['[Sangha address, email and phone to be added].']),
+      LegalSection('Contact', [
+        'Padmashali Suvarna Mahotsava Bhavana, Adi-Udupi, Udupi - 576103.',
+      ]),
+      LegalSection('Phone', ['9741413165']),
+      LegalSection('Email', ['vidyavardhaka@padmashalimahasabha.com']),
     ],
   );
 }

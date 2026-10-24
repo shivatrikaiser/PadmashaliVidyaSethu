@@ -116,10 +116,16 @@ When PVS is deployed (for example to `https://pvs.vidyasethu.co.in`):
 
 ## Enquiry endpoint
 
-The contact and "For organizations" forms post JSON to `enquiryEndpoint` (in the environment files). **It is `null`
-today, because no enquiry service exists yet.** While it is `null`, the forms are shown disabled with "Online
-enquiries are not open yet" and nothing is ever reported as sent. Success is shown only after the endpoint returns
-2xx.
+The contact and "For organizations" forms post JSON to `enquiryEndpoint` (in the environment files). Production
+uses the shared enquiry service in the API, `https://api.pvs.vidyasethu.co.in/api/v1/enquiries`, for every
+organization: it validates the enquiry, rate-limits per IP (5 an hour), rejects submissions filled in under 3
+seconds and emails it (plain text, enquirer as Reply-To) to `Enquiries:Recipient` (default support@iqexplore.com)
+through the API's SMTP settings (`Email:*`, `PhoneVerification:EmailSender`). The API must allow the website's origin:
+`Cors__AllowedOrigins__N` (next free number) = `https://vidyasethu.co.in`. If `enquiryEndpoint` is `null`, the forms are shown disabled
+with "Online enquiries are not open yet" and nothing is ever reported as sent. Success is shown only after the
+endpoint returns 2xx.
+
+The rest of this section is the contract the endpoint follows.
 
 To enable the forms, build a small endpoint and set `enquiryEndpoint`. Options:
 - An API on the same domain, e.g. an Azure Function or small App Service API routed at `/api/enquiries` (no CORS).
@@ -151,11 +157,29 @@ already has a hidden honeypot field and a minimum fill time.
 `company.email`, `company.phone` and `company.address` in the environment files are `null`, and the Contact page
 says "Our contact details will be published here soon." Fill them in only with details approved for publication.
 
+## PVS web app at /pvs
+
+The Padmashali Vidya Sethu app (Flutter) is published as part of this website at `https://vidyasethu.co.in/pvs/`;
+the organization page's "Open Padmashali Vidya Sethu" button links there.
+
+```bash
+npm run build:pvs   # flutter build web --base-href /pvs/ (production config) -> ../padmashali_vidya_setu/build/web
+npm run build       # the website; copies that build to dist/VidyaSethuWeb/browser/pvs (and the package / zip)
+```
+
+Upload the `browser` folder (including `browser/pvs`) or the zip - both contain the app.
+
+`npm run build` stops if the PVS web build is missing or was made for another base href. `/pvs` has its own
+Content-Security-Policy (WebAssembly, the API, Google's font CDN for fallback glyphs) in `web.config` (`<location
+path="pvs">`) and in `staticwebapp.config.json` (route `/pvs/*`, used by `server.mjs` on Linux); any other
+`/pvs/...` address returns the app's `index.html`. The API must allow `https://vidyasethu.co.in` (CORS).
+
 ## Legal pages
 
 `/privacy`, `/terms` and `/accessibility` are **drafts** (`src/app/i18n/en/legal.ts`, with `[For review: …]`
 markers) and show a "Draft for review" notice while `legalPagesApproved` is `false`. Have them reviewed, update the
-text and dates, then set `legalPagesApproved: true`.
+text and dates, then set `legalPagesApproved: true` in `src/environments/shared.ts` (one switch for the production
+and the development build - development differs from production only in its data sources).
 
 ## Localization (Kannada)
 

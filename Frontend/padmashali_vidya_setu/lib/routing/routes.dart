@@ -9,9 +9,10 @@ abstract final class Routes {
   static const deleteAccount = '/account/delete';
   static const privacy = '/privacy';
   static const terms = '/terms';
+  static const contact = '/contact';
   static const profilePattern = '/profile/:registrationId';
   static String profile(String registrationId) => '/profile/$registrationId';
 
   /// Reachable without signing in.
-  static const public = {welcome, phone, verify, privacy, terms};
+  static const public = {welcome, phone, verify, privacy, terms, contact};
 }

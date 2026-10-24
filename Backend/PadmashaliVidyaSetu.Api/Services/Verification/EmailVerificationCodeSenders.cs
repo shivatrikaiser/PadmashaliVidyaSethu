@@ -35,19 +35,10 @@ public sealed class SmtpVerificationEmailSender(
     {
         var o = options.Value;
         var masked = EmailAddress.Mask(email);
-        try
+        using var message = BuildMessage(o, email, code, verification.Value.CodeLifetimeSeconds);
+        var error = await SmtpDelivery.TrySendAsync(o, message, cancellationToken);
+        if (error is not null)
         {
-            using var message = BuildMessage(o, email, code, verification.Value.CodeLifetimeSeconds);
-            using var client = new SmtpClient { Timeout = o.TimeoutSeconds * 1000 };
-            await client.ConnectAsync(o.Host, o.Port, SecureSocket(o.Security), cancellationToken);
-            if (!string.IsNullOrWhiteSpace(o.UserName)) await client.AuthenticateAsync(o.UserName, o.Password ?? string.Empty, cancellationToken);
-            await client.SendAsync(message, cancellationToken);
-            await client.DisconnectAsync(true, cancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
-        {
-            // MailKit messages name the server's reply (e.g. "5.7.8 Authentication failed"), never the message body.
-            var error = ex.GetType().Name + ": " + ex.Message;
             logger.LogError("Verification email failed for {Email}: {Error}", masked, error);
             return (false, error);
         }
@@ -75,6 +66,30 @@ public sealed class SmtpVerificationEmailSender(
                 "<p style=\"color:#666\">If you did not ask for it, you can ignore this email.</p>",
         }.ToMessageBody();
         return message;
+    }
+
+}
+
+/// <summary>Sends one message through the configured SMTP server (verification codes, website enquiries).</summary>
+public static class SmtpDelivery
+{
+    /// <returns>null when the server accepted the message; otherwise the error (server reply, never the body).</returns>
+    public static async Task<string?> TrySendAsync(EmailOptions o, MimeMessage message, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var client = new SmtpClient { Timeout = o.TimeoutSeconds * 1000 };
+            await client.ConnectAsync(o.Host, o.Port, SecureSocket(o.Security), cancellationToken);
+            if (!string.IsNullOrWhiteSpace(o.UserName)) await client.AuthenticateAsync(o.UserName, o.Password ?? string.Empty, cancellationToken);
+            await client.SendAsync(message, cancellationToken);
+            await client.DisconnectAsync(true, cancellationToken);
+            return null;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+        {
+            // MailKit messages name the server's reply (e.g. "5.7.8 Authentication failed"), never the message body.
+            return ex.GetType().Name + ": " + ex.Message;
+        }
     }
 
     private static SecureSocketOptions SecureSocket(string security) => security.ToLowerInvariant() switch

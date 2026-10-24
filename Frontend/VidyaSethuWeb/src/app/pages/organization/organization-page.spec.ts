@@ -50,15 +50,31 @@ describe('OrganizationPage (Padmashali Vidya Sethu)', () => {
     ['privacy', 'Padmashali Vidya Sethu app - Privacy Policy', 'Who we share it with'],
     ['terms', 'Padmashali Vidya Sethu app - Terms and Conditions', 'Acceptable use'],
     ['delete-account', 'Padmashali Vidya Sethu app - Delete your account', 'What happens when you delete'],
-  ])('/%s shows the app document, marked as a draft', async (page, title, heading) => {
-    const el = await open(production, `${PVS_URL}/${page}`);
-    expect(el.querySelector('h1')?.textContent).toContain(title);
-    expect(el.textContent).toContain(heading);
-    expect(el.querySelector('[data-testid="legal-draft"]')).toBeTruthy();
+  ])('/%s shows the app document; the draft notice follows the one shared switch', async (page, title, heading) => {
+    // Approved: no notice in production or in development (both builds share legalPagesApproved).
+    for (const config of [production, development]) {
+      TestBed.resetTestingModule();
+      const el = await open(config, `${PVS_URL}/${page}`);
+      expect(el.querySelector('h1')?.textContent).toContain(title);
+      expect(el.textContent).toContain(heading);
+      expect(el.querySelector('[data-testid="legal-draft"]')).toBeNull();
+    }
+
+    TestBed.resetTestingModule();
+    const draft = await open({ ...production, legalPagesApproved: false }, `${PVS_URL}/${page}`);
+    expect(draft.querySelector('[data-testid="legal-draft"]')).toBeTruthy();
   });
 
-  it('production without a configured destination: explains the portal is not available and shows no link', async () => {
+  it('production: "Open Padmashali Vidya Sethu" goes to vidyasethu.co.in/pvs', async () => {
     const el = await open(production);
+    expect(el.querySelector<HTMLAnchorElement>('[data-testid="open-portal"]')?.getAttribute('href')).toBe(
+      'https://vidyasethu.co.in/pvs/',
+    );
+    expect(el.querySelector('[data-testid="portal-unavailable"]')).toBeNull();
+  });
+
+  it('without a configured destination: explains the portal is not available and shows no link', async () => {
+    const el = await open({ ...production, organizationLinks: { pvs: { application: null } } });
     expect(el.querySelector('[data-testid="portal-unavailable"]')?.textContent).toContain(
       'not yet publicly available',
     );

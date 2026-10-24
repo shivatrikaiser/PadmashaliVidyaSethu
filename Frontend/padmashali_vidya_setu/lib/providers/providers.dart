@@ -36,6 +36,9 @@ final Provider<MasterDataRepository> masterDataRepositoryProvider = Provider<Mas
 final Provider<MemberRepository> memberRepositoryProvider = Provider<MemberRepository>(
   (ref) => MemberRepository(ref.watch(apiClientProvider)),
 );
+final Provider<EnquiryRepository> enquiryRepositoryProvider = Provider<EnquiryRepository>(
+  (ref) => EnquiryRepository(ref.watch(apiClientProvider)),
+);
 
 final StateNotifierProvider<SessionNotifier, SessionState> sessionProvider =
     StateNotifierProvider<SessionNotifier, SessionState>(

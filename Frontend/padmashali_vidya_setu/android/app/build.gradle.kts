@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -9,6 +11,26 @@ plugins {
 // com.vidyasethu.pvs). Without it the app builds and runs, just without push.
 if (file("google-services.json").exists()) {
     apply(plugin = "com.google.gms.google-services")
+}
+
+// Release signing (Google Play upload key): android/key.properties - never committed (see android/.gitignore):
+//   storeFile=D:/Keys/pvs-upload.jks
+//   storePassword=...
+//   keyAlias=upload
+//   keyPassword=...
+val keystoreProperties = Properties().apply {
+    val file = rootProject.file("key.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+val hasReleaseKey = !keystoreProperties.isEmpty
+
+// A Play upload must never be debug-signed: stop the bundle build when the key is missing.
+gradle.taskGraph.whenReady {
+    if (!hasReleaseKey && allTasks.any { it.name == "bundleRelease" }) {
+        throw GradleException(
+            "Release signing key not set up: create android/key.properties (see the comment in android/app/build.gradle.kts).",
+        )
+    }
 }
 
 android {
@@ -38,11 +60,22 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (hasReleaseKey) {
+            create("release") {
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // The upload key when android/key.properties exists; otherwise the debug key, so `flutter run --release`
+            // still works on this PC (bundleRelease is refused above).
+            signingConfig = signingConfigs.getByName(if (hasReleaseKey) "release" else "debug")
         }
     }
 }

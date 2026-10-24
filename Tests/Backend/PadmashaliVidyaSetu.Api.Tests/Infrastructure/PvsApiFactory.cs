@@ -44,6 +44,7 @@ public sealed class PvsApiFactory : WebApplicationFactory<Program>, IAsyncLifeti
             ["RateLimiting:VerificationPermitLimit"] = "10000",
             ["RateLimiting:AuthPermitLimit"] = "10000",
             ["RateLimiting:LookupPermitLimit"] = "10000",
+            ["RateLimiting:EnquiryPermitLimit"] = "10000",
             ["RateLimiting:GlobalPermitLimit"] = "100000",
             ["Serilog:MinimumLevel:Default"] = "Warning",
             ["Firebase:AllUsersTopic"] = "all-test",
@@ -62,12 +63,16 @@ public sealed class PvsApiFactory : WebApplicationFactory<Program>, IAsyncLifeti
             // Record email verification codes instead of using SMTP.
             services.RemoveAll<IVerificationEmailSender>();
             services.AddSingleton<IVerificationEmailSender>(EmailSender);
+            // Record website enquiry emails instead of using SMTP.
+            services.RemoveAll<PadmashaliVidyaSetu.Api.Services.Website.IEnquiryMailer>();
+            services.AddSingleton<PadmashaliVidyaSetu.Api.Services.Website.IEnquiryMailer>(EnquiryMailer);
         });
     }
 
     public FakePushSender PushSender { get; } = new();
     public FakeEmailSender EmailSender { get; } = new();
     public RecordingCodeSender CodeSender { get; } = new();
+    public RecordingEnquiryMailer EnquiryMailer { get; } = new();
 
     /// <summary>The store-review test login used by the tests (national digits) and its fixed code.</summary>
     public const string TestLoginMobile = "9000012345";
@@ -166,6 +171,22 @@ public sealed record ErrorItem(string? Field, string Message);
 public sealed record ChallengeData(Guid ChallengeId, string MaskedMobileNumber, int CodeLength, string? DevelopmentCode);
 public sealed record EmailChallengeData(Guid ChallengeId, string MaskedEmail, int CodeLength, string? DevelopmentCode);
 public sealed record TestTokens(string AccessToken, string RefreshToken, bool IsNewAccount, int RegisteredMemberCount);
+
+/// <summary>Records website enquiry emails instead of sending them.</summary>
+public sealed class RecordingEnquiryMailer : PadmashaliVidyaSetu.Api.Services.Website.IEnquiryMailer
+{
+    public System.Collections.Concurrent.ConcurrentQueue<MimeKit.MimeMessage> Sent { get; } = new();
+
+    public Task SendAsync(MimeKit.MimeMessage message, CancellationToken ct)
+    {
+        // The service disposes its message: keep a copy.
+        using var buffer = new MemoryStream();
+        message.WriteTo(buffer);
+        buffer.Position = 0;
+        Sent.Enqueue(MimeKit.MimeMessage.Load(buffer));
+        return Task.CompletedTask;
+    }
+}
 
 /// <summary>Records phone verification codes (SMS / WhatsApp) instead of sending them.</summary>
 public sealed class RecordingCodeSender : IVerificationCodeSender

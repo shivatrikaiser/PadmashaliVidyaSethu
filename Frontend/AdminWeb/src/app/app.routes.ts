@@ -29,6 +29,11 @@ export const routes: Routes = [
         title: 'Member | PVS Admin',
       },
       {
+        path: 'deleted-accounts',
+        loadComponent: () => import('./pages/deleted-accounts/deleted-accounts').then((m) => m.DeletedAccounts),
+        title: 'Deleted accounts | PVS Admin',
+      },
+      {
         path: 'other-values',
         canActivate: [superAdminGuard],
         loadComponent: () => import('./pages/other-values/other-values').then((m) => m.OtherValues),

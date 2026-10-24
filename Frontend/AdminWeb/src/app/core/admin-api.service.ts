@@ -5,7 +5,7 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ApiResponse } from './api';
 import {
-  AdminUser, AppBranding, BrandingText, FooterSponsor, FooterSponsorInput, ListItem, ListType, LocationItem, LookupItem, MemberDetail, MemberFilters, MemberRow, OtherValue,
+  AdminUser, AppBranding, BrandingText, DeletedAccount, DeletedAccountFilters, FooterSponsor, FooterSponsorInput, ListItem, ListType, LocationItem, LookupItem, MemberDetail, MemberFilters, MemberRow, OtherValue,
   PagedResult, Summary,
 } from './models';
 
@@ -46,6 +46,12 @@ export class AdminApi {
   // ---------------------------------------------------------------- Reports
   summary(): Observable<Summary> {
     return this.get('/admin/reports/summary');
+  }
+  deletedAccounts(filters: DeletedAccountFilters): Observable<DeletedAccount[]> {
+    return this.get('/admin/reports/deleted-accounts', toParams(filters));
+  }
+  exportDeletedAccounts(filters: DeletedAccountFilters): Observable<Blob> {
+    return this.http.get(`${this.api}/admin/reports/deleted-accounts/export`, { params: toParams(filters), responseType: 'blob' });
   }
 
   // ---------------------------------------------------------------- Master lists

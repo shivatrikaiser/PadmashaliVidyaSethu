@@ -48,6 +48,35 @@ class MasterDataRepository {
       _api.get('/api/v1/app/version', AppVersionInfo.fromJson, query: {'platform': platform});
 }
 
+/// Messages from the Contact us screen, sent to the shared enquiry service (the same one as the VidyaSethu website's
+/// forms; emailed to support).
+class EnquiryRepository {
+  EnquiryRepository(this._api);
+  final ApiClient _api;
+
+  Future<void> send({
+    required String name,
+    required String email,
+    required String phone,
+    required String message,
+    required Duration elapsed,
+  }) {
+    String? value(String s) => s.trim().isEmpty ? null : s.trim();
+    return _api.post('/api/v1/enquiries', {
+      'category': 'general',
+      'name': name.trim(),
+      'organization': 'Padmashali Vidya Sethu app',
+      'email': value(email),
+      'phone': value(phone),
+      'message': message.trim(),
+      'consent': true,
+      'locale': 'en',
+      'page': 'pvs-app/contact',
+      'elapsedMs': elapsed.inMilliseconds,
+    }, (_) {});
+  }
+}
+
 class MemberRepository {
   MemberRepository(this._api);
   final ApiClient _api;

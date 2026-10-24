@@ -49,6 +49,7 @@ public static class AuditActions
     public const string LoggedOut = "Auth.LoggedOut";
     public const string AccountDeleted = "Auth.AccountDeleted";
     public const string TestLoginCodeIssued = "Auth.TestLoginCodeIssued";
+    public const string WebsiteEnquiryReceived = "Website.EnquiryReceived";
     public const string DeletedAccountSignInBlocked = "Auth.DeletedAccountSignInBlocked";
     public const string PasswordSignInSucceeded = "Auth.PasswordSignInSucceeded";
     public const string PasswordSignInFailed = "Auth.PasswordSignInFailed";

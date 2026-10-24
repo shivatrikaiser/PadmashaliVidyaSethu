@@ -2,6 +2,22 @@ namespace PadmashaliVidyaSetu.Api.DTOs;
 
 public sealed record RequestVerificationCodeRequest(string? MobileNumber);
 
+/// <summary>
+/// POST /api/v1/enquiries - the VidyaSethu website's enquiry forms (contract: Frontend/VidyaSethuWeb README
+/// "Enquiry endpoint"). Email or phone is required; <c>ElapsedMs</c> = time from the form appearing to sending.
+/// </summary>
+public sealed record EnquiryRequest(
+    string? Category,
+    string? Name,
+    string? Organization,
+    string? Email,
+    string? Phone,
+    string? Message,
+    bool Consent,
+    string? Locale,
+    string? Page,
+    int ElapsedMs);
+
 /// <summary>POST /api/v1/diagnostics/email-test.</summary>
 public sealed record EmailTestRequest(string? Email);
 

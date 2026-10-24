@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:padmashali_vidya_setu/app.dart';
+import 'package:padmashali_vidya_setu/legal/legal_documents.dart';
 import 'package:padmashali_vidya_setu/screens/auth/phone_screen.dart';
 import 'package:padmashali_vidya_setu/widgets/app_footer.dart';
 import 'package:padmashali_vidya_setu/widgets/brand.dart';
@@ -55,7 +56,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Who we are'), findsOneWidget);
     expect(find.text('How long we keep it, and deleting your account'), findsOneWidget);
-    expect(find.byKey(const Key('legalDraftNote')), findsOneWidget);
+    expect(find.byKey(const Key('legalDraftNote')), LegalDocuments.draft ? findsOneWidget : findsNothing);
 
     await tester.pageBack();
     await tester.pumpAndSettle();
@@ -64,6 +65,15 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Your account'), findsOneWidget);
     expect(find.text('Acceptable use'), findsOneWidget);
+
+    // Contact us is reachable before signing in too.
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('contactLink')));
+    await tester.tap(find.byKey(const Key('contactLink')));
+    await tester.pumpAndSettle();
+    expect(find.text('9741413165'), findsOneWidget);
+    expect(find.text('vidyavardhaka@padmashalimahasabha.com'), findsOneWidget);
   });
 
   testWidgets('phone number is validated before sending', (tester) async {

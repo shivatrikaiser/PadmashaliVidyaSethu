@@ -133,6 +133,7 @@ public sealed class AdminMemberService(
         if (q.TempleId is { } templeId) query = query.Where(m => m.TempleId == templeId);
         if (q.MemberStatusId is { } statusId) query = query.Where(m => m.MemberStatusId == statusId);
         if (q.ClassId is { } classId) query = query.Where(m => m.ClassId == classId);
+        if (q.OrganisationId is { } organisationId) query = query.Where(m => m.OrganisationId == organisationId);
         if (q.DistrictId is { } districtId)
             query = query.Where(m => m.Addresses.Any(a => a.AddressType == AddressTypes.Permanent && a.DistrictId == districtId));
 
@@ -175,7 +176,8 @@ public sealed class AdminMemberService(
     /// CSV field, quoted when needed. A leading = or @ (or + / - not followed by a digit, so "+91..." stays a phone
     /// number) is prefixed with ' so Excel never runs member-typed text as a formula.
     /// </summary>
-    private static string CsvField(object? value)
+    /// <summary>One CSV value, quoted when needed; also guards against spreadsheet formula injection.</summary>
+    internal static string CsvField(object? value)
     {
         var text = value?.ToString() ?? string.Empty;
         var formulaLike = text.Length > 0 && (text[0] is '=' or '@'

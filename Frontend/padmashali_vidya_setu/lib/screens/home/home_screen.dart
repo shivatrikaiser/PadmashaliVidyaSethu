@@ -294,6 +294,8 @@ class _AccountMenu extends ConsumerWidget {
           await context.push(Routes.register);
         } else if (value == 'delete') {
           await context.push(Routes.deleteAccount);
+        } else if (value == 'contact') {
+          await context.push(Routes.contact);
         } else if (value == 'privacy') {
           await context.push(Routes.privacy);
         } else if (value == 'terms') {
@@ -314,6 +316,7 @@ class _AccountMenu extends ConsumerWidget {
       },
       itemBuilder: (_) => [
         if (canAddMember) PopupMenuItem(value: 'add', child: Text(l10n.addFamilyMember)),
+        PopupMenuItem(key: const Key('contactMenuItem'), value: 'contact', child: Text(l10n.contactTitle)),
         PopupMenuItem(value: 'privacy', child: Text(l10n.privacyPolicy)),
         PopupMenuItem(value: 'terms', child: Text(l10n.termsAndConditions)),
         PopupMenuItem(value: 'signOut', child: Text(l10n.signOut)),

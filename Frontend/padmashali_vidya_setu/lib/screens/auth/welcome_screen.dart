@@ -77,6 +77,7 @@ class WelcomeScreen extends ConsumerWidget {
                       LegalLinks(
                         onPrivacy: () => context.push(Routes.privacy),
                         onTerms: () => context.push(Routes.terms),
+                        onContact: () => context.push(Routes.contact),
                       ),
                     ],
                   ),

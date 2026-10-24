@@ -1,11 +1,14 @@
 import type { SiteConfig } from '../app/core/site-config';
+import { shared } from './shared';
 
-/** `ng serve` / `npm run build:dev`. Never used for a deployed site. */
+/**
+ * `ng serve` / `npm run build:dev`. Never used for a deployed site. Same as production (shared.ts) except the data
+ * sources below.
+ */
 export const environment: SiteConfig = {
+  ...shared,
   environmentName: 'development',
   siteUrl: 'http://localhost:4300',
-
-  allowedLinkHosts: ['vidyasethu.co.in', '*.vidyasethu.co.in'],
   allowLocalhostLinks: true,
 
   // Development fallback: the PVS Flutter app run as a web app on this PC -
@@ -16,14 +19,6 @@ export const environment: SiteConfig = {
     pvs: { application: 'http://localhost:8080/' },
   },
 
-  enquiryEndpoint: null,
-
-  company: {
-    legalName: 'Swaprajna Technologies (OPC) Private Limited',
-    email: null,
-    phone: null,
-    address: null,
-  },
-
-  legalPagesApproved: false,
+  // The API run on this PC (dotnet run) - enquiries are acknowledged but not emailed in Development.
+  enquiryEndpoint: 'http://localhost:5274/api/v1/enquiries',
 };

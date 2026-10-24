@@ -23,12 +23,30 @@ export interface MemberFilters {
   templeId?: number | null;
   memberStatusId?: number | null;
   classId?: number | null;
+  organisationId?: number | null;
   districtId?: number | null;
   ageFrom?: number | null;
   ageTo?: number | null;
   isActive?: boolean | null;
   page?: number;
   pageSize?: number;
+}
+
+/** An account its user deleted in the app (kept for the records; the number cannot register again). */
+export interface DeletedAccount {
+  accountId: number;
+  mobileNumber: string;
+  createdDate: string;
+  lastLoginDate: string | null;
+  deletedDate: string;
+  members: { registrationId: string; fullName: string; temple: string }[];
+}
+
+/** Deleted-accounts report filters; dates as yyyy-MM-dd (days in India). */
+export interface DeletedAccountFilters {
+  search?: string;
+  from?: string | null;
+  to?: string | null;
 }
 
 export interface MemberRow {

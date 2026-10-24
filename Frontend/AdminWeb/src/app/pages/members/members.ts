@@ -24,6 +24,7 @@ export class Members {
   protected readonly temples = signal<LookupItem[]>([]);
   protected readonly statuses = signal<LookupItem[]>([]);
   protected readonly classes = signal<LookupItem[]>([]);
+  protected readonly organisations = signal<LookupItem[]>([]);
   protected readonly states = signal<LookupItem[]>([]);
   protected readonly districts = signal<LookupItem[]>([]);
 
@@ -33,10 +34,11 @@ export class Members {
   protected readonly error = signal<string | null>(null);
 
   constructor() {
-    this.api.lookups(['temples', 'member-statuses', 'classes']).subscribe((l) => {
+    this.api.lookups(['temples', 'member-statuses', 'classes', 'organisations']).subscribe((l) => {
       this.temples.set(l['temples']);
       this.statuses.set(l['member-statuses']);
       this.classes.set(l['classes']);
+      this.organisations.set(l['organisations']);
     });
     this.api.states(INDIA).subscribe((s) => this.states.set(s));
     this.search();

@@ -15,7 +15,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sponsoredBy => 'Sponsored by:';
 
   @override
-  String get poweredBy => 'Powered by';
+  String get poweredBy => 'Technology Powered by';
 
   @override
   String get technologyPoweredBy => 'Technology Powered by';
@@ -346,6 +346,57 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get termsAndConditions => 'Terms and Conditions';
+
+  @override
+  String get contactTitle => 'Contact us';
+
+  @override
+  String get contactSanghaTitle => 'Sangha office';
+
+  @override
+  String get contactSupportTitle => 'App support';
+
+  @override
+  String get contactSupportText =>
+      'For technical problems with the app (signing in, verification codes, errors).';
+
+  @override
+  String get contactFormTitle => 'Send us a message';
+
+  @override
+  String get contactName => 'Your name';
+
+  @override
+  String get emailLabel => 'Email Address';
+
+  @override
+  String get contactEmailOrPhone =>
+      'Give an email address, a phone number, or both, so we can reply.';
+
+  @override
+  String get contactEmailOrPhoneRequired =>
+      'Please give an email address or a phone number.';
+
+  @override
+  String get contactMessage => 'Message';
+
+  @override
+  String get contactMessageTooShort => 'Please write at least 10 characters.';
+
+  @override
+  String get contactConsent =>
+      'I agree that these details may be used to reply to my message.';
+
+  @override
+  String get contactConsentRequired =>
+      'Please tick the box to agree that we may use these details to reply.';
+
+  @override
+  String get contactSend => 'Send Message';
+
+  @override
+  String get contactSent =>
+      'Thank you - your message has been sent. We will reply as soon as we can.';
 
   @override
   String get agreeByContinuing =>

@@ -26,6 +26,8 @@ Hosting has not been chosen yet. This is the recommended path on Azure (any SQL 
    | `PhoneVerification__TestLogin__MobileNumber` / `__Code` | Store-review sign-in (Google Play): `917795276699` / `9876` in appsettings.json. That number signs in with the fixed code and is never sent anything; "Delete account" closes its members but does not block it. Set the number empty to switch it off |
    | `Cors__AllowedOrigins__0` | `https://pvs.vidyasethu.co.in` (admin portal) |
    | `Cors__AllowedOrigins__1` | `https://app.vidyasethu.co.in` (member web app) |
+   | `Cors__AllowedOrigins__N` (next free number; `__3` in production) | `https://vidyasethu.co.in` (website: enquiry forms and the PVS web app at /pvs) |
+   | `Enquiries__Recipient` | Optional - who receives website enquiries (default `support@iqexplore.com`); sent through the `Email` SMTP settings |
    | `Swagger__Enabled` | `true` only while testing - serves `/swagger`, `/openapi/v1.json` and the SMS / WhatsApp / email tests (`POST /api/v1/diagnostics/sms-test`, `.../whatsapp-test`, `.../email-test`); remove afterwards |
 
 4. HTTPS only; HSTS is enabled automatically outside Development. If behind a proxy/Front Door, configure

@@ -49,12 +49,20 @@ class LegalDocumentScreen extends StatelessWidget {
   }
 }
 
-/// "Privacy Policy · Terms and Conditions" links, used on the sign-in screens and in registration.
+/// "Privacy Policy · Terms and Conditions" links (+ "Contact us" when [onContact] is set), used on the sign-in
+/// screens and in registration.
 class LegalLinks extends StatelessWidget {
-  const LegalLinks({super.key, required this.onPrivacy, required this.onTerms, this.alignment = WrapAlignment.center});
+  const LegalLinks({
+    super.key,
+    required this.onPrivacy,
+    required this.onTerms,
+    this.onContact,
+    this.alignment = WrapAlignment.center,
+  });
 
   final VoidCallback onPrivacy;
   final VoidCallback onTerms;
+  final VoidCallback? onContact;
   final WrapAlignment alignment;
 
   @override
@@ -67,6 +75,10 @@ class LegalLinks extends StatelessWidget {
         TextButton(key: const Key('privacyPolicyLink'), onPressed: onPrivacy, child: Text(l10n.privacyPolicy)),
         const Text('·'),
         TextButton(key: const Key('termsLink'), onPressed: onTerms, child: Text(l10n.termsAndConditions)),
+        if (onContact != null) ...[
+          const Text('·'),
+          TextButton(key: const Key('contactLink'), onPressed: onContact, child: Text(l10n.contactTitle)),
+        ],
       ],
     );
   }

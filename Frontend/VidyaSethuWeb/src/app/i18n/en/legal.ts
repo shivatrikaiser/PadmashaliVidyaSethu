@@ -13,7 +13,7 @@ export interface LegalDocument {
 
 const privacy: LegalDocument = {
   title: 'Privacy notice',
-  lastUpdated: '13 October 2026 (draft)',
+  lastUpdated: '13 October 2026 ',
   intro:
     'This notice explains how the VidyaSethu public website (vidyasethu.co.in) handles personal data. It does not ' +
     'cover the portals of the organizations listed on this website - each organization has its own privacy notice.',
@@ -28,7 +28,7 @@ const privacy: LegalDocument = {
     {
       heading: 'Organizations are responsible for their own portals',
       paragraphs: [
-        'Organizations such as Padmashali Vidya Sethu run their own portals. When you register or sign in there, ' +
+        'Organizations such as Padmashali Vidya Sethu run their own portals / Apps. When you register or sign in there, ' +
           'that organization decides what information is collected and how it is used, under its own privacy ' +
           'notice. This website does not collect member registrations and cannot access organization records.',
       ],
@@ -58,7 +58,7 @@ const privacy: LegalDocument = {
       paragraphs: [
         'We process enquiry details with your consent, which you give when you send the form. We intend to handle ' +
           'personal data in line with applicable Indian law, including the Digital Personal Data Protection Act, ' +
-          '2023. [For review: confirm obligations, grievance-officer details and the process for withdrawing consent.]',
+          '2023. ',
         'You may ask us for a summary of the personal data we hold about you, ask us to correct or erase it, or ' +
           'withdraw your consent, by contacting us. Choose “Privacy or personal data request” on the contact form.',
       ],
@@ -66,8 +66,7 @@ const privacy: LegalDocument = {
     {
       heading: 'How long we keep it',
       paragraphs: [
-        'We keep enquiries only as long as needed to respond and follow up. [For review: set a retention period, ' +
-          'for example 24 months after the last contact.] Hosting logs are kept for a limited period set by our ' +
+        'We keep enquiries only as long as needed to respond and follow up, around 24 months after the last contact. Hosting logs are kept for a limited period set by our ' +
           'hosting configuration.',
       ],
     },
@@ -75,7 +74,7 @@ const privacy: LegalDocument = {
       heading: 'Who we share it with',
       paragraphs: [
         'Service providers that host and operate this website and its enquiry service process data on our behalf. ' +
-          '[For review: list providers and data locations once hosting is confirmed.] We may disclose data where ' +
+          'We may disclose data where ' +
           'required by law.',
       ],
     },
@@ -102,7 +101,7 @@ const privacy: LegalDocument = {
 
 const terms: LegalDocument = {
   title: 'Terms of use',
-  lastUpdated: '13 October 2026 (draft)',
+  lastUpdated: '13 October 2026 ',
   intro:
     'These terms apply to your use of the VidyaSethu public website (vidyasethu.co.in). Organization portals have ' +
     'their own terms.',
@@ -154,14 +153,13 @@ const terms: LegalDocument = {
       heading: 'Disclaimer and liability',
       paragraphs: [
         'The website is provided “as is”. We try to keep the information accurate but do not guarantee that it is ' +
-          'complete or current. [For review: limitation-of-liability wording.]',
+          'complete or current.',
       ],
     },
     {
       heading: 'Governing law',
       paragraphs: [
-        'These terms are governed by the laws of India. [For review: confirm jurisdiction (courts of the relevant ' +
-          'city).]',
+        'These terms are governed by the laws of India, and courts at Udupi, Karnataka have jurisdiction.',
       ],
     },
     {
@@ -173,7 +171,7 @@ const terms: LegalDocument = {
 
 const accessibility: LegalDocument = {
   title: 'Accessibility',
-  lastUpdated: '13 October 2026 (draft)',
+  lastUpdated: '13 October 2026 ',
   intro:
     'We want everyone, including people with disabilities, to be able to use the VidyaSethu website. We aim to meet ' +
     'the Web Content Accessibility Guidelines (WCAG) 2.2 at level AA. This is our goal - the website has not yet ' +

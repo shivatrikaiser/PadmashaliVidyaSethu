@@ -9,6 +9,7 @@ import '../screens/auth/splash_screen.dart';
 import '../screens/auth/verify_code_screen.dart';
 import '../screens/auth/welcome_screen.dart';
 import '../legal/legal_documents.dart';
+import '../screens/contact/contact_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/legal/legal_document_screen.dart';
 import '../screens/profile/profile_screen.dart';
@@ -42,6 +43,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: Routes.home, builder: (_, _) => const HomeScreen()),
       GoRoute(path: Routes.deleteAccount, builder: (_, _) => const DeleteAccountScreen()),
+      GoRoute(path: Routes.contact, builder: (_, _) => const ContactScreen()),
       GoRoute(
         path: Routes.privacy,
         builder: (_, _) => const LegalDocumentScreen(document: LegalDocuments.privacyPolicy),

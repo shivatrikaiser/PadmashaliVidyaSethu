@@ -27,6 +27,12 @@
       @for (c of classes(); track c.id) { <option [ngValue]="c.id">{{ c.name }}</option> }
     </select>
   </label>
+  <label>Organisation
+    <select name="organisation" [(ngModel)]="filters.organisationId">
+      <option [ngValue]="null">All</option>
+      @for (o of organisations(); track o.id) { <option [ngValue]="o.id">{{ o.name }}</option> }
+    </select>
+  </label>
   <label>State
     <select name="state" [(ngModel)]="stateId" (ngModelChange)="onStateChange()">
       <option [ngValue]="null">All</option>

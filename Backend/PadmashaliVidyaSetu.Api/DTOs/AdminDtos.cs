@@ -19,7 +19,8 @@ public sealed record MemberSearchQuery(
     int? AgeTo = null,
     bool? IsActive = true,
     int Page = 1,
-    int PageSize = 25);
+    int PageSize = 25,
+    int? OrganisationId = null);
 
 public sealed record AdminMemberRowDto(
     string RegistrationId,
@@ -34,6 +35,22 @@ public sealed record AdminMemberRowDto(
     string MobileNumber,
     bool IsActive,
     DateTime RegistrationCompletedDate);
+
+// ---------------------------------------------------------------- Deleted accounts report
+
+/// <summary>An account deleted by its user in the app ("Delete my account"): kept for the records, number blocked.</summary>
+public sealed record DeletedAccountDto(
+    int AccountId,
+    string MobileNumber,
+    DateTime CreatedDate,
+    DateTime? LastLoginDate,
+    DateTime DeletedDate,
+    IReadOnlyList<DeletedAccountMemberDto> Members);
+
+public sealed record DeletedAccountMemberDto(string RegistrationId, string FullName, string Temple);
+
+/// <summary>Deleted between <c>From</c> and <c>To</c> (dates in India, both inclusive; either may be empty).</summary>
+public sealed record DeletedAccountsQuery(DateOnly? From = null, DateOnly? To = null, string? Search = null);
 
 public sealed record ConsentDto(string ConsentType, string PolicyVersion, bool IsGranted, DateTime RecordedDate);
 

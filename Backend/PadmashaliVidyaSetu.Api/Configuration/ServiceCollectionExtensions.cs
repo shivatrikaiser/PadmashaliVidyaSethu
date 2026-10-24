@@ -19,6 +19,7 @@ using PadmashaliVidyaSetu.Api.Services.Locations;
 using PadmashaliVidyaSetu.Api.Services.MasterData;
 using PadmashaliVidyaSetu.Api.Services.Members;
 using PadmashaliVidyaSetu.Api.Services.Verification;
+using PadmashaliVidyaSetu.Api.Services.Website;
 using PadmashaliVidyaSetu.Api.Validators;
 
 namespace PadmashaliVidyaSetu.Api.Configuration;
@@ -66,6 +67,10 @@ public static class ServiceCollectionExtensions
                 (email, verification) => !IsSender(verification.Value.EmailSender, VerificationSenders.Smtp) || !email.MissingSettings().Any(),
                 "PhoneVerification:EmailSender is Smtp but Email settings are incomplete (Email:Host, FromAddress, Security, " +
                 "Password when UserName is set).")
+            .ValidateOnStart();
+        services.AddOptions<EnquiryOptions>().Bind(configuration.GetSection(EnquiryOptions.Section))
+            .ValidateDataAnnotations()
+            .Validate(o => EmailAddress.TryNormalize(o.Recipient, out _), "Enquiries:Recipient must be a valid email address.")
             .ValidateOnStart();
         services.AddOptions<RegistrationOptions>().Bind(configuration.GetSection(RegistrationOptions.Section)).ValidateDataAnnotations().ValidateOnStart();
         services.AddOptions<PinCodeLookupOptions>().Bind(configuration.GetSection(PinCodeLookupOptions.Section)).ValidateDataAnnotations().ValidateOnStart();
@@ -165,6 +170,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAdminUserService, AdminUserService>();
         services.AddScoped<ILocationReviewService, LocationReviewService>();
         services.AddScoped<IBrandingService, BrandingService>();
+        services.AddScoped<IEnquiryService, EnquiryService>();
         services.AddScoped<IAppVersionService, AppVersionService>();
         services.AddSingleton<IPushSender, FirebasePushSender>();
         services.AddScoped<INotificationService, NotificationService>();
@@ -201,6 +207,17 @@ public static class ServiceCollectionExtensions
                 return sp.GetRequiredService<NotConfiguredVerificationCodeSender>();
             }
             return new RoutingVerificationCodeSender(Resolve(verification.Sender), Resolve(verification.InternationalSender));
+        });
+        // Website enquiries go through the same email setting (PhoneVerification:EmailSender) and SMTP account.
+        services.AddSingleton<SmtpEnquiryMailer>();
+        services.AddSingleton<DevelopmentEnquiryMailer>();
+        services.AddSingleton<NotConfiguredEnquiryMailer>();
+        services.AddScoped<IEnquiryMailer>(sp =>
+        {
+            var configured = sp.GetRequiredService<IOptions<PhoneVerificationOptions>>().Value.EmailSender;
+            if (IsSender(configured, VerificationSenders.Smtp)) return sp.GetRequiredService<SmtpEnquiryMailer>();
+            if (IsSender(configured, VerificationSenders.Development)) return sp.GetRequiredService<DevelopmentEnquiryMailer>();
+            return sp.GetRequiredService<NotConfiguredEnquiryMailer>();
         });
         services.AddSingleton<SmtpVerificationEmailSender>();
         services.AddSingleton<DevelopmentVerificationEmailSender>();

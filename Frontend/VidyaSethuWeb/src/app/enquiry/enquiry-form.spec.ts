@@ -54,9 +54,15 @@ function submit(fixture: ComponentFixture<EnquiryForm>): void {
 }
 
 describe('EnquiryForm', () => {
-  describe('without a configured endpoint (current production)', () => {
+  it('production sends enquiries to the shared enquiry service in the API', () => {
+    expect(production.enquiryEndpoint).toBe('https://api.pvs.vidyasethu.co.in/api/v1/enquiries');
+    const { fixture } = setup(production);
+    expect(el(fixture).querySelector('[data-testid="enquiry-disabled"]')).toBeNull();
+  });
+
+  describe('without a configured endpoint', () => {
     it('says online enquiries are not open, disables the form and never reports success', () => {
-      const { fixture, http } = setup(production);
+      const { fixture, http } = setup({ ...production, enquiryEndpoint: null });
       expect(el(fixture).querySelector('[data-testid="enquiry-disabled"]')?.textContent).toContain(
         'Online enquiries are not open yet',
       );

@@ -12,7 +12,7 @@ const sangha = 'the D. K. Jilla Padmashali Vidyavardhaka Sangha (R), Udupi';
 
 export const pvsPrivacy: LegalDocument = {
   title: 'Padmashali Vidya Sethu app - Privacy Policy',
-  lastUpdated: '23 October 2026 (draft)',
+  lastUpdated: '23 October 2026',
   intro:
     'This policy explains how the Padmashali Vidya Sethu app collects, uses, shares and keeps personal ' +
     'information. Please read it before you register yourself or a family member.',
@@ -23,7 +23,9 @@ export const pvsPrivacy: LegalDocument = {
         `The app is run by ${sangha} ("the Sangha", "we", "us") to support the education, careers and welfare of ` +
           'the community. Technology and hosting are provided to the Sangha by Swaprajna Technologies (OPC) ' +
           "Private Limited, which acts only on the Sangha's instructions.",
-        'Contact: [Sangha address, email and phone to be added].',
+        'Contact: Padmashali Suvarna Mahotsava Bhavana, Adi-Udupi, Udupi - 576103.',
+        'Phone: 9741413165',
+        'Email: vidyavardhaka@padmashalimahasabha.com',
       ],
     },
     {
@@ -75,7 +77,7 @@ export const pvsPrivacy: LegalDocument = {
         'Authorised Sangha office-bearers and staff, only as far as their role needs.',
         'Service providers that run parts of the app for us, only for that purpose: Microsoft Azure (hosting and ' +
           'database, in India), SMS Gateway Hub (verification codes by SMS in India), Meta WhatsApp Business ' +
-          '(verification codes for numbers outside India), our email provider (email verification codes), Google ' +
+          '(verification codes for numbers outside India), Zoho Mail (email verification codes), Google ' +
           "Firebase (app notifications) and India Post's PIN code service (only the PIN code you enter).",
         'Authorities, when the law requires it.',
       ],
@@ -87,8 +89,8 @@ export const pvsPrivacy: LegalDocument = {
           'website. Your account and the members registered with it are then closed and no longer shown in the ' +
           'app, and the mobile number cannot be used to sign in or register again.',
         "The information is kept in the Sangha's records, marked as deleted, for record-keeping and to prevent " +
-          'misuse. [For review: state the retention period and when records are finally erased, in line with the ' +
-          'Digital Personal Data Protection Act, 2023.]',
+          'misuse, in line with the Digital ' +
+          'Personal Data Protection Act, 2023.',
       ],
     },
     {
@@ -105,7 +107,7 @@ export const pvsPrivacy: LegalDocument = {
         'You may ask for a summary of the information we hold about you or your child, ask us to correct or update ' +
           'it, withdraw consent, or raise a complaint. To correct information, please contact the Sangha office; ' +
           'online editing will be available soon.',
-        'Grievance officer: [name, email and phone to be added]. If you are not satisfied with our response, you ' +
+        'Grievance officer: President, D K Jilla Paddmashali Vidyavardhaka Sangha®. If you are not satisfied with our response, you ' +
           'may complain to the Data Protection Board of India.',
       ],
     },
@@ -121,7 +123,7 @@ export const pvsPrivacy: LegalDocument = {
 
 export const pvsTerms: LegalDocument = {
   title: 'Padmashali Vidya Sethu app - Terms and Conditions',
-  lastUpdated: '23 October 2026 (draft)',
+  lastUpdated: '23 October 2026',
   intro:
     'These terms apply when you use the Padmashali Vidya Sethu app. By signing in or registering, you agree to ' +
     'them and to the Privacy Policy.',
@@ -192,16 +194,18 @@ export const pvsTerms: LegalDocument = {
       paragraphs: [
         'We may update these terms; the date at the top shows the latest version, and continuing to use the app ' +
           'means you accept the updated terms. These terms are governed by the laws of India, and courts at Udupi, ' +
-          'Karnataka have jurisdiction. [For review: confirm jurisdiction.]',
+          'Karnataka have jurisdiction. ',
       ],
     },
-    { heading: 'Contact', paragraphs: ['[Sangha address, email and phone to be added].'] },
+    { heading: 'Contact', paragraphs: ['Padmashali Suvarna Mahotsava Bhavana, Adi-Udupi, Udupi - 576103.'] },
+    { heading: 'Phone', paragraphs: ['9741413165'] },
+    { heading: 'Email', paragraphs: ['vidyavardhaka@padmashalimahasabha.com'] },
   ],
 };
 
 export const pvsDeleteAccount: LegalDocument = {
   title: 'Padmashali Vidya Sethu app - Delete your account',
-  lastUpdated: '23 October 2026 (draft)',
+  lastUpdated: '23 October 2026',
   intro:
     'You can delete your Padmashali Vidya Sethu account at any time, in the app or by asking the Sangha. This page ' +
     'explains how, and what happens to your information.',
@@ -220,7 +224,7 @@ export const pvsDeleteAccount: LegalDocument = {
       heading: 'Without the app',
       paragraphs: [
         'If you no longer have the app, contact the Sangha office from the mobile number you registered with and ' +
-          'ask for your account to be deleted: [Sangha email and phone to be added]. The Sangha will confirm the ' +
+          'ask for your account to be deleted: Phone: 9741413165 Email: vidyavardhaka@padmashalimahasabha.com. The Sangha will confirm the ' +
           'number belongs to you before deleting the account.',
       ],
     },
@@ -231,14 +235,14 @@ export const pvsDeleteAccount: LegalDocument = {
         'Your mobile number cannot be used to sign in or register again.',
         "The information you gave (member details, addresses, contact details and any disability information) is " +
           "not erased: it is kept in the Sangha's records, marked as deleted, for record-keeping and to prevent " +
-          'misuse. [For review: retention period and when records are finally erased.]',
+          'misuse, in line with the Digital Personal Data Protection Act, 2023.',
         'Security records (sign-in and audit logs) are kept as well.',
       ],
     },
     {
       heading: 'Questions',
       paragraphs: [
-        'See the app\'s Privacy Policy, or contact the Sangha: [Sangha email and phone to be added].',
+        'See the app\'s Privacy Policy, or contact the Sangha: Phone: 9741413165, Email: vidyavardhaka@padmashalimahasabha.com',
       ],
     },
   ],

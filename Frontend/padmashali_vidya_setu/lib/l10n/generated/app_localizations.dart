@@ -109,7 +109,7 @@ abstract class AppLocalizations {
   /// No description provided for @poweredBy.
   ///
   /// In en, this message translates to:
-  /// **'Powered by'**
+  /// **'Technology Powered by'**
   String get poweredBy;
 
   /// No description provided for @technologyPoweredBy.
@@ -711,6 +711,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Terms and Conditions'**
   String get termsAndConditions;
+
+  /// No description provided for @contactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact us'**
+  String get contactTitle;
+
+  /// No description provided for @contactSanghaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sangha office'**
+  String get contactSanghaTitle;
+
+  /// No description provided for @contactSupportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App support'**
+  String get contactSupportTitle;
+
+  /// No description provided for @contactSupportText.
+  ///
+  /// In en, this message translates to:
+  /// **'For technical problems with the app (signing in, verification codes, errors).'**
+  String get contactSupportText;
+
+  /// No description provided for @contactFormTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send us a message'**
+  String get contactFormTitle;
+
+  /// No description provided for @contactName.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get contactName;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Address'**
+  String get emailLabel;
+
+  /// No description provided for @contactEmailOrPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Give an email address, a phone number, or both, so we can reply.'**
+  String get contactEmailOrPhone;
+
+  /// No description provided for @contactEmailOrPhoneRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please give an email address or a phone number.'**
+  String get contactEmailOrPhoneRequired;
+
+  /// No description provided for @contactMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get contactMessage;
+
+  /// No description provided for @contactMessageTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Please write at least 10 characters.'**
+  String get contactMessageTooShort;
+
+  /// No description provided for @contactConsent.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree that these details may be used to reply to my message.'**
+  String get contactConsent;
+
+  /// No description provided for @contactConsentRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please tick the box to agree that we may use these details to reply.'**
+  String get contactConsentRequired;
+
+  /// No description provided for @contactSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Message'**
+  String get contactSend;
+
+  /// No description provided for @contactSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you - your message has been sent. We will reply as soon as we can.'**
+  String get contactSent;
 
   /// No description provided for @agreeByContinuing.
   ///

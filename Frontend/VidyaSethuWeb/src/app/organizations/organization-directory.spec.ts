@@ -61,8 +61,15 @@ describe('OrganizationDirectory', () => {
     expect(dir.bySlug('second')?.organizationId).toBe('b');
   });
 
-  it('production: the PVS destination is not configured yet, so no link is offered', () => {
-    expect(directory(production).link(pvs, 'application')).toBeNull();
+  it('production: the PVS destination is its web app at vidyasethu.co.in/pvs', () => {
+    expect(directory(production).link(pvs, 'application')).toEqual({
+      href: 'https://vidyasethu.co.in/pvs/',
+      development: false,
+    });
+  });
+
+  it('without a configured destination no link is offered', () => {
+    expect(directory({ ...production, organizationLinks: { pvs: { application: null } } }).link(pvs, 'application')).toBeNull();
   });
 
   it('development: the PVS destination is the local development fallback, marked as such', () => {
