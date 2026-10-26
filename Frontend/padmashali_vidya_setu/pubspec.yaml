@@ -2,7 +2,7 @@ name: padmashali_vidya_setu
 description: "Padmashali Vidya Sethu - community education, skills and career platform"
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ^3.11.5
