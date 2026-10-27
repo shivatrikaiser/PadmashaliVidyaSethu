@@ -106,13 +106,13 @@ The destination is configured per environment in `organizationLinks.pvs.applicat
 
 | File | Current value | Effect |
 |---|---|---|
-| `src/environments/environment.ts` (production) | `null` | The PVS page says "Portal not yet available online"; no button |
+| `src/environments/environment.ts` (production) | `'https://pvs.vidyasethu.co.in/'` | "Open Padmashali Vidya Sethu" button |
 | `src/environments/environment.development.ts` | `'http://localhost:8080/'` | Button shown, with a "Development link" notice |
 
-When PVS is deployed (for example to `https://pvs.vidyasethu.co.in`):
-1. In `environment.ts` set `pvs: { application: 'https://pvs.vidyasethu.co.in/' }`.
+To change it (or set it to `null`, which makes the PVS page say "Portal not yet available online", with no button):
+1. Edit `pvs: { application: ... }` in `environment.ts`.
 2. Run `npm run build`. The tests and post-build checks reject non-https, non-allowed or localhost URLs.
-3. Deploy. The "Open Padmashali Vidya Sethu" button then appears on the PVS page.
+3. Deploy.
 
 ## Enquiry endpoint
 
@@ -157,22 +157,12 @@ already has a hidden honeypot field and a minimum fill time.
 `company.email`, `company.phone` and `company.address` in the environment files are `null`, and the Contact page
 says "Our contact details will be published here soon." Fill them in only with details approved for publication.
 
-## PVS web app at /pvs
+## Padmashali Vidya Sethu web app
 
-The Padmashali Vidya Sethu app (Flutter) is published as part of this website at `https://vidyasethu.co.in/pvs/`;
-the organization page's "Open Padmashali Vidya Sethu" button links there.
-
-```bash
-npm run build:pvs   # flutter build web --base-href /pvs/ (production config) -> ../padmashali_vidya_setu/build/web
-npm run build       # the website; copies that build to dist/VidyaSethuWeb/browser/pvs (and the package / zip)
-```
-
-Upload the `browser` folder (including `browser/pvs`) or the zip - both contain the app.
-
-`npm run build` stops if the PVS web build is missing or was made for another base href. `/pvs` has its own
-Content-Security-Policy (WebAssembly, the API, Google's font CDN for fallback glyphs) in `web.config` (`<location
-path="pvs">`) and in `staticwebapp.config.json` (route `/pvs/*`, used by `server.mjs` on Linux); any other
-`/pvs/...` address returns the app's `index.html`. The API must allow `https://vidyasethu.co.in` (CORS).
+The Padmashali Vidya Sethu app (Flutter) has its own address, `https://pvs.vidyasethu.co.in` (its own Web App - see
+`Docs/Deployment.md` "Member web app"); the organization page's "Open Padmashali Vidya Sethu" button links there.
+This website no longer contains it: `/pvs` and any `/pvs/...` address redirect (301) to `https://pvs.vidyasethu.co.in`
+(`web.config`, `server.mjs`, `staticwebapp.config.json`), so old links keep working.
 
 ## Legal pages
 
@@ -342,19 +332,10 @@ The site has no database or server state, so a rollback never needs a data migra
 2. Run `npm test` and `npm run build`.
 3. Deploy the new zip (step 4) and run the smoke test (step 6).
 
-### 10. Adding pvs.vidyasethu.co.in later
+### 10. Organization apps on their own subdomain
 
-This is done in the **PVS** hosting, not in this site.
-
-1. Deploy the PVS web app (the Flutter web build: `flutter build web --release
-   --dart-define-from-file=config/production.json`) on its own Web App or static host. It needs a fallback to
-   `index.html`, because Flutter routes are client-side.
-2. In that resource add custom domain `pvs.vidyasethu.co.in`: a **CNAME** `pvs` → its default hostname, plus its
-   TXT record and a managed certificate.
-3. In the PVS API settings add `https://pvs.vidyasethu.co.in` to `Cors:AllowedOrigins`.
-4. In this site set `organizationLinks.pvs.application` to `'https://pvs.vidyasethu.co.in/'`, then rebuild and
-   redeploy (steps 1 and 4).
-
+PVS runs at `https://pvs.vidyasethu.co.in` on its own Web App (`Docs/Deployment.md` "Member web app"); this site only
+links to it (`organizationLinks.pvs.application`) and redirects the old `/pvs` addresses there.
 
 Future organizations follow the same pattern (`{org}.vidyasethu.co.in`). A subdomain is only an address. The
 organization application's backend must still check tenant identity and user permissions on every request.

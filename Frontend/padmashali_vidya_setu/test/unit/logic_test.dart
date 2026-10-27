@@ -199,6 +199,9 @@ void main() {
       expect(redirectFor(s, Routes.verify), Routes.register);
       expect(redirectFor(s, Routes.home), Routes.register);
       expect(redirectFor(s, Routes.register), isNull);
+      // Privacy / Terms links in the registration form.
+      expect(redirectFor(s, Routes.privacy), isNull);
+      expect(redirectFor(s, Routes.terms), isNull);
     });
 
     test('signed in with members lands on home but may add family members', () {
@@ -207,6 +210,21 @@ void main() {
       expect(redirectFor(s, Routes.splash), Routes.home);
       expect(redirectFor(s, Routes.register), isNull);
       expect(redirectFor(s, Routes.registrationComplete), isNull);
+    });
+
+    test('signed in with members can open Contact, Privacy Policy and Terms from the menu', () {
+      final s = SessionState(status: SessionStatus.signedIn, account: withMember);
+      expect(redirectFor(s, Routes.contact), isNull);
+      expect(redirectFor(s, Routes.privacy), isNull);
+      expect(redirectFor(s, Routes.terms), isNull);
+      expect(redirectFor(s, Routes.welcome), Routes.home);
+    });
+
+    test('signed out users can open Contact, Privacy Policy and Terms', () {
+      const s = SessionState(status: SessionStatus.signedOut);
+      expect(redirectFor(s, Routes.contact), isNull);
+      expect(redirectFor(s, Routes.privacy), isNull);
+      expect(redirectFor(s, Routes.terms), isNull);
     });
   });
 

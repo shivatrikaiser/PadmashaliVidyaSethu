@@ -8,7 +8,7 @@ import 'package:flutter/widgets.dart';
 ///
 /// The app is laid out on a smaller logical canvas (the real size divided by [scaleFor]) and drawn scaled up, so text,
 /// fields, buttons and spacing all grow together and stay readable. Phones (shortest side under 600) are left exactly
-/// as they are; large browser windows (the web version at /pvs) are enlarged a little less ([maxWebScale]).
+/// as they are; large browser windows (the web version, pvs.vidyasethu.co.in) are enlarged a little less ([maxWebScale]).
 class TabletScale extends StatelessWidget {
   const TabletScale({super.key, required this.child});
 

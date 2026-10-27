@@ -65,10 +65,10 @@ describe('OrganizationPage (Padmashali Vidya Sethu)', () => {
     expect(draft.querySelector('[data-testid="legal-draft"]')).toBeTruthy();
   });
 
-  it('production: "Open Padmashali Vidya Sethu" goes to vidyasethu.co.in/pvs', async () => {
+  it('production: "Open Padmashali Vidya Sethu" goes to pvs.vidyasethu.co.in', async () => {
     const el = await open(production);
     expect(el.querySelector<HTMLAnchorElement>('[data-testid="open-portal"]')?.getAttribute('href')).toBe(
-      'https://vidyasethu.co.in/pvs/',
+      'https://pvs.vidyasethu.co.in/',
     );
     expect(el.querySelector('[data-testid="portal-unavailable"]')).toBeNull();
   });

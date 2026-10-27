@@ -75,11 +75,11 @@ New admin pages go under `pages/`, are added as children of the `Shell` route in
 `adminGuard`) and get a link in `layout/shell.html`. Their API endpoints go in an `Admin*Controller`
 (`Backend/.../Controllers`, `[Authorize(Policy = Policies.Admin)]`) backed by a service in `Services/Admin`.
 
-## Deployment - https://pvs.vidyasethu.co.in
+## Deployment - https://pvs-admin.vidyasethu.co.in
 
 | Address | What it is |
 |---|---|
-| `https://pvs.vidyasethu.co.in` | This admin portal (Azure App Service Web App) |
+| `https://pvs-admin.vidyasethu.co.in` | This admin portal (Azure App Service Web App) |
 | `https://api.pvs.vidyasethu.co.in` | The PVS API (its own App Service) - set in `src/environments/environment.ts` |
 
 If the API host changes, update `environment.ts` **and** the CSP (`connect-src`, `img-src`) in both
@@ -122,16 +122,16 @@ CSP (`script-src 'self'`) would block, leaving the portal unstyled.
 
    | Host | Type | Value |
    |---|---|---|
-   | `pvs` | **CNAME** | `<pvs-admin-app>.azurewebsites.net` |
-   | `asuid.pvs` | **TXT** | the Custom Domain Verification ID shown in the dialog |
+   | `pvs-admin` | **CNAME** | `<pvs-admin-app>.azurewebsites.net` |
+   | `asuid.pvs-admin` | **TXT** | the Custom Domain Verification ID shown in the dialog |
 
 6. **API** (`api.pvs.vidyasethu.co.in`, its own Web App - see `Docs/Deployment.md`): add the application setting
-   `Cors__AllowedOrigins__0` = `https://pvs.vidyasethu.co.in` (no trailing slash). Without it every sign-in fails
+   `Cors__AllowedOrigins__0` = `https://pvs-admin.vidyasethu.co.in` (no trailing slash). Without it every sign-in fails
    with "Cannot reach the server".
 7. **Smoke test:**
    ```bash
-   for p in / /login /members /robots.txt; do curl -s -o /dev/null -w "%{http_code} $p\n" https://pvs.vidyasethu.co.in$p; done  # 200
-   curl -s -o /dev/null -w "%{http_code} hidden\n" https://pvs.vidyasethu.co.in/web.config                                     # 404
+   for p in / /login /members /robots.txt; do curl -s -o /dev/null -w "%{http_code} $p\n" https://pvs-admin.vidyasethu.co.in$p; done  # 200
+   curl -s -o /dev/null -w "%{http_code} hidden\n" https://pvs-admin.vidyasethu.co.in/web.config                                     # 404
    ```
    Then sign in with an admin mobile number and open the Dashboard.
 

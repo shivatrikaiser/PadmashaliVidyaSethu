@@ -13,6 +13,9 @@ abstract final class Routes {
   static const profilePattern = '/profile/:registrationId';
   static String profile(String registrationId) => '/profile/$registrationId';
 
+  /// Information pages (menu, legal links): open in every session state, signed in or not.
+  static const information = {privacy, terms, contact};
+
   /// Reachable without signing in.
-  static const public = {welcome, phone, verify, privacy, terms, contact};
+  static const public = {welcome, phone, verify, ...information};
 }

@@ -7,10 +7,14 @@
       "statusCode": 404
     },
     {
+      "route": "/pvs",
+      "redirect": "https://pvs.vidyasethu.co.in/",
+      "statusCode": 301
+    },
+    {
       "route": "/pvs/*",
-      "headers": {
-        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://api.pvs.vidyasethu.co.in; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.pvs.vidyasethu.co.in https://fonts.gstatic.com; worker-src 'self' blob:; manifest-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
-      }
+      "redirect": "https://pvs.vidyasethu.co.in/",
+      "statusCode": 301
     },
     {
       "route": "/*.{js,css}",
@@ -47,12 +51,6 @@
     "Cross-Origin-Opener-Policy": "same-origin"
   },
   "mimeTypes": {
-    ".webmanifest": "application/manifest+json",
-    ".wasm": "application/wasm",
-    ".mjs": "text/javascript",
-    ".bin": "application/octet-stream",
-    ".frag": "application/octet-stream",
-    ".otf": "font/otf",
-    ".ttf": "font/ttf"
+    ".webmanifest": "application/manifest+json"
   }
 }

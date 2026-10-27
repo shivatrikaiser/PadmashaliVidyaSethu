@@ -24,9 +24,9 @@ Hosting has not been chosen yet. This is the recommended path on Azure (any SQL 
    | `Email__Password` | SMTP password (secret) |
    | `PhoneVerification__EmailSender` | `Smtp` (default in appsettings.json) |
    | `PhoneVerification__TestLogin__MobileNumber` / `__Code` | Store-review sign-in (Google Play): `917795276699` / `9876` in appsettings.json. That number signs in with the fixed code and is never sent anything; "Delete account" closes its members but does not block it. Set the number empty to switch it off |
-   | `Cors__AllowedOrigins__0` | `https://pvs.vidyasethu.co.in` (admin portal) |
-   | `Cors__AllowedOrigins__1` | `https://app.vidyasethu.co.in` (member web app) |
-   | `Cors__AllowedOrigins__N` (next free number; `__3` in production) | `https://vidyasethu.co.in` (website: enquiry forms and the PVS web app at /pvs) |
+   | `Cors__AllowedOrigins__0` | `https://pvs-admin.vidyasethu.co.in` (admin portal) |
+   | `Cors__AllowedOrigins__1` | `https://pvs.vidyasethu.co.in` (member web app) |
+   | `Cors__AllowedOrigins__N` (next free number; `__3` in production) | `https://vidyasethu.co.in` (website: enquiry forms) |
    | `Enquiries__Recipient` | Optional - who receives website enquiries (default `support@iqexplore.com`); sent through the `Email` SMTP settings |
    | `Swagger__Enabled` | `true` only while testing - serves `/swagger`, `/openapi/v1.json` and the SMS / WhatsApp / email tests (`POST /api/v1/diagnostics/sms-test`, `.../whatsapp-test`, `.../email-test`); remove afterwards |
 
@@ -54,22 +54,41 @@ flutter build appbundle --release --dart-define-from-file=config/production.json
 
 | Address | What |
 |---|---|
-| `https://app.vidyasethu.co.in` | PVS member app, Flutter web build (Azure Static Web App, `web/staticwebapp.config.json`) |
-| `https://pvs.vidyasethu.co.in` | Admin portal (`Frontend/AdminWeb`) - see `Frontend/AdminWeb/README.md` "Deployment" |
+| `https://pvs.vidyasethu.co.in` | PVS member app, Flutter web build - see "Member web app" below |
+| `https://pvs-admin.vidyasethu.co.in` | Admin portal (`Frontend/AdminWeb`) - see `Frontend/AdminWeb/README.md` "Deployment" |
+| `https://vidyasethu.co.in` | VidyaSethu website; `/pvs` redirects to the member app |
 | `https://api.pvs.vidyasethu.co.in` | PVS API (custom domain on the API App Service: CNAME `api.pvs` + TXT `asuid.api.pvs`) |
 
 ## Admin portal
 Azure App Service Web App (one zip, Windows or Linux) built with `npm run build` in `Frontend/AdminWeb`. Its
-production build calls `https://api.pvs.vidyasethu.co.in`, and the API must list `https://pvs.vidyasethu.co.in` in
+production build calls `https://api.pvs.vidyasethu.co.in`, and the API must list `https://pvs-admin.vidyasethu.co.in` in
 `Cors__AllowedOrigins__0`.
 
 ## VidyaSethu public website
 Deployed separately as an Azure App Service Web App (one zip, Windows or Linux; static files, no database) - see
 `Frontend/VidyaSethuWeb/README.md`. Its "Open Padmashali Vidya Sethu" destination
 (`organizationLinks.pvs.application` in `src/environments/environment.ts`) is the member app
-`https://app.vidyasethu.co.in/`, not the admin portal.
+`https://pvs.vidyasethu.co.in/`, not the admin portal.
 
 ## Member web app
-`flutter build web --release --dart-define-from-file=config/production.json` → `build/web`, deployed to an Azure
-Static Web App (Free plan) with custom domain `app.vidyasethu.co.in`. `web/staticwebapp.config.json` is copied into
-the build (fallback to `index.html`, security headers, `.wasm` type).
+`https://pvs.vidyasethu.co.in`, its own Azure App Service Web App (Windows, IIS), published by FTP.
+
+1. **Build** (base href `/`):
+   ```powershell
+   cd Frontend\padmashali_vidya_setu
+   flutter build web --release --no-web-resources-cdn --dart-define-from-file=config/production.json
+   ```
+   Output: `build\web`. It includes `web\web.config` (IIS): app files as they are, every other address served
+   `index.html` (Flutter routes), CSP (WebAssembly, the API, Google's font CDN), security headers, caching.
+2. **Web App** (once): Publish **Code**, OS **Windows**, any stack (static files only), plan **Basic B1** or higher
+   (custom domain with HTTPS). Configuration: HTTPS Only **On**, minimum TLS 1.2, FTP state **FTPS only**; do not set
+   `WEBSITE_RUN_FROM_PACKAGE` (it makes `wwwroot` read-only, so FTP uploads are ignored).
+3. **Upload** (FTP credentials: Web App → Deployment Center → FTPS credentials): the **contents** of `build\web`
+   (subfolders included) to `/site/wwwroot`, overwriting. `/site/wwwroot/index.html` and `/site/wwwroot/web.config`
+   must sit side by side.
+4. **Custom domain** (Web App → Custom domains → Add, *App Service Managed Certificate*), at the DNS provider:
+   **CNAME** `pvs` → `<web-app>.azurewebsites.net`, **TXT** `asuid.pvs` → the verification ID shown in the dialog.
+   Remove `pvs.vidyasethu.co.in` from the admin portal's Web App first (it moved to `pvs-admin.vidyasethu.co.in`).
+5. **API:** `Cors__AllowedOrigins__1` = `https://pvs.vidyasethu.co.in` (see the settings table above).
+6. **Check:** `https://pvs.vidyasethu.co.in/` loads the app, a refresh on a screen (e.g. `/register`) still works,
+   `https://vidyasethu.co.in/pvs` redirects there, and sign-in reaches the API.

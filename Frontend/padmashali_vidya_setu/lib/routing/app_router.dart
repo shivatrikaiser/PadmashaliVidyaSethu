@@ -22,6 +22,7 @@ import 'routes.dart';
 /// * signed out → welcome / phone / verify only
 /// * signed in, no member registered yet → registration
 /// * signed in with members → home (registration stays reachable for adding family members)
+/// * Contact, Privacy Policy and Terms open whenever the session is known
 final routerProvider = Provider<GoRouter>((ref) {
   final refresh = ValueNotifier<SessionState>(ref.read(sessionProvider));
   ref.listen(sessionProvider, (_, next) => refresh.value = next);
@@ -66,6 +67,8 @@ String? redirectFor(SessionState session, String location) {
   switch (session.status) {
     case SessionStatus.unknown:
       return location == Routes.splash ? null : Routes.splash;
+    case _ when Routes.information.contains(location):
+      return null;
     case SessionStatus.signedOut:
       return Routes.public.contains(location) ? null : Routes.welcome;
     case SessionStatus.signedIn:

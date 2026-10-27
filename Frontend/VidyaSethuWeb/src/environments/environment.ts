@@ -19,9 +19,9 @@ export const environment: SiteConfig = {
   // Per-environment organization destinations, keyed by organizationId. A value here replaces the link in
   // src/app/organizations/organizations.data.ts. null = not available yet (the page says so, no link is shown).
   //
-  // Padmashali Vidya Sethu: its web app is served by this website at /pvs (README "PVS web app at /pvs").
+  // Padmashali Vidya Sethu: its web app has its own address (README "Padmashali Vidya Sethu web app").
   organizationLinks: {
-    pvs: { application: 'https://vidyasethu.co.in/pvs/' },
+    pvs: { application: 'https://pvs.vidyasethu.co.in/' },
   },
 
   // Endpoint that accepts enquiry form posts (JSON): the shared enquiry service in the API, used by every

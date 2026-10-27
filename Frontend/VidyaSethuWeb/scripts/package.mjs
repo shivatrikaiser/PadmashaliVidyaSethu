@@ -4,13 +4,8 @@
 //   dist/VidyaSethuWeb/vidyasethu-web.zip   the same, zipped for `az webapp deploy --type zip` / Deployment Center
 //
 // The same zip works on a Windows or a Linux Web App.
-//
-// The Padmashali Vidya Sethu web app is included at /pvs: build it first with `npm run build:pvs` (Flutter web build
-// with base href /pvs/ in Frontend/padmashali_vidya_setu/build/web). It is copied into dist/VidyaSethuWeb/browser/pvs
-// as well as the package, so uploading either the browser folder or the zip publishes it. The production site links
-// to /pvs, so packaging stops if that build is missing or was made for another base href.
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -28,24 +23,7 @@ if (!existsSync(join(browser, 'index.html'))) {
 rmSync(out, { recursive: true, force: true });
 rmSync(zip, { force: true });
 
-const pvsBuild = join(root, '..', 'padmashali_vidya_setu', 'build', 'web');
-const pvsIndex = join(pvsBuild, 'index.html');
-if (!existsSync(pvsIndex)) {
-  console.error(
-    'The PVS web app is not built (Frontend/padmashali_vidya_setu/build/web). Run "npm run build:pvs", then "npm run build".',
-  );
-  process.exit(1);
-}
-if (!readFileSync(pvsIndex, 'utf8').includes('<base href="/pvs/">')) {
-  console.error('The PVS web app was built for another address. Run "npm run build:pvs" (base href /pvs/), then "npm run build".');
-  process.exit(1);
-}
-rmSync(join(browser, 'pvs'), { recursive: true, force: true });
-cpSync(pvsBuild, join(browser, 'pvs'), { recursive: true });
-// Its own Static Web Apps file would clash with this site's routing; web.config / server.mjs serve /pvs.
-rmSync(join(browser, 'pvs', 'staticwebapp.config.json'), { force: true });
 cpSync(browser, out, { recursive: true });
-console.log(`Included the PVS web app at /pvs (built ${statSync(pvsIndex).mtime.toISOString().slice(0, 16)} UTC).`);
 cpSync(join(root, 'server', 'server.mjs'), join(out, 'server.mjs'));
 writeFileSync(
   join(out, 'package.json'),

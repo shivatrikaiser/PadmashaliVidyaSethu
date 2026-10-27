@@ -163,8 +163,6 @@ console.log(
 
 function walk(dir) {
   return readdirSync(dir).flatMap((name) => {
-    // browser/pvs is the PVS Flutter web app copied in by package.mjs - checked by its own build, not this site's.
-    if (dir === browser && name === 'pvs') return [];
     const full = join(dir, name);
     return statSync(full).isDirectory() ? walk(full) : [full];
   });

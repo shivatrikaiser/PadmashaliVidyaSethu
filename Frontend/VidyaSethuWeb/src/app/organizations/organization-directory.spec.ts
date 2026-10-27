@@ -61,9 +61,9 @@ describe('OrganizationDirectory', () => {
     expect(dir.bySlug('second')?.organizationId).toBe('b');
   });
 
-  it('production: the PVS destination is its web app at vidyasethu.co.in/pvs', () => {
+  it('production: the PVS destination is its web app at pvs.vidyasethu.co.in', () => {
     expect(directory(production).link(pvs, 'application')).toEqual({
-      href: 'https://vidyasethu.co.in/pvs/',
+      href: 'https://pvs.vidyasethu.co.in/',
       development: false,
     });
   });

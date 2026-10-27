@@ -31,16 +31,42 @@
 
   <title>Padmashali Vidya Sethu</title>
   <link rel="manifest" href="manifest.json">
+
+  <!--
+    Loading splash: the splash artwork shown straight away, in the same full-height portrait frame as the app
+    (lib/widgets/portrait_frame.dart), while the Flutter engine and app download. flutter_bootstrap.js fades it out
+    on Flutter's first frame, when the app's own splash screen takes over.
+  -->
+  <style>
+    html, body { margin: 0; height: 100%; }
+    #splash {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; justify-content: center;
+      background: #E9EEF5;
+      transition: opacity 300ms ease-out;
+    }
+    #splash.done { opacity: 0; pointer-events: none; }
+    #splash .frame {
+      position: relative; overflow: hidden;
+      width: min(100vw, 56.25vh); height: 100vh;
+      width: min(100vw, 56.25dvh); height: 100dvh;
+      background: #F6EDE2;
+      box-shadow: 0 0 24px rgba(0, 0, 0, 0.2);
+    }
+    #splash img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 80%; }
+    #splash .bar { position: absolute; top: 0; left: 0; height: 3px; width: 30%; background: #1C4F9C;
+      animation: splash-bar 1.2s ease-in-out infinite; }
+    @keyframes splash-bar { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
+    @media (prefers-reduced-motion: reduce) { #splash .bar { animation: none; width: 100%; opacity: 0.4; } }
+  </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
-
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+  <div id="splash" aria-busy="true">
+    <div class="frame">
+      <img src="assets/assets/images/splash.jpg" alt="Padmashali Vidya Sethu">
+      <div class="bar"></div>
+    </div>
+  </div>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

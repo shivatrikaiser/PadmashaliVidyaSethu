@@ -52,6 +52,14 @@ flutter_launcher_icons:
   adaptive_icon_foreground: branding/pvs_icon_adaptive_foreground.png
   remove_alpha_ios: true
   min_sdk_android: 21
+  # Web: favicon.png, icons/Icon-192/512 and the "maskable" icons (installed web app), plus manifest.json colours.
+  # The generated maskable icons are then replaced by padded ones (emblem at 70%, centred on white) so Android's
+  # circle crop keeps the whole emblem - redo that after re-running this.
+  web:
+    generate: true
+    image_path: branding/pvs_icon_1024.png
+    background_color: "#FFFFFF"
+    theme_color: "#0B2D6B"
 
 # Launch screen shown by Android / iOS before Flutter starts: `dart run flutter_native_splash:create`.
 # The full splash artwork follows in Flutter (lib/screens/auth/splash_screen.dart).

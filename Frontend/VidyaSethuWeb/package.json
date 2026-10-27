@@ -6,7 +6,6 @@
     "start": "ng serve",
     "build": "ng build && node scripts/postbuild.mjs && node scripts/package.mjs",
     "build:dev": "ng build --configuration development",
-    "build:pvs": "cd ../padmashali_vidya_setu && flutter build web --release --base-href /pvs/ --no-web-resources-cdn --dart-define-from-file=config/production.json",
     "test": "ng test --watch=false",
     "verify": "node scripts/postbuild.mjs",
     "serve:dist": "node dist/VidyaSethuWeb/package/server.mjs"

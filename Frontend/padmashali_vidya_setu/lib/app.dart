@@ -6,6 +6,7 @@ import 'l10n/generated/app_localizations.dart';
 import 'routing/app_router.dart';
 import 'theme/app_theme.dart';
 import 'widgets/app_footer.dart';
+import 'widgets/portrait_frame.dart';
 import 'widgets/tablet_scale.dart';
 
 class PvsApp extends ConsumerWidget {
@@ -34,9 +35,9 @@ class PvsApp extends ConsumerWidget {
         final media = MediaQuery.of(context);
         return MediaQuery(
           data: media.copyWith(textScaler: media.textScaler.clamp(maxScaleFactor: 1.6)),
-          // Tablets: the whole interface is enlarged to fill the screen (phones and web unchanged).
-          // Sponsor / "Powered by" footer under every screen.
-          child: TabletScale(child: AppFrame(router: router, child: child!)),
+          // Web: wide windows show a full-height portrait frame. Tablets (and that frame): the whole interface is
+          // enlarged to fill it. Sponsor / "Powered by" footer under every screen.
+          child: PortraitFrame(child: TabletScale(child: AppFrame(router: router, child: child!))),
         );
       },
     );
