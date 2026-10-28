@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:padmashali_vidya_setu/core/api/api_client.dart';
+import 'package:padmashali_vidya_setu/core/storage/token_storage.dart';
+import 'package:padmashali_vidya_setu/models/member_models.dart';
 import 'package:padmashali_vidya_setu/models/registration_draft.dart';
+import 'package:padmashali_vidya_setu/providers/providers.dart';
+import 'package:padmashali_vidya_setu/repositories/repositories.dart';
 import 'package:padmashali_vidya_setu/screens/registration/steps/address_step.dart';
 import 'package:padmashali_vidya_setu/screens/registration/steps/current_status_step.dart';
 import 'package:padmashali_vidya_setu/screens/registration/steps/disability_step.dart';
@@ -229,6 +234,90 @@ void main() {
   });
 
   group('Address step', () {
+    AddressView address(String type, String line1, {String city = 'Puttur(D.K.)'}) => AddressView(
+      addressType: type,
+      addressLine1: line1,
+      addressLine2: 'Near Temple',
+      pinCode: '574201',
+      cityVillageName: city,
+      taluk: 'Puttur',
+      district: 'Dakshina Kannada',
+      state: 'Karnataka',
+      country: 'India',
+      talukId: 3,
+      stateId: 11,
+      countryId: 1,
+    );
+
+    Future<FakeMasterDataRepository> pumpForFamily(
+      WidgetTester tester,
+      RegistrationDraft draft,
+      List<AddressView> addresses,
+    ) async {
+      final repo = FakeMasterDataRepository();
+      await pumpLocalized(
+        tester,
+        Form(
+          child: AddressStep(draft: draft, serverErrors: const {}, onFieldChanged: (_) {}),
+        ),
+        overrides: [
+          ...testOverrides(masterData: repo),
+          memberRepositoryProvider.overrideWithValue(_FakeMemberRepository(addresses)),
+          sessionProvider.overrideWith((ref) => _SignedInSession()),
+        ],
+      );
+      return repo;
+    }
+
+    testWidgets('adding a family member: "Same as" copies the address and re-selects place and taluk', (tester) async {
+      final draft = RegistrationDraft();
+      final repo = await pumpForFamily(tester, draft, [
+        address('Permanent', '12, Car Street'),
+        address('Current', '12, Car Street'),
+      ]);
+
+      await tester.tap(find.byKey(const Key('copyAddress.PVS-01-0001')));
+      await tester.pumpAndSettle();
+
+      final a = draft.permanentAddress;
+      expect(a.addressLine1, '12, Car Street');
+      expect(a.addressLine2, 'Near Temple');
+      expect(a.pinCode, '574201');
+      expect(repo.pinLookups, 1); // looked up again, so the ids come from the lookup
+      expect(a.toJson()['cityId'], 2);
+      expect(a.cityVillageName, 'Puttur(D.K.)');
+      expect(a.talukId, 3);
+      expect(draft.currentSameAsPermanent, isTrue);
+      expect(find.text('12, Car Street'), findsOneWidget); // the form shows the copied text
+      expect(find.textContaining('Address copied from Veerabhadra Shettigar'), findsOneWidget);
+    });
+
+    testWidgets('a different current address is copied too', (tester) async {
+      final draft = RegistrationDraft();
+      await pumpForFamily(tester, draft, [
+        address('Permanent', '12, Car Street'),
+        address('Current', 'Room 4, Hostel Road', city: 'Bolwar'),
+      ]);
+
+      await tester.tap(find.byKey(const Key('copyAddress.PVS-01-0001')));
+      await tester.pumpAndSettle();
+
+      expect(draft.currentSameAsPermanent, isFalse);
+      expect(draft.currentAddress.addressLine1, 'Room 4, Hostel Road');
+      expect(draft.currentAddress.toJson()['cityId'], 1);
+    });
+
+    testWidgets('first registration: no copy buttons', (tester) async {
+      await pumpLocalized(
+        tester,
+        Form(
+          child: AddressStep(draft: RegistrationDraft(), serverErrors: const {}, onFieldChanged: (_) {}),
+        ),
+        overrides: testOverrides(),
+      );
+      expect(find.byKey(const Key('copyAddress.PVS-01-0001')), findsNothing);
+    });
+
     testWidgets('valid PIN fills district, state, country and suggests the taluk', (tester) async {
       final repo = FakeMasterDataRepository();
       final draft = RegistrationDraft();
@@ -432,4 +521,55 @@ void main() {
       expect(json['newTalukName'], 'Kadaba');
     });
   });
+}
+
+const _member = MemberSummary(
+  registrationId: 'PVS-01-0001',
+  fullName: 'Veerabhadra Shettigar',
+  age: 50,
+  templeName: 'T',
+  memberStatusName: 'Working',
+  profileCompletionPercent: 11,
+);
+
+ApiClient _offlineApi() =>
+    ApiClient(baseUrl: 'http://test.invalid', tokenStorage: MemoryTokenStorage(), onSessionExpired: () {});
+
+/// Signed in with one member already registered (adding a family member).
+class _SignedInSession extends SessionNotifier {
+  _SignedInSession()
+    : super(
+        tokens: MemoryTokenStorage(),
+        auth: AuthRepository(_offlineApi()),
+        members: MemberRepository(_offlineApi()),
+      ) {
+    state = const SessionState(
+      status: SessionStatus.signedIn,
+      account: MyAccount(maskedMobileNumber: '+91******6699', members: [_member], maxMembersPerAccount: 10),
+    );
+  }
+}
+
+class _FakeMemberRepository extends MemberRepository {
+  _FakeMemberRepository(this.addresses) : super(_offlineApi());
+  final List<AddressView> addresses;
+
+  @override
+  Future<MemberProfile> profile(String registrationId) async => MemberProfile(
+    registrationId: registrationId,
+    fullName: 'Veerabhadra Shettigar',
+    fatherName: 'Shankar Shettigar',
+    motherName: 'Parvathi Shettigar',
+    dateOfBirth: DateTime(1976, 10, 1),
+    age: 50,
+    gender: 'Male',
+    temple: 'T',
+    memberStatus: 'Working',
+    memberStatusCode: 'WORKING',
+    organisation: 'O',
+    addresses: addresses,
+    isDisabled: false,
+    disabilityTypes: const [],
+    registrationCompletedDate: DateTime(2026, 10, 28),
+  );
 }

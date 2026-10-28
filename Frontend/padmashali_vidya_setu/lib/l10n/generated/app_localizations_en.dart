@@ -250,6 +250,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sameAsPermanent => 'Current address is same as Permanent Address';
 
   @override
+  String get copyAddressTitle => 'Same address as a family member?';
+
+  @override
+  String get copyAddressHelp =>
+      'Copy the address of a member already registered with this mobile number. You can change it afterwards.';
+
+  @override
+  String copyAddressFrom(String name) {
+    return 'Same as $name';
+  }
+
+  @override
+  String addressCopied(String name) {
+    return 'Address copied from $name. Please check it and change anything that is different.';
+  }
+
+  @override
   String get addressLine1 => 'House / Building / Street';
 
   @override

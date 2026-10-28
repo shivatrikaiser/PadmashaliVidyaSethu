@@ -526,6 +526,30 @@ abstract class AppLocalizations {
   /// **'Current address is same as Permanent Address'**
   String get sameAsPermanent;
 
+  /// No description provided for @copyAddressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Same address as a family member?'**
+  String get copyAddressTitle;
+
+  /// No description provided for @copyAddressHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the address of a member already registered with this mobile number. You can change it afterwards.'**
+  String get copyAddressHelp;
+
+  /// No description provided for @copyAddressFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Same as {name}'**
+  String copyAddressFrom(String name);
+
+  /// No description provided for @addressCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Address copied from {name}. Please check it and change anything that is different.'**
+  String addressCopied(String name);
+
   /// No description provided for @addressLine1.
   ///
   /// In en, this message translates to:

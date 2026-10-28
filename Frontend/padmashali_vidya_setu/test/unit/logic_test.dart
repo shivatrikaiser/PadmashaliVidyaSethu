@@ -160,6 +160,82 @@ void main() {
       expect(a.toJson()['cityId'], 7);
     });
 
+    test('a copied Indian address re-selects its place and taluk after the PIN lookup', () {
+      const source = AddressView(
+        addressType: 'Permanent',
+        addressLine1: '12, Car Street',
+        pinCode: '574201',
+        cityVillageName: 'Bolwar',
+        state: 'Karnataka',
+        country: 'India',
+        talukId: 1,
+        stateId: 11,
+        countryId: 1,
+      );
+      final a = AddressDraft()
+        ..pinCode = '575001'
+        ..localities = const [Locality(cityId: 9, name: 'Old')]
+        ..copyFrom(source, const MasterDataItem(id: 1, name: 'India', code: 'IN'));
+      expect(a.localities, isEmpty); // the old lookup is gone, so the form looks the PIN up again
+      expect(a.pinCode, '574201');
+      a.applyLookup(
+        const PinLookupResult(
+          pinCode: '574201',
+          country: MasterDataItem(id: 1, name: 'India', code: 'IN'),
+          state: MasterDataItem(id: 11, name: 'Karnataka', code: 'IN-KA'),
+          district: MasterDataItem(id: 11, name: 'Dakshina Kannada', code: 'KA-DK'),
+          localities: [
+            Locality(cityId: 7, name: 'Puttur', talukId: 3),
+            Locality(cityId: 8, name: 'BOLWAR', talukId: 3),
+          ],
+          taluks: [],
+          suggestedTalukId: 3,
+        ),
+      );
+      expect(a.toJson()['cityId'], 8);
+      expect(a.talukId, 1); // the member's own taluk, not the suggestion
+    });
+
+    test('a copied place the PIN no longer lists is typed in', () {
+      final a = AddressDraft()
+        ..preferredCityName = 'Kabaka'
+        ..applyLookup(
+          const PinLookupResult(
+            pinCode: '574201',
+            country: MasterDataItem(id: 1, name: 'India', code: 'IN'),
+            state: MasterDataItem(id: 11, name: 'Karnataka', code: 'IN-KA'),
+            district: MasterDataItem(id: 11, name: 'Dakshina Kannada', code: 'KA-DK'),
+            localities: [
+              Locality(cityId: 7, name: 'Puttur'),
+              Locality(cityId: 8, name: 'Bolwar'),
+            ],
+            taluks: [],
+          ),
+        );
+      expect(a.cityNotListed, isTrue);
+      expect(a.toJson()['cityVillageName'], 'Kabaka');
+      expect(a.toJson()['cityId'], isNull);
+    });
+
+    test('a copied address abroad keeps every typed field', () {
+      const source = AddressView(
+        addressType: 'Permanent',
+        addressLine1: '5 Palm Street',
+        pinCode: '94016',
+        cityVillageName: 'San Francisco',
+        state: 'California',
+        country: 'United States',
+        stateId: 40,
+        countryId: 8,
+      );
+      final a = AddressDraft()..copyFrom(source, const MasterDataItem(id: 8, name: 'United States', code: 'US'));
+      expect(a.isIndia, isFalse);
+      expect(a.toJson(), containsPair('cityVillageName', 'San Francisco'));
+      expect(a.toJson(), containsPair('stateId', 40));
+      expect(a.toJson(), containsPair('countryId', 8));
+      expect(a.toJson(), containsPair('pinCode', '94016'));
+    });
+
     test('"place not listed" sends the typed name without a city id', () {
       final a = AddressDraft()
         ..localities = const [Locality(cityId: 7, name: 'Puttur')]

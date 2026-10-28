@@ -54,6 +54,18 @@ class _AddressFormState extends ConsumerState<AddressForm> {
   String? _lastLookedUpPin;
 
   AddressDraft get _a => widget.address;
+
+  @override
+  void initState() {
+    super.initState();
+    // A copied address (or one whose PIN lookup failed earlier): look its PIN code up again.
+    if (_a.isIndia && _a.localities.isEmpty && Validators.isCompletePin(_a.pinCode)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _onPinChanged(_a.pinCode);
+      });
+    }
+  }
+
   String? _err(String field) => widget.serverErrors['${widget.fieldPrefix}.$field'];
   Key _key(String field) => Key('${widget.fieldPrefix}.$field');
 

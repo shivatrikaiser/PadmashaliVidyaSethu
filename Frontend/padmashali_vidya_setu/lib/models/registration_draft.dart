@@ -3,6 +3,7 @@ import '../utils/phone_countries.dart';
 import '../utils/validators.dart';
 import 'location_models.dart';
 import 'master_data_item.dart';
+import 'member_models.dart';
 
 /// Address being entered in the registration form.
 class AddressDraft {
@@ -31,6 +32,36 @@ class AddressDraft {
 
   /// Results of the last PIN lookup, used to populate the City/Village and Taluk choices.
   List<Locality> localities = const [];
+
+  /// Set by [copyFrom]: the place and taluk to re-select when the copied PIN code is looked up again.
+  String? preferredCityName;
+  int? preferredTalukId;
+
+  /// Copies a family member's saved address. India: the street lines and PIN code; the form then looks the PIN up
+  /// again and [applyLookup] re-selects the same place and taluk, so the ids sent match the lookup. Elsewhere the
+  /// address is typed, so every field is copied.
+  void copyFrom(AddressView source, MasterDataItem sourceCountry) {
+    country = null; // start from a clean address even when the country stays the same
+    selectCountry(sourceCountry);
+    addressLine1 = source.addressLine1;
+    addressLine2 = source.addressLine2 ?? '';
+    pinCode = source.pinCode ?? '';
+    if (isIndia) {
+      preferredCityName = source.cityVillageName;
+      preferredTalukId = source.talukId;
+    } else {
+      cityVillageName = source.cityVillageName;
+      state = source.stateId == null ? null : MasterDataItem(id: source.stateId!, name: source.state, code: '');
+    }
+  }
+
+  /// True when [a] and [b] have the same street, place, PIN and country (whether a current address differs).
+  static bool sameAddress(AddressView a, AddressView b) =>
+      a.addressLine1 == b.addressLine1 &&
+      (a.addressLine2 ?? '') == (b.addressLine2 ?? '') &&
+      a.pinCode == b.pinCode &&
+      a.cityVillageName == b.cityVillageName &&
+      a.countryId == b.countryId;
 
   /// India (or not chosen yet): PIN code, City / Village, District and Taluk. Otherwise the address is typed.
   bool get isIndia => country == null || country!.code == MasterCodes.countryIndia;
@@ -67,6 +98,20 @@ class AddressDraft {
       cityId = null;
       cityVillageName = '';
     }
+    // A copied address: choose the same place (or type it, if the PIN no longer lists it) and taluk.
+    final preferredName = preferredCityName;
+    if (preferredName != null) {
+      final match = localities.where((l) => l.name.toLowerCase() == preferredName.toLowerCase()).firstOrNull;
+      if (match != null) {
+        selectLocality(match);
+      } else if (preferredName.isNotEmpty) {
+        selectPlaceNotListed();
+        cityVillageName = preferredName;
+      }
+    }
+    if (preferredTalukId != null) talukId = preferredTalukId;
+    preferredCityName = null;
+    preferredTalukId = null;
   }
 
   void clearLookup() {

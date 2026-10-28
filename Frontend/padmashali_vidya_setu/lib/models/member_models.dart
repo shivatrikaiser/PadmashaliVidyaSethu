@@ -158,6 +158,9 @@ class AddressView {
     this.district,
     required this.state,
     required this.country,
+    this.talukId,
+    this.stateId,
+    this.countryId,
   });
 
   final String addressType;
@@ -174,6 +177,11 @@ class AddressView {
   final String state;
   final String country;
 
+  /// Ids of the lookups above, used to copy this address to another family member.
+  final int? talukId;
+  final int? stateId;
+  final int? countryId;
+
   bool get isPermanent => addressType == 'Permanent';
 
   factory AddressView.fromJson(Object? json) {
@@ -188,6 +196,9 @@ class AddressView {
       district: LookupRef.fromJson(m['district'])?.name,
       state: LookupRef.fromJson(m['state'])!.name,
       country: LookupRef.fromJson(m['country'])!.name,
+      talukId: LookupRef.fromJson(m['taluk'])?.id,
+      stateId: LookupRef.fromJson(m['state'])?.id,
+      countryId: LookupRef.fromJson(m['country'])?.id,
     );
   }
 }
