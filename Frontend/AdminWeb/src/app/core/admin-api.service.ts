@@ -5,7 +5,7 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ApiResponse } from './api';
 import {
-  AdminUser, AppBranding, BrandingText, DeletedAccount, DeletedAccountFilters, FooterSponsor, FooterSponsorInput, ListItem, ListType, LocationItem, LookupItem, MemberDetail, MemberFilters, MemberRow, OtherValue,
+  AdminUser, AppBranding, BrandingText, DeletedAccount, DeletedAccountFilters, EventDetail, EventInput, EventRegistrationRow, EventRow, FooterSponsor, FooterSponsorInput, ListItem, ListType, LocationItem, LookupItem, MemberDetail, MemberFilters, MemberRow, OtherValue,
   PagedResult, Summary,
 } from './models';
 
@@ -132,6 +132,27 @@ export class AdminApi {
   }
   sponsorLogoUrl(branding: AppBranding): string | null {
     return branding.hasSponsorLogo ? `${this.api}/app/branding/sponsor-logo?v=${branding.sponsorLogoVersion}` : null;
+  }
+
+  // ---------------------------------------------------------------- Events
+  events(): Observable<EventRow[]> {
+    return this.get('/admin/events');
+  }
+  event(id: number): Observable<EventDetail> {
+    return this.get(`/admin/events/${id}`);
+  }
+  saveEvent(id: number | null, event: EventInput): Observable<EventDetail> {
+    const url = `${this.api}/admin/events`;
+    const request = id === null
+      ? this.http.post<ApiResponse<EventDetail>>(url, event)
+      : this.http.put<ApiResponse<EventDetail>>(`${url}/${id}`, event);
+    return request.pipe(map((r) => r.data!));
+  }
+  eventRegistrations(id: number): Observable<EventRegistrationRow[]> {
+    return this.get(`/admin/events/${id}/registrations`);
+  }
+  exportEventRegistrations(id: number): Observable<Blob> {
+    return this.http.get(`${this.api}/admin/events/${id}/registrations/export`, { responseType: 'blob' });
   }
 
   // ---------------------------------------------------------------- Locations

@@ -2,13 +2,13 @@
 ================================================================================================================
   Padmashali Vidya Setu (PVS) - deployment into a SHARED database (e.g. IQExplore Live)
   Single self-contained deployment script. Must be updated whenever a new EF migration is added.
-  Generated: 2026-10-23 12:40    Migrations: 20261006135106_InitialSchema, 20261009101316_OtherTextColumns, 20261009112325_MemberProfileListChoices, 20261010153650_AppBranding,
+  Generated: 2026-11-20 09:30    Migrations: 20261006135106_InitialSchema, 20261009101316_OtherTextColumns, 20261009112325_MemberProfileListChoices, 20261010153650_AppBranding,
               20261020142456_SponsorOrganisationAddress, 20261020153210_AppVersions, 20261020155916_AdminPasswords, 20261022042837_MemberMobileNumber, 20261022044620_PushNotifications, 20261022051124_AndroidPackageName,
               20261023100540_AddressOutsideIndia, 20261023110803_MemberEmail,
-              20261023114125_AccountDeletion, 20261023123334_FooterSponsors
+              20261023114125_AccountDeletion, 20261023123334_FooterSponsors, 20261120090151_EventRegistrations
 ================================================================================================================
   WHAT IT DOES
-    * Creates 49 tables (incl. the migrations history) + their keys, indexes and constraints, and loads the
+    * Creates 53 tables (incl. the migrations history) + their keys, indexes and constraints, and loads the
       PVS master data (temples, genders, classes, locations, ...). Every object name starts with PVS_.
     * Creates objects ONLY - never alters, drops or writes to any existing non-PVS table / object.
     * Safe to run again: already-applied migrations are skipped; new ones (after regeneration) are applied.
@@ -4543,6 +4543,240 @@ BEGIN
 END;
 GO
 
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE TABLE [PVS_Events] (
+        [EventId] int NOT NULL IDENTITY,
+        [Code] varchar(12) NOT NULL,
+        [Title] nvarchar(150) NOT NULL,
+        [Description] nvarchar(2000) NULL,
+        [Venue] nvarchar(300) NULL,
+        [EventDate] date NOT NULL,
+        [AgeAsOnDate] date NOT NULL,
+        [RegistrationOpensDate] date NOT NULL,
+        [RegistrationClosesDate] date NOT NULL,
+        [MaxGroupsPerMember] int NOT NULL,
+        [IsPublished] bit NOT NULL,
+        [LastRegistrationNumber] int NOT NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_Events_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [ModifiedDate] datetime2(3) NULL,
+        [CreatedBy] nvarchar(100) NULL,
+        [ModifiedBy] nvarchar(100) NULL,
+        [IsActive] bit NOT NULL CONSTRAINT [PVS_DF_Events_IsActive] DEFAULT CAST(1 AS bit),
+        CONSTRAINT [PVS_PK_Events] PRIMARY KEY ([EventId]),
+        CONSTRAINT [PVS_CK_Events_Code] CHECK (LEN([Code]) >= 2 AND [Code] NOT LIKE '%[^A-Z0-9]%'),
+        CONSTRAINT [PVS_CK_Events_LastRegistrationNumber] CHECK ([LastRegistrationNumber] BETWEEN 0 AND 9999),
+        CONSTRAINT [PVS_CK_Events_MaxGroupsPerMember] CHECK ([MaxGroupsPerMember] BETWEEN 1 AND 50),
+        CONSTRAINT [PVS_CK_Events_RegistrationDates] CHECK ([RegistrationOpensDate] <= [RegistrationClosesDate])
+    );
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE TABLE [PVS_EventGroups] (
+        [EventGroupId] int NOT NULL IDENTITY,
+        [EventId] int NOT NULL,
+        [Name] nvarchar(100) NOT NULL,
+        [MinAge] int NOT NULL,
+        [MaxAge] int NOT NULL,
+        [GenderId] int NULL,
+        [Capacity] int NULL,
+        [DisplayOrder] int NOT NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_EventGroups_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [ModifiedDate] datetime2(3) NULL,
+        [CreatedBy] nvarchar(100) NULL,
+        [ModifiedBy] nvarchar(100) NULL,
+        [IsActive] bit NOT NULL CONSTRAINT [PVS_DF_EventGroups_IsActive] DEFAULT CAST(1 AS bit),
+        CONSTRAINT [PVS_PK_EventGroups] PRIMARY KEY ([EventGroupId]),
+        CONSTRAINT [PVS_CK_EventGroups_Ages] CHECK ([MinAge] >= 0 AND [MaxAge] <= 120 AND [MinAge] <= [MaxAge]),
+        CONSTRAINT [PVS_CK_EventGroups_Capacity] CHECK ([Capacity] IS NULL OR [Capacity] >= 1),
+        CONSTRAINT [PVS_FK_EventGroups_Events_EventId] FOREIGN KEY ([EventId]) REFERENCES [PVS_Events] ([EventId]) ON DELETE CASCADE,
+        CONSTRAINT [PVS_FK_EventGroups_Genders_GenderId] FOREIGN KEY ([GenderId]) REFERENCES [PVS_Genders] ([GenderId]) ON DELETE NO ACTION
+    );
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE TABLE [PVS_EventRegistrations] (
+        [EventRegistrationId] int NOT NULL IDENTITY,
+        [EventId] int NOT NULL,
+        [RegistrationId] char(11) NOT NULL,
+        [RegistrationNumber] varchar(17) NOT NULL,
+        [AgeOnAgeAsOnDate] int NOT NULL,
+        [RegisteredDate] datetime2(3) NOT NULL,
+        [CancelledDate] datetime2(3) NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_EventRegistrations_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [ModifiedDate] datetime2(3) NULL,
+        [CreatedBy] nvarchar(100) NULL,
+        [ModifiedBy] nvarchar(100) NULL,
+        [IsActive] bit NOT NULL CONSTRAINT [PVS_DF_EventRegistrations_IsActive] DEFAULT CAST(1 AS bit),
+        CONSTRAINT [PVS_PK_EventRegistrations] PRIMARY KEY ([EventRegistrationId]),
+        CONSTRAINT [PVS_FK_EventRegistrations_Events_EventId] FOREIGN KEY ([EventId]) REFERENCES [PVS_Events] ([EventId]) ON DELETE NO ACTION,
+        CONSTRAINT [PVS_FK_EventRegistrations_Members_RegistrationId] FOREIGN KEY ([RegistrationId]) REFERENCES [PVS_Members] ([RegistrationId]) ON DELETE NO ACTION
+    );
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE TABLE [PVS_EventRegistrationGroups] (
+        [EventRegistrationId] int NOT NULL,
+        [EventGroupId] int NOT NULL,
+        CONSTRAINT [PVS_PK_EventRegistrationGroups] PRIMARY KEY ([EventRegistrationId], [EventGroupId]),
+        CONSTRAINT [PVS_FK_EventRegistrationGroups_EventGroups_EventGroupId] FOREIGN KEY ([EventGroupId]) REFERENCES [PVS_EventGroups] ([EventGroupId]) ON DELETE NO ACTION,
+        CONSTRAINT [PVS_FK_EventRegistrationGroups_EventRegistrations_EventRegistrationId] FOREIGN KEY ([EventRegistrationId]) REFERENCES [PVS_EventRegistrations] ([EventRegistrationId]) ON DELETE CASCADE
+    );
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_EventGroups_EventId_DisplayOrder] ON [PVS_EventGroups] ([EventId], [DisplayOrder]);
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_EventGroups_GenderId] ON [PVS_EventGroups] ([GenderId]);
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_EventRegistrationGroups_EventGroupId] ON [PVS_EventRegistrationGroups] ([EventGroupId]);
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE UNIQUE INDEX [PVS_IX_EventRegistrations_EventId_RegistrationId] ON [PVS_EventRegistrations] ([EventId], [RegistrationId]);
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_EventRegistrations_RegistrationId] ON [PVS_EventRegistrations] ([RegistrationId]);
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE UNIQUE INDEX [PVS_IX_EventRegistrations_RegistrationNumber] ON [PVS_EventRegistrations] ([RegistrationNumber]);
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE UNIQUE INDEX [PVS_IX_Events_Code] ON [PVS_Events] ([Code]);
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_Events_IsActive_IsPublished_RegistrationClosesDate] ON [PVS_Events] ([IsActive], [IsPublished], [RegistrationClosesDate]);
+END;
+GO
+
+IF @@TRANCOUNT = 0
+BEGIN
+    RAISERROR(N'PVS deployment STOPPED: an earlier step failed and everything was rolled back. Nothing was changed.', 16, 1);
+    SET NOEXEC ON;
+END;
+IF NOT EXISTS (SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261120090151_EventRegistrations', N'10.0.12');
+END;
+GO
+
 -------------------------------------------------------------------------------- 3. Post-flight checks, then COMMIT
 IF @@TRANCOUNT = 0
 BEGIN
@@ -4573,6 +4807,10 @@ INSERT INTO @expected (TableName) VALUES
     (N'PVS_Districts'),
     (N'PVS_EFMigrationsHistory'),
     (N'PVS_EducationLevels'),
+    (N'PVS_EventGroups'),
+    (N'PVS_EventRegistrationGroups'),
+    (N'PVS_EventRegistrations'),
+    (N'PVS_Events'),
     (N'PVS_Genders'),
     (N'PVS_FooterSponsors'),
     (N'PVS_Hobbies'),

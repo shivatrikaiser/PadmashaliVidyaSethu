@@ -724,4 +724,138 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get memberMobileNeedsVerification =>
       'Verify this mobile number, or leave it empty.';
+
+  @override
+  String get events => 'Events';
+
+  @override
+  String get eventsTitle => 'Events & Competitions';
+
+  @override
+  String eventsFor(String name) {
+    return 'Events for $name';
+  }
+
+  @override
+  String get eventsChooseMember => 'Family member';
+
+  @override
+  String noEvents(String name) {
+    return 'No events open for $name right now. Events appear here when registration opens.';
+  }
+
+  @override
+  String eventsOpenCount(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count events for $name.',
+      one: '1 event for $name.',
+      zero: 'No events open for registration right now.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get viewEvents => 'View events';
+
+  @override
+  String get eventDateLabel => 'Event date';
+
+  @override
+  String get eventVenueLabel => 'Venue';
+
+  @override
+  String eventRegistrationDates(String opens, String closes) {
+    return 'Registration: $opens to $closes';
+  }
+
+  @override
+  String eventAgeOn(String date, int age) {
+    return 'Age as on $date: $age years';
+  }
+
+  @override
+  String get eventChooseGroup => 'Choose a group';
+
+  @override
+  String eventChooseGroups(int max) {
+    return 'Choose up to $max groups';
+  }
+
+  @override
+  String eventGroupAges(int min, int max) {
+    return 'Age $min to $max';
+  }
+
+  @override
+  String eventGroupGenderOnly(String gender) {
+    return '$gender only';
+  }
+
+  @override
+  String get eventGroupFull => 'Full';
+
+  @override
+  String get eventRegister => 'Register';
+
+  @override
+  String get eventSaveChanges => 'Save changes';
+
+  @override
+  String get eventCancelRegistration => 'Cancel registration';
+
+  @override
+  String eventCancelConfirm(String name, String event) {
+    return 'Cancel $name\'s registration for $event?';
+  }
+
+  @override
+  String get eventKeepRegistration => 'Keep it';
+
+  @override
+  String get eventCancelled => 'Registration cancelled.';
+
+  @override
+  String eventRegisteredChip(String number) {
+    return 'Registered · $number';
+  }
+
+  @override
+  String eventOpensOn(String date) {
+    return 'Registration opens on $date';
+  }
+
+  @override
+  String get eventRegistrationClosed => 'Registration closed';
+
+  @override
+  String get eventRegistrationOpen => 'Registration open';
+
+  @override
+  String get eventYourRegistration => 'Your registration';
+
+  @override
+  String eventTooManyGroups(int max) {
+    return 'Choose at most $max groups.';
+  }
+
+  @override
+  String get eventChooseAtLeastOne => 'Choose a group.';
+
+  @override
+  String get eventNotAvailable => 'This event is no longer available.';
+
+  @override
+  String get eventRegisteredTitle => 'Registration successful';
+
+  @override
+  String get eventRegistrationNumberLabel => 'Event Registration Number';
+
+  @override
+  String get eventRegisteredNote =>
+      'Keep this number. You may be asked for it at the event.';
+
+  @override
+  String get eventBackToEvents => 'Back to events';
 }

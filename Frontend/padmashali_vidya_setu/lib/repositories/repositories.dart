@@ -2,6 +2,7 @@ import '../core/api/api_client.dart';
 import '../models/app_branding.dart';
 import '../models/app_version.dart';
 import '../models/auth_models.dart';
+import '../models/event_models.dart';
 import '../models/location_models.dart';
 import '../models/master_data_item.dart';
 import '../models/member_models.dart';
@@ -116,4 +117,24 @@ class MemberRepository {
 
   Future<MemberDashboard> dashboard(String registrationId) =>
       _api.get('/api/v1/members/$registrationId/dashboard', MemberDashboard.fromJson);
+}
+
+/// Event registrations (sports, drawing, quiz, ...) for a member of the signed-in account.
+class EventRepository {
+  EventRepository(this._api);
+  final ApiClient _api;
+
+  /// Events the member can register for (or is registered for), with the groups that fit them.
+  Future<List<MemberEvent>> list(String registrationId) =>
+      _api.get('/api/v1/members/$registrationId/events', MemberEvent.listFromJson);
+
+  /// Registers the member or changes their groups; the number stays the same.
+  Future<EventRegistrationResult> register(String registrationId, int eventId, List<int> groupIds) => _api.put(
+    '/api/v1/members/$registrationId/events/$eventId/registration',
+    {'groupIds': groupIds},
+    EventRegistrationResult.fromJson,
+  );
+
+  Future<void> cancel(String registrationId, int eventId) =>
+      _api.delete('/api/v1/members/$registrationId/events/$eventId/registration', (_) {});
 }

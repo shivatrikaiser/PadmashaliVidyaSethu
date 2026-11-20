@@ -1,0 +1,185 @@
+<p><a routerLink="/events">← Events</a></p>
+<div class="page-head">
+  <h1>{{ id === null ? 'New event' : form.title || 'Event' }}</h1>
+  @if (detail(); as d) {
+    <span class="muted small">Last changed {{ d.modifiedDate | date: 'dd MMM yyyy, HH:mm' }} by {{ d.modifiedBy }}</span>
+  }
+</div>
+
+@if (error()) { <p class="alert">{{ error() }}</p> }
+@if (message()) { <p class="notice">{{ message() }}</p> }
+
+@if (loading()) {
+  <p class="muted">Loading…</p>
+} @else {
+  <form (ngSubmit)="save()">
+    <section class="panel">
+      <h2>Event</h2>
+      <div class="grid">
+        <label class="wide">Event name
+          <input name="title" [(ngModel)]="form.title" maxlength="150" placeholder="e.g. Sports Day 2026" />
+          @if (err('title'); as m) { <span class="field-error">{{ m }}</span> }
+        </label>
+        <label>Code <small class="muted">(start of registration numbers)</small>
+          <input name="code" [(ngModel)]="form.code" maxlength="12" placeholder="e.g. SPORTS26" class="upper"
+                 [readonly]="(detail()?.registrationCount ?? 0) > 0" />
+          <small class="muted">Numbers: {{ (form.code || 'CODE').toUpperCase() }}-0001, -0002, …</small>
+          @if (err('code'); as m) { <span class="field-error">{{ m }}</span> }
+        </label>
+        <label class="wide">Venue <small class="muted">(optional)</small>
+          <input name="venue" [(ngModel)]="form.venue" maxlength="300" placeholder="e.g. Temple grounds, Barkur" />
+          @if (err('venue'); as m) { <span class="field-error">{{ m }}</span> }
+        </label>
+        <label class="full">Description <small class="muted">(optional - rules, timings, what to bring)</small>
+          <textarea name="description" [(ngModel)]="form.description" rows="5" maxlength="2000"></textarea>
+          @if (err('description'); as m) { <span class="field-error">{{ m }}</span> }
+        </label>
+      </div>
+
+      <h2>Dates</h2>
+      <div class="grid">
+        <label>Event date
+          <input type="date" name="eventDate" [(ngModel)]="form.eventDate" />
+          @if (err('eventDate'); as m) { <span class="field-error">{{ m }}</span> }
+        </label>
+        <label>Age as on
+          <input type="date" name="ageAsOnDate" [(ngModel)]="form.ageAsOnDate" />
+          <button type="button" class="link small-link" (click)="ageAsOnEventDate()">Same as event date</button>
+          @if (err('ageAsOnDate'); as m) { <span class="field-error">{{ m }}</span> }
+        </label>
+        <label>Registration opens
+          <input type="date" name="registrationOpensDate" [(ngModel)]="form.registrationOpensDate" />
+          @if (err('registrationOpensDate'); as m) { <span class="field-error">{{ m }}</span> }
+        </label>
+        <label>Registration closes <small class="muted">(last day)</small>
+          <input type="date" name="registrationClosesDate" [(ngModel)]="form.registrationClosesDate" />
+          @if (err('registrationClosesDate'); as m) { <span class="field-error">{{ m }}</span> }
+        </label>
+      </div>
+      <p class="muted small">
+        Members' ages for the groups are worked out on the "age as on" date. Members can register, change their groups
+        or cancel from the opening day to the closing day (India time).
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>Groups</h2>
+      <p class="muted small">
+        Members only see the groups that fit their age and gender. Leave Gender as "Everyone" for mixed groups and
+        Places empty for no limit.
+      </p>
+      <label class="inline">Groups one member may join
+        <input type="number" name="maxGroupsPerMember" [(ngModel)]="form.maxGroupsPerMember" min="1" max="50" class="small-num" />
+        @if (err('maxGroupsPerMember'); as m) { <span class="field-error">{{ m }}</span> }
+      </label>
+      @if (err('groups'); as m) { <p class="field-error">{{ m }}</p> }
+
+      <div class="table-wrap">
+        <table class="groups">
+          <thead>
+            <tr><th>Group name</th><th>Min age</th><th>Max age</th><th>Gender</th><th>Places</th><th class="num">Registered</th><th></th></tr>
+          </thead>
+          <tbody>
+            @for (g of form.groups; track $index; let i = $index) {
+              <tr>
+                <td>
+                  <input [name]="'name' + i" [(ngModel)]="g.name" maxlength="100" placeholder="e.g. Girls Under 12" />
+                  @if (err('groups[' + i + '].name'); as m) { <span class="field-error">{{ m }}</span> }
+                </td>
+                <td>
+                  <input type="number" [name]="'min' + i" [(ngModel)]="g.minAge" min="0" max="120" class="age" />
+                  @if (err('groups[' + i + '].minAge'); as m) { <span class="field-error">{{ m }}</span> }
+                </td>
+                <td>
+                  <input type="number" [name]="'max' + i" [(ngModel)]="g.maxAge" min="0" max="120" class="age" />
+                  @if (err('groups[' + i + '].maxAge'); as m) { <span class="field-error">{{ m }}</span> }
+                </td>
+                <td>
+                  <select [name]="'gender' + i" [(ngModel)]="g.genderId">
+                    <option [ngValue]="null">Everyone</option>
+                    @for (x of genders(); track x.id) { <option [ngValue]="x.id">{{ x.name }}</option> }
+                  </select>
+                  @if (err('groups[' + i + '].genderId'); as m) { <span class="field-error">{{ m }}</span> }
+                </td>
+                <td>
+                  <input type="number" [name]="'capacity' + i" [(ngModel)]="g.capacity" min="1" class="age" placeholder="No limit" />
+                  @if (err('groups[' + i + '].capacity'); as m) { <span class="field-error">{{ m }}</span> }
+                </td>
+                <td class="num">{{ g.registrationCount ?? 0 }}</td>
+                <td class="row-actions">
+                  <button type="button" class="secondary" (click)="moveGroup(i, -1)" [disabled]="i === 0" aria-label="Move up">↑</button>
+                  <button type="button" class="secondary" (click)="moveGroup(i, 1)" [disabled]="i === form.groups.length - 1" aria-label="Move down">↓</button>
+                  <button type="button" class="secondary" (click)="removeGroup(i)" [disabled]="(g.registrationCount ?? 0) > 0"
+                          [title]="(g.registrationCount ?? 0) > 0 ? 'Members are registered in this group' : 'Remove'">Remove</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <p><button type="button" class="secondary" (click)="addGroup()">Add group</button></p>
+    </section>
+
+    <section class="panel">
+      <h2>Show in the app</h2>
+      <label class="check">
+        <input type="checkbox" name="isPublished" [(ngModel)]="form.isPublished" />
+        Published - members see this event in the app (untick to keep it as a draft)
+      </label>
+      <label class="check">
+        <input type="checkbox" name="isActive" [(ngModel)]="form.isActive" />
+        Active - untick to cancel the event (hidden from the app; registrations are kept)
+      </label>
+      <p class="actions">
+        <button type="submit" [disabled]="busy()">{{ busy() ? 'Saving…' : 'Save event' }}</button>
+        <a class="button secondary" routerLink="/events">Back</a>
+      </p>
+    </section>
+  </form>
+
+  @if (id !== null) {
+    <div class="page-head">
+      <h2>Registrations <span class="badge">{{ detail()?.registrationCount ?? 0 }}</span></h2>
+      <button type="button" class="secondary" (click)="export()" [disabled]="exporting() || !registrations()?.length">
+        {{ exporting() ? 'Preparing…' : 'Export to Excel (CSV)' }}
+      </button>
+    </div>
+    @if (cancelledCount()) {
+      <label class="check">
+        <input type="checkbox" [checked]="showCancelled()" (change)="showCancelled.set(!showCancelled())" />
+        Show cancelled ({{ cancelledCount() }})
+      </label>
+    }
+    @if (visibleRegistrations().length) {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Number</th><th>Member</th><th>Gender</th><th class="num">Age</th><th>Groups</th><th>Temple</th><th>Mobile</th><th>Registered</th></tr>
+          </thead>
+          <tbody>
+            @for (r of visibleRegistrations(); track r.registrationNumber) {
+              <tr [class.inactive]="!r.isActive">
+                <td class="nowrap"><strong>{{ r.registrationNumber }}</strong></td>
+                <td><a [routerLink]="['/members', r.registrationId]">{{ r.fullName }}</a><br /><small class="muted">{{ r.registrationId }}</small></td>
+                <td>{{ r.gender }}</td>
+                <td class="num">{{ r.age }}</td>
+                <td>{{ r.groups.join(', ') }}</td>
+                <td>{{ r.temple }}</td>
+                <td class="nowrap">{{ r.mobile }}</td>
+                <td class="nowrap">
+                  @if (r.isActive) {
+                    {{ r.registeredDate | date: 'dd MMM yyyy, HH:mm' }}
+                  } @else {
+                    Cancelled {{ r.cancelledDate | date: 'dd MMM yyyy' }}
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else if (registrations()) {
+      <p class="muted">No registrations yet.</p>
+    }
+  }
+}

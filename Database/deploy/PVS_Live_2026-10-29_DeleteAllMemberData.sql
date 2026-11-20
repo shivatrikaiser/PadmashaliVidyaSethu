@@ -12,9 +12,12 @@
       PVS_RefreshTokens (they are signed out). This includes accounts closed with "Delete my account", so those
       mobile numbers can register again.
     * All PVS_PhoneVerificationChallenges (verification codes; they hold mobile numbers and email addresses).
+    * Event registrations (PVS_EventRegistrations, PVS_EventRegistrationGroups), once the 20 Nov 2026 events update
+      is installed. The events and their groups are kept.
 
   WHAT IT RESETS
     * PVS_TempleRegistrationSequences: every temple starts again at 0001 (the next member is PVS-xx-0001).
+    * PVS_Events.LastRegistrationNumber: event registration numbers start again at 0001 (e.g. SPORTS26-0001).
 
   WHAT IT KEEPS
     * Admin portal logins: accounts with any role other than MEMBER (ADMIN, SUPER_ADMIN, coordinators), their
@@ -68,6 +71,14 @@ PRINT CONCAT('Members to delete: ', @Members, '   member logins to delete: ', @M
              '   admin logins kept: ', @AdminAccountsBefore);
 
 -- 1. Everything entered for members (children first; most also cascade, deleted explicitly to report counts).
+--    Event registrations exist only after the 20 Nov 2026 events update (dynamic SQL, so this compiles without them).
+IF OBJECT_ID(N'dbo.PVS_EventRegistrations') IS NOT NULL
+BEGIN
+    EXEC (N'DELETE FROM dbo.PVS_EventRegistrationGroups;'); PRINT CONCAT('  PVS_EventRegistrationGroups   ', @@ROWCOUNT);
+    EXEC (N'DELETE FROM dbo.PVS_EventRegistrations;');      PRINT CONCAT('  PVS_EventRegistrations        ', @@ROWCOUNT);
+    EXEC (N'UPDATE dbo.PVS_Events SET LastRegistrationNumber = 0 WHERE LastRegistrationNumber <> 0;');
+    PRINT CONCAT('  Event registration numbers reset: ', @@ROWCOUNT, ' event(s)');
+END;
 DELETE FROM dbo.PVS_ConsentRecords;            PRINT CONCAT('  PVS_ConsentRecords            ', @@ROWCOUNT);
 DELETE FROM dbo.PVS_MemberAddresses;           PRINT CONCAT('  PVS_MemberAddresses           ', @@ROWCOUNT);
 DELETE FROM dbo.PVS_MemberDisabilities;        PRINT CONCAT('  PVS_MemberDisabilities        ', @@ROWCOUNT);

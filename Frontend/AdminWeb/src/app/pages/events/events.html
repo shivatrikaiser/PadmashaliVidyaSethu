@@ -1,0 +1,39 @@
+<div class="page-head">
+  <h1>Events</h1>
+  <a class="button" routerLink="/events/new">New event</a>
+</div>
+<p class="muted">
+  Sports, drawing, quiz and other events members register for in the app. Members see a published event while its
+  registration is open, with only the groups that fit their age (on the event's "age as on" date) and gender.
+</p>
+
+@if (error()) { <p class="alert">{{ error() }}</p> }
+
+@if (events(); as list) {
+  @if (list.length) {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Event</th><th>Code</th><th>Event date</th><th>Registration</th><th>Status</th><th class="num">Groups</th><th class="num">Registered</th></tr>
+        </thead>
+        <tbody>
+          @for (e of list; track e.id) {
+            <tr [class.inactive]="!e.isActive">
+              <td><a [routerLink]="['/events', e.id]">{{ e.title }}</a></td>
+              <td>{{ e.code }}</td>
+              <td class="nowrap">{{ e.eventDate | date: 'dd MMM yyyy' }}</td>
+              <td class="nowrap">{{ e.registrationOpensDate | date: 'dd MMM' }} – {{ e.registrationClosesDate | date: 'dd MMM yyyy' }}</td>
+              <td>{{ status(e) }}</td>
+              <td class="num">{{ e.groupCount }}</td>
+              <td class="num">{{ e.registrationCount }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="panel muted">No events yet. Use <strong>New event</strong> to add one.</p>
+  }
+} @else if (!error()) {
+  <p class="muted">Loading…</p>
+}

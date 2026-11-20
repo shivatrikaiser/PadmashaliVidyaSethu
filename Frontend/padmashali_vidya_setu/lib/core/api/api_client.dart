@@ -47,6 +47,11 @@ class ApiClient {
   Future<T> post<T>(String path, Object? body, JsonParser<T> parse) =>
       _send(() => _dio.post<Object?>(path, data: body), parse);
 
+  Future<T> put<T>(String path, Object? body, JsonParser<T> parse) =>
+      _send(() => _dio.put<Object?>(path, data: body), parse);
+
+  Future<T> delete<T>(String path, JsonParser<T> parse) => _send(() => _dio.delete<Object?>(path), parse);
+
   Future<void> _attachToken(RequestOptions options, RequestInterceptorHandler handler) async {
     if (options.path != _refreshPath && !options.headers.containsKey('Authorization')) {
       final tokens = await _tokens.read();

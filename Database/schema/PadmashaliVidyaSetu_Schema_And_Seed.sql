@@ -3099,3 +3099,176 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE TABLE [PVS_Events] (
+        [EventId] int NOT NULL IDENTITY,
+        [Code] varchar(12) NOT NULL,
+        [Title] nvarchar(150) NOT NULL,
+        [Description] nvarchar(2000) NULL,
+        [Venue] nvarchar(300) NULL,
+        [EventDate] date NOT NULL,
+        [AgeAsOnDate] date NOT NULL,
+        [RegistrationOpensDate] date NOT NULL,
+        [RegistrationClosesDate] date NOT NULL,
+        [MaxGroupsPerMember] int NOT NULL,
+        [IsPublished] bit NOT NULL,
+        [LastRegistrationNumber] int NOT NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_Events_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [ModifiedDate] datetime2(3) NULL,
+        [CreatedBy] nvarchar(100) NULL,
+        [ModifiedBy] nvarchar(100) NULL,
+        [IsActive] bit NOT NULL CONSTRAINT [PVS_DF_Events_IsActive] DEFAULT CAST(1 AS bit),
+        CONSTRAINT [PVS_PK_Events] PRIMARY KEY ([EventId]),
+        CONSTRAINT [PVS_CK_Events_Code] CHECK (LEN([Code]) >= 2 AND [Code] NOT LIKE '%[^A-Z0-9]%'),
+        CONSTRAINT [PVS_CK_Events_LastRegistrationNumber] CHECK ([LastRegistrationNumber] BETWEEN 0 AND 9999),
+        CONSTRAINT [PVS_CK_Events_MaxGroupsPerMember] CHECK ([MaxGroupsPerMember] BETWEEN 1 AND 50),
+        CONSTRAINT [PVS_CK_Events_RegistrationDates] CHECK ([RegistrationOpensDate] <= [RegistrationClosesDate])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE TABLE [PVS_EventGroups] (
+        [EventGroupId] int NOT NULL IDENTITY,
+        [EventId] int NOT NULL,
+        [Name] nvarchar(100) NOT NULL,
+        [MinAge] int NOT NULL,
+        [MaxAge] int NOT NULL,
+        [GenderId] int NULL,
+        [Capacity] int NULL,
+        [DisplayOrder] int NOT NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_EventGroups_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [ModifiedDate] datetime2(3) NULL,
+        [CreatedBy] nvarchar(100) NULL,
+        [ModifiedBy] nvarchar(100) NULL,
+        [IsActive] bit NOT NULL CONSTRAINT [PVS_DF_EventGroups_IsActive] DEFAULT CAST(1 AS bit),
+        CONSTRAINT [PVS_PK_EventGroups] PRIMARY KEY ([EventGroupId]),
+        CONSTRAINT [PVS_CK_EventGroups_Ages] CHECK ([MinAge] >= 0 AND [MaxAge] <= 120 AND [MinAge] <= [MaxAge]),
+        CONSTRAINT [PVS_CK_EventGroups_Capacity] CHECK ([Capacity] IS NULL OR [Capacity] >= 1),
+        CONSTRAINT [PVS_FK_EventGroups_Events_EventId] FOREIGN KEY ([EventId]) REFERENCES [PVS_Events] ([EventId]) ON DELETE CASCADE,
+        CONSTRAINT [PVS_FK_EventGroups_Genders_GenderId] FOREIGN KEY ([GenderId]) REFERENCES [PVS_Genders] ([GenderId]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE TABLE [PVS_EventRegistrations] (
+        [EventRegistrationId] int NOT NULL IDENTITY,
+        [EventId] int NOT NULL,
+        [RegistrationId] char(11) NOT NULL,
+        [RegistrationNumber] varchar(17) NOT NULL,
+        [AgeOnAgeAsOnDate] int NOT NULL,
+        [RegisteredDate] datetime2(3) NOT NULL,
+        [CancelledDate] datetime2(3) NULL,
+        [CreatedDate] datetime2(3) NOT NULL CONSTRAINT [PVS_DF_EventRegistrations_CreatedDate] DEFAULT (SYSUTCDATETIME()),
+        [ModifiedDate] datetime2(3) NULL,
+        [CreatedBy] nvarchar(100) NULL,
+        [ModifiedBy] nvarchar(100) NULL,
+        [IsActive] bit NOT NULL CONSTRAINT [PVS_DF_EventRegistrations_IsActive] DEFAULT CAST(1 AS bit),
+        CONSTRAINT [PVS_PK_EventRegistrations] PRIMARY KEY ([EventRegistrationId]),
+        CONSTRAINT [PVS_FK_EventRegistrations_Events_EventId] FOREIGN KEY ([EventId]) REFERENCES [PVS_Events] ([EventId]) ON DELETE NO ACTION,
+        CONSTRAINT [PVS_FK_EventRegistrations_Members_RegistrationId] FOREIGN KEY ([RegistrationId]) REFERENCES [PVS_Members] ([RegistrationId]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE TABLE [PVS_EventRegistrationGroups] (
+        [EventRegistrationId] int NOT NULL,
+        [EventGroupId] int NOT NULL,
+        CONSTRAINT [PVS_PK_EventRegistrationGroups] PRIMARY KEY ([EventRegistrationId], [EventGroupId]),
+        CONSTRAINT [PVS_FK_EventRegistrationGroups_EventGroups_EventGroupId] FOREIGN KEY ([EventGroupId]) REFERENCES [PVS_EventGroups] ([EventGroupId]) ON DELETE NO ACTION,
+        CONSTRAINT [PVS_FK_EventRegistrationGroups_EventRegistrations_EventRegistrationId] FOREIGN KEY ([EventRegistrationId]) REFERENCES [PVS_EventRegistrations] ([EventRegistrationId]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_EventGroups_EventId_DisplayOrder] ON [PVS_EventGroups] ([EventId], [DisplayOrder]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_EventGroups_GenderId] ON [PVS_EventGroups] ([GenderId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_EventRegistrationGroups_EventGroupId] ON [PVS_EventRegistrationGroups] ([EventGroupId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE UNIQUE INDEX [PVS_IX_EventRegistrations_EventId_RegistrationId] ON [PVS_EventRegistrations] ([EventId], [RegistrationId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_EventRegistrations_RegistrationId] ON [PVS_EventRegistrations] ([RegistrationId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE UNIQUE INDEX [PVS_IX_EventRegistrations_RegistrationNumber] ON [PVS_EventRegistrations] ([RegistrationNumber]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE UNIQUE INDEX [PVS_IX_Events_Code] ON [PVS_Events] ([Code]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    CREATE INDEX [PVS_IX_Events_IsActive_IsPublished_RegistrationClosesDate] ON [PVS_Events] ([IsActive], [IsPublished], [RegistrationClosesDate]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [PVS_EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261120090151_EventRegistrations'
+)
+BEGIN
+    INSERT INTO [PVS_EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261120090151_EventRegistrations', N'10.0.12');
+END;
+
+COMMIT;
+GO
+

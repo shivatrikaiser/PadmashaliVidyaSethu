@@ -15,6 +15,7 @@ using PadmashaliVidyaSetu.Api.Middleware;
 using PadmashaliVidyaSetu.Api.Services.Notifications;
 using PadmashaliVidyaSetu.Api.Services.Admin;
 using PadmashaliVidyaSetu.Api.Services.Auth;
+using PadmashaliVidyaSetu.Api.Services.Events;
 using PadmashaliVidyaSetu.Api.Services.Locations;
 using PadmashaliVidyaSetu.Api.Services.MasterData;
 using PadmashaliVidyaSetu.Api.Services.Members;
@@ -174,6 +175,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAppVersionService, AppVersionService>();
         services.AddSingleton<IPushSender, FirebasePushSender>();
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IEventService, EventService>();
+        services.AddScoped<IAdminEventService, AdminEventService>();
 
         services.AddHttpClient<IPinCodeProvider, IndiaPostPinCodeProvider>((sp, client) =>
         {

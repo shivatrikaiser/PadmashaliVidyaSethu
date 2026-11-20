@@ -1347,6 +1347,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Verify this mobile number, or leave it empty.'**
   String get memberMobileNeedsVerification;
+
+  /// No description provided for @events.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get events;
+
+  /// No description provided for @eventsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Events & Competitions'**
+  String get eventsTitle;
+
+  /// No description provided for @eventsFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Events for {name}'**
+  String eventsFor(String name);
+
+  /// No description provided for @eventsChooseMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Family member'**
+  String get eventsChooseMember;
+
+  /// No description provided for @noEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'No events open for {name} right now. Events appear here when registration opens.'**
+  String noEvents(String name);
+
+  /// No description provided for @eventsOpenCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No events open for registration right now.} =1{1 event for {name}.} other{{count} events for {name}.}}'**
+  String eventsOpenCount(int count, String name);
+
+  /// No description provided for @viewEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'View events'**
+  String get viewEvents;
+
+  /// No description provided for @eventDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Event date'**
+  String get eventDateLabel;
+
+  /// No description provided for @eventVenueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Venue'**
+  String get eventVenueLabel;
+
+  /// No description provided for @eventRegistrationDates.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration: {opens} to {closes}'**
+  String eventRegistrationDates(String opens, String closes);
+
+  /// No description provided for @eventAgeOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Age as on {date}: {age} years'**
+  String eventAgeOn(String date, int age);
+
+  /// No description provided for @eventChooseGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a group'**
+  String get eventChooseGroup;
+
+  /// No description provided for @eventChooseGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose up to {max} groups'**
+  String eventChooseGroups(int max);
+
+  /// No description provided for @eventGroupAges.
+  ///
+  /// In en, this message translates to:
+  /// **'Age {min} to {max}'**
+  String eventGroupAges(int min, int max);
+
+  /// No description provided for @eventGroupGenderOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'{gender} only'**
+  String eventGroupGenderOnly(String gender);
+
+  /// No description provided for @eventGroupFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Full'**
+  String get eventGroupFull;
+
+  /// No description provided for @eventRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get eventRegister;
+
+  /// No description provided for @eventSaveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get eventSaveChanges;
+
+  /// No description provided for @eventCancelRegistration.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel registration'**
+  String get eventCancelRegistration;
+
+  /// No description provided for @eventCancelConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel {name}\'s registration for {event}?'**
+  String eventCancelConfirm(String name, String event);
+
+  /// No description provided for @eventKeepRegistration.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep it'**
+  String get eventKeepRegistration;
+
+  /// No description provided for @eventCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration cancelled.'**
+  String get eventCancelled;
+
+  /// No description provided for @eventRegisteredChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Registered · {number}'**
+  String eventRegisteredChip(String number);
+
+  /// No description provided for @eventOpensOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration opens on {date}'**
+  String eventOpensOn(String date);
+
+  /// No description provided for @eventRegistrationClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration closed'**
+  String get eventRegistrationClosed;
+
+  /// No description provided for @eventRegistrationOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration open'**
+  String get eventRegistrationOpen;
+
+  /// No description provided for @eventYourRegistration.
+  ///
+  /// In en, this message translates to:
+  /// **'Your registration'**
+  String get eventYourRegistration;
+
+  /// No description provided for @eventTooManyGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose at most {max} groups.'**
+  String eventTooManyGroups(int max);
+
+  /// No description provided for @eventChooseAtLeastOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a group.'**
+  String get eventChooseAtLeastOne;
+
+  /// No description provided for @eventNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This event is no longer available.'**
+  String get eventNotAvailable;
+
+  /// No description provided for @eventRegisteredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration successful'**
+  String get eventRegisteredTitle;
+
+  /// No description provided for @eventRegistrationNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Event Registration Number'**
+  String get eventRegistrationNumberLabel;
+
+  /// No description provided for @eventRegisteredNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep this number. You may be asked for it at the event.'**
+  String get eventRegisteredNote;
+
+  /// No description provided for @eventBackToEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to events'**
+  String get eventBackToEvents;
 }
 
 class _AppLocalizationsDelegate

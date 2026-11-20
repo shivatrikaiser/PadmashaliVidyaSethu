@@ -4,6 +4,7 @@ import '../config/app_config.dart';
 import '../core/api/api_client.dart';
 import '../core/storage/token_storage.dart';
 import '../models/app_branding.dart';
+import '../models/event_models.dart';
 import '../models/master_data_item.dart';
 import '../models/member_models.dart';
 import '../repositories/repositories.dart';
@@ -35,6 +36,9 @@ final Provider<MasterDataRepository> masterDataRepositoryProvider = Provider<Mas
 );
 final Provider<MemberRepository> memberRepositoryProvider = Provider<MemberRepository>(
   (ref) => MemberRepository(ref.watch(apiClientProvider)),
+);
+final Provider<EventRepository> eventRepositoryProvider = Provider<EventRepository>(
+  (ref) => EventRepository(ref.watch(apiClientProvider)),
 );
 final Provider<EnquiryRepository> enquiryRepositoryProvider = Provider<EnquiryRepository>(
   (ref) => EnquiryRepository(ref.watch(apiClientProvider)),
@@ -84,3 +88,8 @@ final profileProvider = FutureProvider.autoDispose.family<MemberProfile, String>
 
 /// Phone verification in progress (mobile number + issued challenge).
 final pendingVerificationProvider = StateProvider<PendingVerification?>((ref) => null);
+
+/// Events for one member (see [EventRepository.list]).
+final memberEventsProvider = FutureProvider.autoDispose.family<List<MemberEvent>, String>(
+  (ref, registrationId) => ref.watch(eventRepositoryProvider).list(registrationId),
+);

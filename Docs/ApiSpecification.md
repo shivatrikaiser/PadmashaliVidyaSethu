@@ -58,6 +58,14 @@ The code is sent by SMS (SMS Gateway Hub) and is valid for 10 minutes. `developm
 
 `registrationId` must match `PVS-\d{2}-\d{4}`.
 
+### Events (bearer, the member's own account)
+
+| Method & path | Description |
+|---|---|
+| `GET /members/{registrationId}/events` | Published events the member can register for (until registration closes) or is registered for (until the event day). Each has the member's `age` on the event's `ageAsOnDate`, `isRegistrationOpen`, only the `groups` that fit the member's age and gender (`isFull` when the places are taken), and the member's `registration` (`registrationNumber`, `groupIds`, `groupNames`) or null. Events with no fitting group are left out |
+| `PUT /members/{registrationId}/events/{eventId}/registration` `{ groupIds }` | Register, or change the groups (1 to the event's `maxGroupsPerMember`). Returns `{ registrationNumber, eventTitle, eventDate, venue, registrationId, memberName, groups }`. One number per member and event (`CODE-0001`), kept when groups change or after cancelling and registering again. 400 for a group that does not fit / too many; 422 when registration is not open or a group is full |
+| `DELETE /members/{registrationId}/events/{eventId}/registration` | Cancel (while registration is open) |
+
 ### `POST /members` body
 
 ```json
@@ -128,6 +136,9 @@ Used by `Frontend/AdminWeb`. Members get 403.
 | `POST /admin/locations/taluks/{id}/merge` `{ targetTalukId }` | Move all addresses to another taluk of the same district |
 | `GET /admin/branding`, `PUT /admin/branding` `{ sponsorName, sponsorOrganisation, sponsorAddress, poweredBy }` (address: up to 4 lines, 300 chars), `POST /admin/branding/sponsor-logo` (multipart `file`, PNG/JPEG/WebP <= 300 KB), `DELETE /admin/branding/sponsor-logo` | App sponsor (splash, welcome screen, footer) - **Super Admin only** |
 | `GET /admin/users`, `POST /admin/users` `{ mobileNumber, roleCode, password? }`, `PUT /admin/users/{accountId}/password` `{ password }`, `DELETE /admin/users/{accountId}/roles/{roleCode}` | Admin users and their portal passwords - **Super Admin only**; a new password or a removed role signs the person out (not when you set your own password) |
+| `GET /admin/events`, `GET /admin/events/{id}` | Events (newest first) with group and registration counts; one event with its groups |
+| `POST /admin/events`, `PUT /admin/events/{id}` `{ code, title, description, venue, eventDate, ageAsOnDate, registrationOpensDate, registrationClosesDate, maxGroupsPerMember, isPublished, isActive, groups: [{ id?, name, minAge, maxAge, genderId?, capacity? }] }` | Add / edit an event; the groups list replaces the event's groups in that order (`id` null = new). The code cannot change once members registered; a group with registrations cannot be removed |
+| `GET /admin/events/{id}/registrations`, `GET /admin/events/{id}/registrations/export` | Registrations (cancelled ones included) and CSV for Excel |
 | `GET /admin/notifications`, `POST /admin/notifications` `{ title, body }` | Push notification to all app users (Firebase topic per environment) and the last 50 sent - **Super Admin only**; 503 when the Firebase key is not configured. See `Docs/PushNotifications.md` |
 
 Every change is written to `PVS_AuditLogs` (`Admin.*` actions).

@@ -29,6 +29,16 @@ export const routes: Routes = [
         title: 'Member | PVS Admin',
       },
       {
+        path: 'events',
+        loadComponent: () => import('./pages/events/events').then((m) => m.Events),
+        title: 'Events | PVS Admin',
+      },
+      {
+        path: 'events/:id',
+        loadComponent: () => import('./pages/events/event-edit').then((m) => m.EventEdit),
+        title: 'Event | PVS Admin',
+      },
+      {
         path: 'deleted-accounts',
         loadComponent: () => import('./pages/deleted-accounts/deleted-accounts').then((m) => m.DeletedAccounts),
         title: 'Deleted accounts | PVS Admin',

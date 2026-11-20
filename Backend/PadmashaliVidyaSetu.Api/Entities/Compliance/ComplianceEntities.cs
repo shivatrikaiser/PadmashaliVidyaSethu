@@ -69,4 +69,8 @@ public static class AuditActions
     public const string LocationUpdated = "Admin.LocationUpdated";
     public const string TalukMerged = "Admin.TalukMerged";
     public const string BrandingUpdated = "Admin.BrandingUpdated";
+    public const string EventSaved = "Admin.EventSaved";
+    public const string EventRegistrationsExported = "Admin.EventRegistrationsExported";
+    public const string EventRegistered = "Member.EventRegistered";
+    public const string EventRegistrationCancelled = "Member.EventRegistrationCancelled";
 }

@@ -3,6 +3,7 @@ using PadmashaliVidyaSetu.Api.Authentication;
 using PadmashaliVidyaSetu.Api.Entities.Accounts;
 using PadmashaliVidyaSetu.Api.Entities.Common;
 using PadmashaliVidyaSetu.Api.Entities.Compliance;
+using PadmashaliVidyaSetu.Api.Entities.Events;
 using PadmashaliVidyaSetu.Api.Entities.Locations;
 using PadmashaliVidyaSetu.Api.Entities.MasterData;
 using PadmashaliVidyaSetu.Api.Entities.Members;
@@ -66,6 +67,12 @@ public class AppDbContext(
     public DbSet<MemberCareerAspiration> MemberCareerAspirations => Set<MemberCareerAspiration>();
     public DbSet<MemberCompetitiveExam> MemberCompetitiveExams => Set<MemberCompetitiveExam>();
     public DbSet<AcademicAchievement> AcademicAchievements => Set<AcademicAchievement>();
+
+    // Events (sports, drawing, quiz, ... registrations)
+    public DbSet<Event> Events => Set<Event>();
+    public DbSet<EventGroup> EventGroups => Set<EventGroup>();
+    public DbSet<EventRegistration> EventRegistrations => Set<EventRegistration>();
+    public DbSet<EventRegistrationGroup> EventRegistrationGroups => Set<EventRegistrationGroup>();
 
     // Compliance
     public DbSet<ConsentRecord> ConsentRecords => Set<ConsentRecord>();

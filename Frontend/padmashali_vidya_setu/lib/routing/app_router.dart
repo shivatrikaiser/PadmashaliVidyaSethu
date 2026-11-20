@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../models/event_models.dart';
 import '../providers/providers.dart';
 import '../screens/account/delete_account_screen.dart';
 import '../screens/auth/phone_screen.dart';
@@ -10,6 +11,9 @@ import '../screens/auth/verify_code_screen.dart';
 import '../screens/auth/welcome_screen.dart';
 import '../legal/legal_documents.dart';
 import '../screens/contact/contact_screen.dart';
+import '../screens/events/event_registered_screen.dart';
+import '../screens/events/event_screen.dart';
+import '../screens/events/events_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/legal/legal_document_screen.dart';
 import '../screens/profile/profile_screen.dart';
@@ -52,6 +56,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.terms,
         builder: (_, _) => const LegalDocumentScreen(document: LegalDocuments.termsAndConditions),
+      ),
+      GoRoute(path: Routes.events, builder: (_, _) => const EventsScreen()),
+      // Before the event pattern, so "registered" is not read as an event id.
+      GoRoute(
+        path: Routes.eventRegistered,
+        builder: (_, state) => EventRegisteredScreen(result: state.extra as EventRegistrationResult?),
+      ),
+      GoRoute(
+        path: Routes.eventPattern,
+        builder: (_, state) => EventScreen(eventId: int.tryParse(state.pathParameters['eventId']!) ?? 0),
       ),
       GoRoute(
         path: Routes.profilePattern,

@@ -12,6 +12,10 @@ abstract final class Routes {
   static const contact = '/contact';
   static const profilePattern = '/profile/:registrationId';
   static String profile(String registrationId) => '/profile/$registrationId';
+  static const events = '/events';
+  static const eventPattern = '/events/:eventId';
+  static String event(int eventId) => '/events/$eventId';
+  static const eventRegistered = '/events/registered';
 
   /// Information pages (menu, legal links): open in every session state, signed in or not.
   static const information = {privacy, terms, contact};

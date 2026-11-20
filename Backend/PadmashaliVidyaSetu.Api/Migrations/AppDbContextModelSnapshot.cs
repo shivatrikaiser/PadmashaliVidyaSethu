@@ -503,6 +503,260 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                     b.ToTable("PVS_ConsentRecords", (string)null);
                 });
 
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Events.Event", b =>
+                {
+                    b.Property<int>("EventId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventId"));
+
+                    b.Property<DateOnly>("AgeAsOnDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(12)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_Events_CreatedDate");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateOnly>("EventDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true, "PVS_DF_Events_IsActive");
+
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("LastRegistrationNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxGroupsPerMember")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<DateOnly>("RegistrationClosesDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("RegistrationOpensDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Venue")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.HasKey("EventId")
+                        .HasName("PVS_PK_Events");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_Events_Code");
+
+                    b.HasIndex("IsActive", "IsPublished", "RegistrationClosesDate")
+                        .HasDatabaseName("PVS_IX_Events_IsActive_IsPublished_RegistrationClosesDate");
+
+                    b.ToTable("PVS_Events", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Events_Code", "LEN([Code]) >= 2 AND [Code] NOT LIKE '%[^A-Z0-9]%'")
+                                .HasName("PVS_CK_Events_Code");
+
+                            t.HasCheckConstraint("CK_Events_LastRegistrationNumber", "[LastRegistrationNumber] BETWEEN 0 AND 9999")
+                                .HasName("PVS_CK_Events_LastRegistrationNumber");
+
+                            t.HasCheckConstraint("CK_Events_MaxGroupsPerMember", "[MaxGroupsPerMember] BETWEEN 1 AND 50")
+                                .HasName("PVS_CK_Events_MaxGroupsPerMember");
+
+                            t.HasCheckConstraint("CK_Events_RegistrationDates", "[RegistrationOpensDate] <= [RegistrationClosesDate]")
+                                .HasName("PVS_CK_Events_RegistrationDates");
+                        });
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Events.EventGroup", b =>
+                {
+                    b.Property<int>("EventGroupId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventGroupId"));
+
+                    b.Property<int?>("Capacity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_EventGroups_CreatedDate");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GenderId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true, "PVS_DF_EventGroups_IsActive");
+
+                    b.Property<int>("MaxAge")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MinAge")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("EventGroupId")
+                        .HasName("PVS_PK_EventGroups");
+
+                    b.HasIndex("GenderId")
+                        .HasDatabaseName("PVS_IX_EventGroups_GenderId");
+
+                    b.HasIndex("EventId", "DisplayOrder")
+                        .HasDatabaseName("PVS_IX_EventGroups_EventId_DisplayOrder");
+
+                    b.ToTable("PVS_EventGroups", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_EventGroups_Ages", "[MinAge] >= 0 AND [MaxAge] <= 120 AND [MinAge] <= [MaxAge]")
+                                .HasName("PVS_CK_EventGroups_Ages");
+
+                            t.HasCheckConstraint("CK_EventGroups_Capacity", "[Capacity] IS NULL OR [Capacity] >= 1")
+                                .HasName("PVS_CK_EventGroups_Capacity");
+                        });
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Events.EventRegistration", b =>
+                {
+                    b.Property<int>("EventRegistrationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventRegistrationId"));
+
+                    b.Property<int>("AgeOnAgeAsOnDate")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CancelledDate")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(3)")
+                        .HasDefaultValueSql("SYSUTCDATETIME()", "PVS_DF_EventRegistrations_CreatedDate");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true, "PVS_DF_EventRegistrations_IsActive");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<DateTime>("RegisteredDate")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<string>("RegistrationId")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .IsUnicode(false)
+                        .HasColumnType("char(11)")
+                        .IsFixedLength();
+
+                    b.Property<string>("RegistrationNumber")
+                        .IsRequired()
+                        .HasMaxLength(17)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(17)");
+
+                    b.HasKey("EventRegistrationId")
+                        .HasName("PVS_PK_EventRegistrations");
+
+                    b.HasIndex("RegistrationId")
+                        .HasDatabaseName("PVS_IX_EventRegistrations_RegistrationId");
+
+                    b.HasIndex("RegistrationNumber")
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_EventRegistrations_RegistrationNumber");
+
+                    b.HasIndex("EventId", "RegistrationId")
+                        .IsUnique()
+                        .HasDatabaseName("PVS_IX_EventRegistrations_EventId_RegistrationId");
+
+                    b.ToTable("PVS_EventRegistrations", (string)null);
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Events.EventRegistrationGroup", b =>
+                {
+                    b.Property<int>("EventRegistrationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EventGroupId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EventRegistrationId", "EventGroupId")
+                        .HasName("PVS_PK_EventRegistrationGroups");
+
+                    b.HasIndex("EventGroupId")
+                        .HasDatabaseName("PVS_IX_EventRegistrationGroups_EventGroupId");
+
+                    b.ToTable("PVS_EventRegistrationGroups", (string)null);
+                });
+
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Locations.City", b =>
                 {
                     b.Property<int>("Id")
@@ -7014,6 +7268,68 @@ namespace PadmashaliVidyaSetu.Api.Migrations
                         .HasConstraintName("PVS_FK_ConsentRecords_Members_RegistrationId");
                 });
 
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Events.EventGroup", b =>
+                {
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.Events.Event", "Event")
+                        .WithMany("Groups")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_EventGroups_Events_EventId");
+
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.MasterData.Gender", "Gender")
+                        .WithMany()
+                        .HasForeignKey("GenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("PVS_FK_EventGroups_Genders_GenderId");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Gender");
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Events.EventRegistration", b =>
+                {
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.Events.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_EventRegistrations_Events_EventId");
+
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.Members.Member", "Member")
+                        .WithMany()
+                        .HasForeignKey("RegistrationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_EventRegistrations_Members_RegistrationId");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Events.EventRegistrationGroup", b =>
+                {
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.Events.EventGroup", "EventGroup")
+                        .WithMany()
+                        .HasForeignKey("EventGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_EventRegistrationGroups_EventGroups_EventGroupId");
+
+                    b.HasOne("PadmashaliVidyaSetu.Api.Entities.Events.EventRegistration", "EventRegistration")
+                        .WithMany("Groups")
+                        .HasForeignKey("EventRegistrationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("PVS_FK_EventRegistrationGroups_EventRegistrations_EventRegistrationId");
+
+                    b.Navigation("EventGroup");
+
+                    b.Navigation("EventRegistration");
+                });
+
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Locations.City", b =>
                 {
                     b.HasOne("PadmashaliVidyaSetu.Api.Entities.Locations.District", "District")
@@ -7416,6 +7732,16 @@ namespace PadmashaliVidyaSetu.Api.Migrations
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Accounts.Account", b =>
                 {
                     b.Navigation("AccountRoles");
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Events.Event", b =>
+                {
+                    b.Navigation("Groups");
+                });
+
+            modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Events.EventRegistration", b =>
+                {
+                    b.Navigation("Groups");
                 });
 
             modelBuilder.Entity("PadmashaliVidyaSetu.Api.Entities.Locations.Country", b =>

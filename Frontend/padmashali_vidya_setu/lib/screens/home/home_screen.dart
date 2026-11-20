@@ -40,6 +40,7 @@ class HomeScreen extends ConsumerWidget {
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(dashboardProvider(member.registrationId));
+          ref.invalidate(memberEventsProvider(member.registrationId));
           await ref.read(sessionProvider.notifier).refreshAccount();
         },
         child: ListView(
@@ -86,7 +87,7 @@ class HomeScreen extends ConsumerWidget {
                     message: l10n.noOpportunities,
                   ),
                   const SizedBox(height: 16),
-                  _EmptyFeedCard(icon: Icons.event_outlined, title: l10n.upcomingPrograms, message: l10n.noPrograms),
+                  _EventsCard(member: member),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -230,6 +231,12 @@ class _QuickLinks extends StatelessWidget {
           runSpacing: 12,
           children: [
             ActionChip(
+              key: const Key('eventsLink'),
+              avatar: const Icon(Icons.emoji_events_outlined),
+              label: Text(l10n.events),
+              onPressed: () => context.push(Routes.events),
+            ),
+            ActionChip(
               key: const Key('myProfileLink'),
               avatar: const Icon(Icons.badge_outlined),
               label: Text(l10n.myProfile),
@@ -243,6 +250,44 @@ class _QuickLinks extends StatelessWidget {
                 onPressed: () => context.push(Routes.register),
               ),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Events open for the selected member (sports, drawing, quiz, ...), with a link to register.
+class _EventsCard extends ConsumerWidget {
+  const _EventsCard({required this.member});
+  final MemberSummary member;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final events = ref.watch(memberEventsProvider(member.registrationId));
+    final firstName = member.fullName.split(' ').first;
+    return SectionCard(
+      key: const Key('eventsCard'),
+      title: l10n.eventsTitle,
+      icon: Icons.emoji_events_outlined,
+      children: [
+        Text(
+          switch (events) {
+            AsyncData(:final value) => l10n.eventsOpenCount(value.length, firstName),
+            AsyncError() => l10n.noPrograms,
+            _ => '…',
+          },
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+        ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: OutlinedButton.icon(
+            key: const Key('viewEventsButton'),
+            onPressed: () => context.push(Routes.events),
+            icon: const Icon(Icons.arrow_forward),
+            label: Text(l10n.viewEvents),
+          ),
         ),
       ],
     );

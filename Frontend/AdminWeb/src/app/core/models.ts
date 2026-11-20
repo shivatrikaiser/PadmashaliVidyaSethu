@@ -217,3 +217,68 @@ export interface LocationItem {
   addressCount: number;
   createdDate: string;
 }
+
+// ---------------------------------------------------------------- Events (sports, drawing, quiz, ...)
+export interface EventRow {
+  id: number;
+  code: string;
+  title: string;
+  eventDate: string;
+  registrationOpensDate: string;
+  registrationClosesDate: string;
+  isPublished: boolean;
+  isActive: boolean;
+  groupCount: number;
+  registrationCount: number;
+}
+
+export interface EventGroup {
+  id: number | null;
+  name: string;
+  minAge: number | null;
+  maxAge: number | null;
+  genderId: number | null;
+  capacity: number | null;
+  /** Read only (from the server). */
+  genderName?: string | null;
+  registrationCount?: number;
+}
+
+/** Dates are yyyy-MM-dd. */
+export interface EventInput {
+  code: string;
+  title: string;
+  description: string;
+  venue: string;
+  eventDate: string;
+  ageAsOnDate: string;
+  registrationOpensDate: string;
+  registrationClosesDate: string;
+  maxGroupsPerMember: number;
+  isPublished: boolean;
+  isActive: boolean;
+  groups: EventGroup[];
+}
+
+export interface EventDetail extends Omit<EventInput, 'description' | 'venue'> {
+  id: number;
+  description: string | null;
+  venue: string | null;
+  registrationCount: number;
+  modifiedDate: string | null;
+  modifiedBy: string | null;
+}
+
+export interface EventRegistrationRow {
+  registrationNumber: string;
+  registrationId: string;
+  fullName: string;
+  gender: string;
+  age: number;
+  groups: string[];
+  temple: string;
+  mobile: string;
+  isActive: boolean;
+  registeredDate: string;
+  cancelledDate: string | null;
+}

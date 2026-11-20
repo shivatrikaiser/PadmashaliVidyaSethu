@@ -58,6 +58,14 @@ Engine: SQL Server 2019+ / Azure SQL. Schema source of truth: EF Core migrations
 | `MemberDisabilities` | Member ↔ DisabilityType. **Sensitive.** |
 | `TempleRegistrationSequences` | Per-temple counter (0–9999) used by an atomic `MERGE … OUTPUT` to allocate `NNNN`. |
 
+### Events
+| Table | Notes |
+|-------|-------|
+| `Events` | Event members register for in the app (sports, drawing, quiz, ...). Unique `Code` (2–12 of A–Z, 0–9; start of the registration numbers), `EventDate`, `AgeAsOnDate` (ages for the groups are worked out on this date), `RegistrationOpensDate` ≤ `RegistrationClosesDate` (India dates, inclusive), `MaxGroupsPerMember` (1–50), `IsPublished` (draft when 0), `IsActive` (0 = cancelled), `LastRegistrationNumber` (0–9999, incremented with the row locked). |
+| `EventGroups` | Age group of an event: `MinAge` ≤ `MaxAge` (0–120), optional `GenderId`, optional `Capacity`, `DisplayOrder`. A group with registrations is hidden (`IsActive` 0), never deleted. |
+| `EventRegistrations` | One per member and event (unique `EventId` + `RegistrationId`), unique `RegistrationNumber` (`CODE-NNNN`), `AgeOnAgeAsOnDate`, `RegisteredDate`; cancelling sets `IsActive` 0 and `CancelledDate` and keeps the number. |
+| `EventRegistrationGroups` | Registration ↔ EventGroup (the groups chosen). |
+
 ### Compliance
 `ConsentRecords` (immutable: type, policy version, granted, time, IP) and `AuditLogs` (append-only; no FK so rows survive
 account deletion; never contains codes, tokens or sensitive personal data).
@@ -70,7 +78,9 @@ Accounts 1─* Members *─1 Temples / Genders / MemberStatuses / Organisations
                 ├─1..2 MemberAddresses *─0..1 Taluks *─1 Districts *─1 States *─1 Countries  (abroad: address ─ State directly)
                 │                      └─0..1 Cities (PIN cache)
                 ├─* MemberDisabilities *─1 DisabilityTypes
-                └─* ConsentRecords
+                ├─* ConsentRecords
+                └─* EventRegistrations *─1 Events 1─* EventGroups
+                        └─* EventRegistrationGroups *─1 EventGroups
 Accounts 1─* AccountRoles *─1 Roles ;  Accounts 1─* RefreshTokens
 Temples 1─1 TempleRegistrationSequences
 ```
